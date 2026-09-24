@@ -25,5 +25,41 @@ export const putovanja = [
         datumPolaska: '2027-03-20',
         datumPovratka: '2027-03-30',
         budzet: 1800,
+    },
+    {
+        sifra: 4,
+        naziv: 'Putovanje u New York',
+        destinacija: 'New York',
+        drzava: 'Sjedinjene Američke Države',
+        datumPolaska: '2026-12-23',
+        datumPovratka: '2027-01-03',
+        budzet: 4000
+    },
+    {
+        sifra: 5,
+        naziv: 'Putovanje u Amsterdam',
+        destinacija: 'Amsterdam',
+        drzava: 'Nizozemska',
+        datumPolaska: '2027-05-01',
+        datumPovratka: '2027-05-07',
+        budzet: 2000,
+    },
+    {
+        sifra: 6, 
+        naziv: 'Putovanje u Barcelonu',
+        destinacija: 'Barcelona',
+        drzava: 'Španjolska',
+        datumPolaska: '2027-06-15',
+        datumPovratka: '2027-06-22',
+        budzet: 1500,
+    },
+    {
+        sifra: 7, 
+        naziv: 'Putovanje u Oslo',
+        destinacija: 'Oslo',
+        drzava: 'Norveška',
+        datumPolaska: '2026-12-12',
+        datumPovratka: '2026-12-22',
+        budzet: 2300,
     }
 ]
