@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import { Badge, Table } from "react-bootstrap"
+import FormatDatuma from "../../components/FormatDatuma"
+import { NumericFormat } from "react-number-format"
 
 export default function PutovanjePregled() {
 
@@ -36,12 +38,28 @@ export default function PutovanjePregled() {
                     {putovanja && putovanja.map((putovanja) => (
 
                         <tr key={putovanja.sifra}>
-                            <td> {putovanja.naziv} </td>
+                            <td className="lead">
+                                {putovanja.naziv}
+                            </td>
                             <td> {putovanja.destinacija} </td>
                             <td> {putovanja.drzava} </td>
-                            <td> {putovanja.datumPolaska} </td>
-                            <td> {putovanja.datumPovratka} </td>
-                            <td> {putovanja.budzet} </td>
+                            <td>
+                                <FormatDatuma datum={putovanja.datumPolaska} />
+                            </td>
+                            <td>
+                                <FormatDatuma datum={putovanja.datumPovratka} />
+                            </td>
+                            <td className="desno">
+                                <NumericFormat 
+                                value={putovanja.budzet}
+                                displayType={'text'}
+                                decimalSeparator=","
+                                decimalScale={2}
+                                fixedDecimalScale
+                                thousandSeparator = '.'
+                                suffix=" €"
+                                />
+                            </td>
                         </tr>
 
                     ))}
