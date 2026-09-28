@@ -3,6 +3,8 @@ import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import { Badge, Table } from "react-bootstrap"
 import FormatDatuma from "../../components/FormatDatuma"
 import { NumericFormat } from "react-number-format"
+import { Link } from "react-router-dom"
+import { RouteNames } from "../../constants"
 
 export default function PutovanjePregled() {
 
@@ -21,6 +23,10 @@ export default function PutovanjePregled() {
 
     return (
         <>
+
+        <Link to={RouteNames.PUTOVANJA_DODAJ}>
+        Dodavanje novog putovanja
+        </Link>
 
             <Table hover striped bordered>
                 <thead>
