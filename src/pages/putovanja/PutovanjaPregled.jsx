@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
-import { Badge, Table } from "react-bootstrap"
+import { Badge, Table, Button } from "react-bootstrap"
 import FormatDatuma from "../../components/FormatDatuma"
 import { NumericFormat } from "react-number-format"
 import { Link } from "react-router-dom"
@@ -9,6 +9,15 @@ import { RouteNames } from "../../constants"
 export default function PutovanjePregled() {
 
     const [putovanja, setPutovanja] = useState([])
+    const [prosireni, setProsireni] = useState([])
+
+    function promijeniProsireno(sifra) {
+        if (prosireni.includes(sifra)) {
+            setProsireni(prosireni.filter(id => id !== sifra))
+        } else {
+            setProsireni([...prosireni, sifra])
+        }
+    }
 
     useEffect(() => {
         console.log('Došao na pregled putovanja')
@@ -24,9 +33,11 @@ export default function PutovanjePregled() {
     return (
         <>
 
-        <Link to={RouteNames.PUTOVANJA_DODAJ}>
-        Dodavanje novog putovanja
-        </Link>
+            <Link to={RouteNames.PUTOVANJA_DODAJ}
+                className="btn btn-success w-100 my-3"
+            >
+                Dodavanje novog putovanja
+            </Link>
 
             <Table hover striped bordered>
                 <thead>
@@ -45,8 +56,41 @@ export default function PutovanjePregled() {
 
                         <tr key={putovanja.sifra}>
                             <td className="lead">
-                                {putovanja.naziv}
+                                {prosireni.includes(putovanja.sifra) ? (
+                                    <>
+                                        {putovanja.naziv}
+
+                                        <br />
+
+                                        <Button
+                                            variant="info"
+                                            size="sm"
+                                            className="p-0"
+                                            onClick={() => promijeniProsireno(putovanja.sifra)}
+                                        >
+                                            Sažmi
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <>
+                                        {putovanja.naziv.length > 25
+                                            ? putovanja.naziv.substring(0, 25)
+                                            : putovanja.naziv}
+
+                                        {putovanja.naziv.length > 25 && (
+                                            <Button
+                                                variant="info"
+                                                size="sm"
+                                                className="p-0"
+                                                onClick={() => promijeniProsireno(putovanja.sifra)}
+                                            >
+                                                ...
+                                            </Button>
+                                        )}
+                                    </>
+                                )}
                             </td>
+
                             <td> {putovanja.destinacija} </td>
                             <td> {putovanja.drzava} </td>
                             <td>
@@ -56,14 +100,14 @@ export default function PutovanjePregled() {
                                 <FormatDatuma datum={putovanja.datumPovratka} />
                             </td>
                             <td className="desno">
-                                <NumericFormat 
-                                value={putovanja.budzet}
-                                displayType={'text'}
-                                decimalSeparator=","
-                                decimalScale={2}
-                                fixedDecimalScale
-                                thousandSeparator = '.'
-                                suffix=" €"
+                                <NumericFormat
+                                    value={putovanja.budzet}
+                                    displayType={'text'}
+                                    decimalSeparator=","
+                                    decimalScale={2}
+                                    fixedDecimalScale
+                                    thousandSeparator='.'
+                                    suffix=" €"
                                 />
                             </td>
                         </tr>

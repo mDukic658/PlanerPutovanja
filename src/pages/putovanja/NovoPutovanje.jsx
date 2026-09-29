@@ -43,7 +43,7 @@ export default function NovoPutovanje() {
                 </Form.Group>
 
                 <Form.Group controlId="drzava">
-                    <Form.Label> Drzava </Form.Label>
+                    <Form.Label> Država </Form.Label>
                     <Form.Control type="text" name="drzava" />
                 </Form.Group>
 
@@ -62,16 +62,17 @@ export default function NovoPutovanje() {
                     <Form.Control type="number" name="budzet" step={0.01} />
                 </Form.Group>
 
-                <hr />
 
-                <Row>
+                <Row className="mt-4">
                     <Col>
-                    <Link to={RouteNames.PUTOVANJA}>
+                    <Link to={RouteNames.PUTOVANJA}
+                    className="btn btn-danger"
+                    >
                     Odustani
                     </Link>
                     </Col>
                     <Col>
-                    <Button type="submit">
+                    <Button type="submit" variant="success">
                         Dodaj
                     </Button>
                     </Col>
