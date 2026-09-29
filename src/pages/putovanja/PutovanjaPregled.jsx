@@ -5,7 +5,6 @@ import FormatDatuma from "../../components/FormatDatuma"
 import { NumericFormat } from "react-number-format"
 import { Link } from "react-router-dom"
 import { RouteNames } from "../../constants"
-import { ShowMore } from "@re-dev/react-truncate"
 
 export default function PutovanjePregled() {
 
@@ -48,14 +47,7 @@ export default function PutovanjePregled() {
 
                         <tr key={putovanja.sifra}>
                             <td className="lead">
-                                <ShowMore
-                                lines={1}
-                                more="..."
-                                less="Sažmi"
-                                trimWhitespace
-                                >
-                                    {putovanja.naziv}
-                                </ShowMore>
+                                {putovanja.naziv}
                             </td>
 
                             <td> {putovanja.destinacija} </td>
