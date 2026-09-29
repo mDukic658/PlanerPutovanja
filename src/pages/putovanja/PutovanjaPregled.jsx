@@ -1,23 +1,15 @@
 import { useEffect, useState } from "react"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
-import { Badge, Table, Button } from "react-bootstrap"
+import { Badge, Table } from "react-bootstrap"
 import FormatDatuma from "../../components/FormatDatuma"
 import { NumericFormat } from "react-number-format"
 import { Link } from "react-router-dom"
 import { RouteNames } from "../../constants"
+import { ShowMore } from "@re-dev/react-truncate"
 
 export default function PutovanjePregled() {
 
     const [putovanja, setPutovanja] = useState([])
-    const [prosireni, setProsireni] = useState([])
-
-    function promijeniProsireno(sifra) {
-        if (prosireni.includes(sifra)) {
-            setProsireni(prosireni.filter(id => id !== sifra))
-        } else {
-            setProsireni([...prosireni, sifra])
-        }
-    }
 
     useEffect(() => {
         console.log('Došao na pregled putovanja')
@@ -56,39 +48,14 @@ export default function PutovanjePregled() {
 
                         <tr key={putovanja.sifra}>
                             <td className="lead">
-                                {prosireni.includes(putovanja.sifra) ? (
-                                    <>
-                                        {putovanja.naziv}
-
-                                        <br />
-
-                                        <Button
-                                            variant="info"
-                                            size="sm"
-                                            className="p-0"
-                                            onClick={() => promijeniProsireno(putovanja.sifra)}
-                                        >
-                                            Sažmi
-                                        </Button>
-                                    </>
-                                ) : (
-                                    <>
-                                        {putovanja.naziv.length > 25
-                                            ? putovanja.naziv.substring(0, 25)
-                                            : putovanja.naziv}
-
-                                        {putovanja.naziv.length > 25 && (
-                                            <Button
-                                                variant="info"
-                                                size="sm"
-                                                className="p-0"
-                                                onClick={() => promijeniProsireno(putovanja.sifra)}
-                                            >
-                                                ...
-                                            </Button>
-                                        )}
-                                    </>
-                                )}
+                                <ShowMore
+                                lines={1}
+                                more="..."
+                                less="Sažmi"
+                                trimWhitespace
+                                >
+                                    {putovanja.naziv}
+                                </ShowMore>
                             </td>
 
                             <td> {putovanja.destinacija} </td>
