@@ -1,14 +1,18 @@
-import { useEffect, useState } from "react";
-import PutovanjaService from "../../services/putovanja/PutovanjaService";
-import { Tab, Tabs } from "react-bootstrap";
-
+import { useEffect, useState } from "react"
+import PutovanjaService from "../../services/putovanja/PutovanjaService"
+import PakiranjaService from "../../services/lista_pakiranja/PakiranjaService"
+import { Tab, Tabs } from "react-bootstrap"
+import Pakiranje from "./Pakiranje"
+import NovoPakiranje from "./NovoPakiranje"
 
 export default function ListaPakiranja() {
 
     const [putovanja, setPutovanja] = useState([])
+    const [pakiranja, setPakiranja] = useState([])
 
     useEffect(() => {
         ucitajPutovanja()
+        ucitajPakiranja()
     }, [])
 
     async function ucitajPutovanja() {
@@ -17,19 +21,63 @@ export default function ListaPakiranja() {
         })
     }
 
+    async function ucitajPakiranja() {
+        await PakiranjaService.get().then((odgovor) => {
+            setPakiranja(odgovor.data)
+        })
+    }
+
+    function promijeni(sifra) {
+        const novaPakiranja = pakiranja.map((stavka) => {
+            if (stavka.sifra === sifra) {
+                return {
+                    ...stavka,
+                    spakirano: !stavka.spakirano
+                }
+            }
+
+            return stavka
+        })
+
+        setPakiranja(novaPakiranja)
+    }
+
     return (
         <>
-
             <h3>Lista pakiranja</h3>
 
             <Tabs
                 defaultActiveKey={1}
                 variant="pills"
-                className="mb-3"
+                className="lista-pakiranja-tabs mb-3"
             >
+                {putovanja && putovanja.map((putovanje) => (
+                    <Tab
+                        eventKey={putovanje.sifra}
+                        title={putovanje.naziv}
+                        key={putovanje.sifra}
+                    >
+                        <h4>{putovanje.naziv}</h4>
+                        <p>{putovanje.destinacija}, {putovanje.drzava}</p>
 
+                        {pakiranja
+                            .filter((pakiranje) => pakiranje.putovanjeSifra === putovanje.sifra)
+                            .map((pakiranje) => (
+                                <Pakiranje
+                                    key={pakiranje.sifra}
+                                    pakiranje={pakiranje}
+                                    promijeni={promijeni}
+                                />
+                            ))
+                        }
+
+                        <NovoPakiranje
+                            putovanjeSifra={putovanje.sifra}
+                            dodano={ucitajPakiranja}
+                        />
+                    </Tab>
+                ))}
             </Tabs>
-
         </>
     )
 }
