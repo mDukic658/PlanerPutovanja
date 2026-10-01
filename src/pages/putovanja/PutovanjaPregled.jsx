@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
-import { Badge, Table } from "react-bootstrap"
+import { Button, Badge, Table } from "react-bootstrap"
 import FormatDatuma from "../../components/FormatDatuma"
 import { NumericFormat } from "react-number-format"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { RouteNames } from "../../constants"
 
 export default function PutovanjePregled() {
 
     const [putovanja, setPutovanja] = useState([])
+
+    const navigate = useNavigate()
 
     useEffect(() => {
         console.log('Došao na pregled putovanja')
@@ -68,6 +70,12 @@ export default function PutovanjePregled() {
                                     thousandSeparator='.'
                                     suffix=" €"
                                 />
+                            </td>
+                            <td>
+                                <Button
+                                    onClick={() => { navigate(`/putovanja/${putovanja.sifra}`) }}>
+                                    Promijeni
+                                </Button>
                             </td>
                         </tr>
 

@@ -1,20 +1,31 @@
 import { putovanja } from "./PutovanjaPodaci";
 
-async function get(){
-    return {data: [...putovanja]}
+async function get() {
+    return { data: [...putovanja] }
 }
 
-async function dodaj(putovanje){
-    if(putovanja.length === 0){
+async function getBySifra(sifra) {
+    const putovanje = putovanja.find(
+        (putovanje) => putovanje.sifra === parseInt(sifra)
+    )
+
+    return {
+        data: putovanje
+    }
+}
+
+async function dodaj(putovanje) {
+    if (putovanja.length === 0) {
         putovanje.sifra = 1
-    }else{
+    } else {
         putovanje.sifra = putovanja[putovanja.length - 1].sifra + 1
     }
 
     putovanja.push(putovanje)
 }
 
-export default{
+export default {
     get,
+    getBySifra,
     dodaj
 }
