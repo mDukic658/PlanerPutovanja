@@ -1,16 +1,25 @@
+export default function Pakiranje({ pakiranje, predmeti, promijeni }) {
 
-export default function Pakiranje ({pakiranje, promijeni}){
+    const predmet = predmeti.find(
+        (stavka) => stavka.sifra === pakiranje.predmetSifra
+    )
 
-     return (
+    return (
         <div>
             <input
                 type="checkbox"
                 checked={pakiranje.spakirano}
-                onChange={() => promijeni(pakiranje.sifra)}
+                onChange={() =>
+                    promijeni(
+                        pakiranje.predmetSifra,
+                        pakiranje.putovanjeSifra
+                    )
+                }
             />
+
             {' '}
-            {pakiranje.naziv}
+
+            {predmet && predmet.naziv}
         </div>
     )
-
 }

@@ -9,6 +9,7 @@ import PutovanjePregled from './pages/putovanja/PutovanjaPregled'
 import NovoPutovanje from './pages/putovanja/NovoPutovanje'
 import ListaPakiranja from './pages/lista_pakiranja/ListaPakiranja'
 import PutovanjePromjena from './pages/putovanja/PutovanjePromjena'
+import Predmeti from './pages/predmeti/Predmeti'
 
 function App() {
 
@@ -23,6 +24,7 @@ function App() {
             <Route path={RouteNames.PUTOVANJA_DODAJ} element={<NovoPutovanje />} />
             <Route path={RouteNames.LISTA_PAKIRANJA} element={<ListaPakiranja />} />
             <Route path={RouteNames.PUTOVANJA_PROMIJENA} element={<PutovanjePromjena />} />
+            <Route path={RouteNames.PREDMETI} element={<Predmeti />} />
           </Routes>
         </Container>
         <hr />

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import PakiranjaService from "../../services/lista_pakiranja/PakiranjaService"
+import PredmetiService from "../../services/predmeti/PredmetiService"
 import { Tab, Tabs } from "react-bootstrap"
 import Pakiranje from "./Pakiranje"
 import NovoPakiranje from "./NovoPakiranje"
@@ -9,10 +10,12 @@ export default function ListaPakiranja() {
 
     const [putovanja, setPutovanja] = useState([])
     const [pakiranja, setPakiranja] = useState([])
+    const [predmeti, setPredmeti] = useState([])
 
     useEffect(() => {
         ucitajPutovanja()
         ucitajPakiranja()
+        ucitajPredmete()
     }, [])
 
     async function ucitajPutovanja() {
@@ -27,9 +30,20 @@ export default function ListaPakiranja() {
         })
     }
 
-    function promijeni(sifra) {
+    async function ucitajPredmete() {
+        await PredmetiService.get().then((odgovor) => {
+            setPredmeti(odgovor.data)
+        })
+    }
+
+    function promijeni(predmetSifra, putovanjeSifra) {
+
         const novaPakiranja = pakiranja.map((stavka) => {
-            if (stavka.sifra === sifra) {
+
+            if (
+                stavka.predmetSifra === predmetSifra &&
+                stavka.putovanjeSifra === putovanjeSifra
+            ) {
                 return {
                     ...stavka,
                     spakirano: !stavka.spakirano
@@ -58,14 +72,20 @@ export default function ListaPakiranja() {
                         key={putovanje.sifra}
                     >
                         <h4>{putovanje.naziv}</h4>
-                        <p>{putovanje.destinacija}, {putovanje.drzava}</p>
+
+                        <p>
+                            {putovanje.destinacija}, {putovanje.drzava}
+                        </p>
 
                         {pakiranja
-                            .filter((pakiranje) => pakiranje.putovanjeSifra === putovanje.sifra)
+                            .filter((pakiranje) =>
+                                pakiranje.putovanjeSifra === putovanje.sifra
+                            )
                             .map((pakiranje) => (
                                 <Pakiranje
-                                    key={pakiranje.sifra}
+                                    key={pakiranje.predmetSifra}
                                     pakiranje={pakiranje}
+                                    predmeti={predmeti}
                                     promijeni={promijeni}
                                 />
                             ))
@@ -73,8 +93,9 @@ export default function ListaPakiranja() {
 
                         <NovoPakiranje
                             putovanjeSifra={putovanje.sifra}
-                            dodano={ucitajPakiranja}
+                            ucitajPakiranja={ucitajPakiranja}
                         />
+
                     </Tab>
                 ))}
             </Tabs>
