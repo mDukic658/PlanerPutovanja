@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react"
 import { Button, Form, Table } from "react-bootstrap"
+import { useNavigate } from "react-router-dom"
 import PredmetiService from "../../services/predmeti/PredmetiService"
+import { RouteNames } from "../../constants"
 
 export default function Predmeti() {
+
+    const navigate = useNavigate()
 
     const [predmeti, setPredmeti] = useState([])
 
@@ -38,6 +42,7 @@ export default function Predmeti() {
                     <tr>
                         <th>Šifra</th>
                         <th>Naziv</th>
+                        <th>Akcija</th>
                     </tr>
                 </thead>
 
@@ -46,6 +51,16 @@ export default function Predmeti() {
                         <tr key={predmet.sifra}>
                             <td>{predmet.sifra}</td>
                             <td>{predmet.naziv}</td>
+                            <td>
+                                <Button
+                                    variant="success"
+                                    onClick={() => {
+                                        navigate('/predmet/promjena/' + predmet.sifra)
+                                    }}
+                                >
+                                    Promijeni
+                                </Button>
+                            </td>
                         </tr>
                     ))}
                 </tbody>

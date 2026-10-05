@@ -9,6 +9,7 @@ export const RouteNames = {
     PUTOVANJA_PROMIJENA: '/putovanja/:sifra',
 
     PREDMETI: '/predmeti',
+    PREDMET_PROMJENA: '/predmet/promjena/:sifra',
 
     LISTA_PAKIRANJA: '/lista/pakiranja'
 }
