@@ -24,8 +24,18 @@ async function dodaj(putovanje) {
     putovanja.push(putovanje)
 }
 
+async function promijeni(sifra, putovanje){
+    const index = nadiIndex(sifra)
+    putovanja[index] = {...putovanja[index], ...putovanje}
+}
+
+function nadiIndex(sifra){
+    return putovanja.findIndex(p => p.sifra === parseInt(sifra))
+}
+
 export default {
     get,
     getBySifra,
-    dodaj
+    dodaj,
+    promijeni
 }

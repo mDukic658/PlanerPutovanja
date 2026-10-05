@@ -23,8 +23,8 @@ export default function PutovanjePromjena() {
         ucitajPutovanje()
     }, [])
 
-    async function dodaj(putovanje) {
-        await PutovanjaService.dodaj(putovanje).then(() => {
+    async function promijeni(putovanje) {
+        await PutovanjaService.promijeni(params.sifra, putovanje).then(() => {
             navigate(RouteNames.PUTOVANJA)
         })
     }
@@ -32,7 +32,7 @@ export default function PutovanjePromjena() {
     function obradiSubmit(e) {
         e.preventDefault()
         const podaci = new FormData(e.target)
-        dodaj({
+        promijeni({
             naziv: podaci.get('naziv'),
             destinacija: podaci.get('destinacija'),
             drzava: podaci.get('drzava'),
