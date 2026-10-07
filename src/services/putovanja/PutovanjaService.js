@@ -33,9 +33,15 @@ function nadiIndex(sifra){
     return putovanja.findIndex(p => p.sifra === parseInt(sifra))
 }
 
+async function obrisi(sifra){
+    const index = nadiIndex(sifra)
+    putovanja.splice(index, 1)
+}
+
 export default {
     get,
     getBySifra,
     dodaj,
-    promijeni
+    promijeni,
+    obrisi
 }

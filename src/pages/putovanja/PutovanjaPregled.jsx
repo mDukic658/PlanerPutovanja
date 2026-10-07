@@ -23,6 +23,15 @@ export default function PutovanjePregled() {
         })
     }
 
+    async function obrisi(sifra){
+        if(!confirm('Sigurno obrisati?')){
+            return
+        }
+
+        await PutovanjaService.obrisi(sifra)
+        ucitajPutovanja()
+    }
+
     return (
         <>
 
@@ -41,6 +50,8 @@ export default function PutovanjePregled() {
                         <th>Datum Polaska</th>
                         <th>Datum povratka</th>
                         <th>Budžet</th>
+                        <th>Promjena</th>
+                        <th>Brisanje</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -75,6 +86,13 @@ export default function PutovanjePregled() {
                                 <Button
                                     onClick={() => { navigate(`/putovanja/${putovanja.sifra}`) }}>
                                     Promijeni
+                                </Button>
+                            </td>
+                            <td>
+                                <Button
+                                variant="danger"
+                                onClick = {() => obrisi(putovanja.sifra)} >
+                                    Izbriši
                                 </Button>
                             </td>
                         </tr>
