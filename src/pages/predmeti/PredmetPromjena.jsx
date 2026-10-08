@@ -69,7 +69,7 @@ export default function PredmetPromjena() {
 
                 <Button
                     type="button"
-                    variant="secondary"
+                    variant="danger"
                     className="mt-2 ms-2"
                     onClick={() => {
                         navigate(RouteNames.PREDMETI)

@@ -20,8 +20,24 @@ async function dodaj(pakiranje) {
     pakiranja.push(pakiranje)
 }
 
+async function promijeni(sifra, pakiranje){
+    const index = nadiIndex(sifra)
+    pakiranja[index] = {...pakiranja[index], ...pakiranje}
+}
+
+function nadiIndex(sifra){
+    return pakiranja.findIndex(p => p.sifra === parseInt(sifra))
+}
+
+async function obrisi(sifra){
+    const index = nadiIndex(sifra)
+    pakiranja.splice(index, 1)
+}
+
 export default {
     get,
     getByPutovanje,
-    dodaj
+    dodaj,
+    promijeni, 
+    obrisi
 }

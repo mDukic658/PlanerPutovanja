@@ -32,9 +32,19 @@ async function promijeni(sifra, predmet) {
     predmeti[indeks].naziv = predmet.naziv
 }
 
+function nadiIndex(sifra){
+    return predmet.findIndex(p => p.sifra === parseInt(sifra))
+}
+
+async function obrisi(sifra){
+    const index = nadiIndex(sifra)
+    predmeti.splice(index, 1)
+}
+
 export default {
     get,
     dodaj,
     getBySifra,
-    promijeni
+    promijeni,
+    obrisi
 }
