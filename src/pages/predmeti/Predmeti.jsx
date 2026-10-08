@@ -33,6 +33,11 @@ export default function Predmeti() {
         ucitajPredmete()
     }
 
+    async function obrisi(sifra) {
+        await PredmetiService.obrisi(sifra)
+        ucitajPredmete()
+    }
+
     return (
         <>
             <h3>Predmeti</h3>
@@ -42,6 +47,7 @@ export default function Predmeti() {
                     <tr>
                         <th>Šifra</th>
                         <th>Naziv</th>
+                        <th>Akcija</th>
                         <th>Akcija</th>
                     </tr>
                 </thead>
@@ -59,6 +65,13 @@ export default function Predmeti() {
                                     }}
                                 >
                                     Promijeni
+                                </Button>
+                            </td>
+                            <td>
+                                <Button 
+                                variant="danger"
+                                onClick={() => obrisi(predmet.sifra)}>
+                                    Obriši
                                 </Button>
                             </td>
                         </tr>

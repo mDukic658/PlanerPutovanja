@@ -1,47 +1,37 @@
-import { putovanja } from "./PutovanjaPodaci";
 
-async function get() {
-    return { data: [...putovanja] }
+import { DATA_SOURCE } from "../../constants";
+import PutovanjaServiceLocalStorage from "./PutovanjaServiceLocalStorage";
+import PutovanjaServiceMemorija from "./PutovanjaServiceMemorija";
+
+
+let Servis = null
+
+
+switch (DATA_SOURCE) {
+    case 'memorija':
+        Servis = PutovanjaServiceMemorija
+        break
+    case 'localStorage':
+        Servis = PutovanjaServiceLocalStorage
+        break
+    default:
+        Servis = null
 }
 
-async function getBySifra(sifra) {
-    const putovanje = putovanja.find(
-        (putovanje) => putovanje.sifra === parseInt(sifra)
-    )
-
-    return {
-        data: putovanje
-    }
+const PrazanServis = {
+    get: async () => ({ data: [] }),
+    getBySifra: async (sifra) => ({ data: {} }),
+    dodaj: async (putovanje) => { console.error('Servis nije implementiran') },
+    promijeni: async (sifra, putovanje) => { console.error('Servis nije implementiran') },
+    obrisi: async (sifra) => { console.error('Servis nije implementiran') }
 }
 
-async function dodaj(putovanje) {
-    if (putovanja.length === 0) {
-        putovanje.sifra = 1
-    } else {
-        putovanje.sifra = putovanja[putovanja.length - 1].sifra + 1
-    }
-
-    putovanja.push(putovanje)
-}
-
-async function promijeni(sifra, putovanje){
-    const index = nadiIndex(sifra)
-    putovanja[index] = {...putovanja[index], ...putovanje}
-}
-
-function nadiIndex(sifra){
-    return putovanja.findIndex(p => p.sifra === parseInt(sifra))
-}
-
-async function obrisi(sifra){
-    const index = nadiIndex(sifra)
-    putovanja.splice(index, 1)
-}
+const AktivniServis = Servis || PrazanServis
 
 export default {
-    get,
-    getBySifra,
-    dodaj,
-    promijeni,
-    obrisi
+    get: () => AktivniServis.get(),
+    getBySifra: (sifra) => AktivniServis.getBySifra(sifra),
+    dodaj: (putovanje) => AktivniServis.dodaj(putovanje),
+    promijeni: (sifra, putovanje) => AktivniServis.promijeni(sifra, putovanje),
+    obrisi: (sifra) => AktivniServis.obrisi(sifra)
 }

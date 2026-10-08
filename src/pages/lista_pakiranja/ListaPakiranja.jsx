@@ -2,11 +2,13 @@ import { useEffect, useState } from "react"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import PakiranjaService from "../../services/lista_pakiranja/PakiranjaService"
 import PredmetiService from "../../services/predmeti/PredmetiService"
-import { Tab, Tabs } from "react-bootstrap"
+import { Button, Tab, Tabs } from "react-bootstrap"
 import Pakiranje from "./Pakiranje"
-import NovoPakiranje from "./NovoPakiranje"
+import { useNavigate } from "react-router-dom"
 
 export default function ListaPakiranja() {
+
+    const navigate = useNavigate()
 
     const [putovanja, setPutovanja] = useState([])
     const [pakiranja, setPakiranja] = useState([])
@@ -36,24 +38,26 @@ export default function ListaPakiranja() {
         })
     }
 
-    function promijeni(predmetSifra, putovanjeSifra) {
+    async function promijeni(predmetSifra, putovanjeSifra) {
 
-        const novaPakiranja = pakiranja.map((stavka) => {
-
-            if (
+        const pakiranje = pakiranja.find(
+            (stavka) =>
                 stavka.predmetSifra === predmetSifra &&
                 stavka.putovanjeSifra === putovanjeSifra
-            ) {
-                return {
-                    ...stavka,
-                    spakirano: !stavka.spakirano
-                }
-            }
+        )
 
-            return stavka
-        })
+        const novoPakiranje = {
+            ...pakiranje,
+            spakirano: !pakiranje.spakirano
+        }
 
-        setPakiranja(novaPakiranja)
+        await PakiranjaService.promijeni(
+            predmetSifra,
+            putovanjeSifra,
+            novoPakiranje
+        )
+
+        ucitajPakiranja()
     }
 
     return (
@@ -77,6 +81,15 @@ export default function ListaPakiranja() {
                             {putovanje.destinacija}, {putovanje.drzava}
                         </p>
 
+                        <Button
+                            variant="primary"
+                            onClick={() => {
+                                navigate('/lista/pakiranja/' + putovanje.sifra)
+                            }}
+                        >
+                            Uredi listu pakiranja
+                        </Button>
+
                         {pakiranja
                             .filter((pakiranje) =>
                                 pakiranje.putovanjeSifra === putovanje.sifra
@@ -90,11 +103,6 @@ export default function ListaPakiranja() {
                                 />
                             ))
                         }
-
-                        <NovoPakiranje
-                            putovanjeSifra={putovanje.sifra}
-                            ucitajPakiranja={ucitajPakiranja}
-                        />
 
                     </Tab>
                 ))}

@@ -11,6 +11,7 @@ import ListaPakiranja from './pages/lista_pakiranja/ListaPakiranja'
 import PutovanjePromjena from './pages/putovanja/PutovanjePromjena'
 import Predmeti from './pages/predmeti/Predmeti'
 import PredmetPromjena from './pages/predmeti/PredmetPromjena'
+import UrediListuPakiranja from './pages/lista_pakiranja/UrediListuPakiranja'
 
 function App() {
 
@@ -27,6 +28,7 @@ function App() {
             <Route path={RouteNames.PUTOVANJA_PROMIJENA} element={<PutovanjePromjena />} />
             <Route path={RouteNames.PREDMETI} element={<Predmeti />} />
             <Route path={RouteNames.PREDMET_PROMJENA} element={<PredmetPromjena />} />
+            <Route path={RouteNames.LISTA_PAKIRANJA_UREDI} element={<UrediListuPakiranja />} />
           </Routes>
         </Container>
         <hr />

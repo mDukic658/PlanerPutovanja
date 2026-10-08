@@ -11,5 +11,8 @@ export const RouteNames = {
     PREDMETI: '/predmeti',
     PREDMET_PROMJENA: '/predmet/promjena/:sifra',
 
-    LISTA_PAKIRANJA: '/lista/pakiranja'
+    LISTA_PAKIRANJA: '/lista/pakiranja',
+    LISTA_PAKIRANJA_UREDI: '/lista/pakiranja/:sifra'
 }
+
+export const DATA_SOURCE = 'localStorage'
