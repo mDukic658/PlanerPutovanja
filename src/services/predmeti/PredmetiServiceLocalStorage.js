@@ -1,17 +1,14 @@
-import { predmeti } from "./PredmetiPodaci"
 
 const STORAGE_KEY = 'predmeti'
 
-function dohvatiSveIzStorage() {
+function dohvatiSveIzStorage(){
     const podaci = localStorage.getItem(STORAGE_KEY)
 
-    if (podaci) {
+    if(podaci){
         return JSON.parse(podaci)
     }
 
-    spremiUStorage(predmeti)
-
-    return [...predmeti]
+    return []
 }
 
 function spremiUStorage(podaci) {

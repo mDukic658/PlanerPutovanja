@@ -1,17 +1,14 @@
-import { pakiranja } from "./PakiranjaPodaci"
 
 const STORAGE_KEY = 'pakiranja'
 
-function dohvatiSveIzStorage() {
+function dohvatiSveIzStorage(){
     const podaci = localStorage.getItem(STORAGE_KEY)
 
-    if (podaci) {
+    if(podaci){
         return JSON.parse(podaci)
     }
 
-    spremiUStorage(pakiranja)
-
-    return [...pakiranja]
+    return []
 }
 
 function spremiUStorage(podaci) {

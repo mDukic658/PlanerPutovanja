@@ -19,16 +19,21 @@ export default function Izbornik() {
                         <Nav.Link
                             onClick={() => { navigate(RouteNames.HOME) }}
                         >Početna</Nav.Link>
-                        <Nav.Link
-                            onClick={() => { navigate(RouteNames.LISTA_PAKIRANJA) }}
-                        >Lista pakiranja</Nav.Link>
+                        <NavDropdown title="Evidencija pakiranja" id="basic-nav-dropdown">
+                            <NavDropdown.Item
+                            onClick={() => {navigate(RouteNames.LISTA_PAKIRANJA)}}>
+                                    Lista pakiranja
+                            </NavDropdown.Item>
+                            <NavDropdown.Item
+                            onClick={() => {navigate(RouteNames.PREDMETI)}}>
+                                    Predmeti
+                            </NavDropdown.Item>
+                        </NavDropdown>
+                        
                         <NavDropdown title="Programi" id="basic-nav-dropdown">
                             <NavDropdown.Item
                                 onClick={() => { navigate(RouteNames.PUTOVANJA) }}
                             >Putovanja</NavDropdown.Item>
-                            <NavDropdown.Item
-                                onClick={() => { navigate(RouteNames.PREDMETI) }}
-                            >Predmeti</NavDropdown.Item>
                         </NavDropdown>
                     </Nav>
                 </Navbar.Collapse>

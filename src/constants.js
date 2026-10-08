@@ -15,4 +15,4 @@ export const RouteNames = {
     LISTA_PAKIRANJA_UREDI: '/lista/pakiranja/:sifra'
 }
 
-export const DATA_SOURCE = 'localStorage'
+export const DATA_SOURCE = 'memorija'

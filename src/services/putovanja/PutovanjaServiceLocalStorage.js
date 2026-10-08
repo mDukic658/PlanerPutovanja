@@ -1,17 +1,15 @@
-import { putovanja } from "./PutovanjaPodaci"
+
 
 const STORAGE_KEY = 'putovanja'
 
 function dohvatiSveIzStorage() {
     const podaci = localStorage.getItem(STORAGE_KEY)
 
-    if(podaci){
+    if (podaci) {
         return JSON.parse(podaci)
     }
 
-    spremiUStorage(putovanja)
-
-    return [...putovanja]
+    return []
 }
 
 function spremiUStorage(podaci) {
@@ -58,8 +56,8 @@ async function obrisi(sifra) {
     spremiUStorage(putovanja)
 }
 
-export default{
-    get, 
+export default {
+    get,
     getBySifra,
     dodaj,
     promijeni,
