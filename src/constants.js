@@ -12,7 +12,11 @@ export const RouteNames = {
     PREDMET_PROMJENA: '/predmet/promjena/:sifra',
 
     LISTA_PAKIRANJA: '/lista/pakiranja',
-    LISTA_PAKIRANJA_UREDI: '/lista/pakiranja/:sifra'
+    LISTA_PAKIRANJA_UREDI: '/lista/pakiranja/:sifra',
+
+    DRZAVE: '/drzave',
+    DRZAVE_DODAJ: '/drzave/novo',
+    DRZAVE_PROMJENA: '/drzave/promjena'
 }
 
 export const DATA_SOURCE = 'memorija'
