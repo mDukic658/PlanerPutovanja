@@ -12,6 +12,9 @@ import PutovanjePromjena from './pages/putovanja/PutovanjePromjena'
 import Predmeti from './pages/predmeti/Predmeti'
 import PredmetPromjena from './pages/predmeti/PredmetPromjena'
 import UrediListuPakiranja from './pages/lista_pakiranja/UrediListuPakiranja'
+import DrzavePregled from './pages/drzave/DrzavePregled'
+import DrzavaPromjena from './pages/drzave/DrzavaPromjena'
+import NovaDrzava from './pages/drzave/NovaDrzava'
 
 function App() {
 
@@ -29,6 +32,9 @@ function App() {
             <Route path={RouteNames.PREDMETI} element={<Predmeti />} />
             <Route path={RouteNames.PREDMET_PROMJENA} element={<PredmetPromjena />} />
             <Route path={RouteNames.LISTA_PAKIRANJA_UREDI} element={<UrediListuPakiranja />} />
+            <Route path={RouteNames.DRZAVE} element={<DrzavePregled />} />
+            <Route path={RouteNames.DRZAVE_DODAJ} element={<NovaDrzava />} />
+            <Route path={RouteNames.DRZAVE_PROMJENA} element={<DrzavaPromjena />} />
           </Routes>
         </Container>
         <hr />

@@ -2,6 +2,7 @@ import { Button, Col, Form, Row } from "react-bootstrap"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import { RouteNames } from "../../constants"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
+import DrzaveService from "../../services/drzave/DrzaveService"
 import { useState, useEffect } from "react"
 
 export default function PutovanjePromjena() {
@@ -9,6 +10,7 @@ export default function PutovanjePromjena() {
     const navigate = useNavigate()
     const params = useParams()
     const [putovanje, setPutovanje] = useState([])
+    const [drzave, setDrzave] = useState([])
 
     async function ucitajPutovanje() {
         await PutovanjaService.getBySifra(params.sifra).then((odgovor) => {
@@ -19,8 +21,14 @@ export default function PutovanjePromjena() {
         })
     }
 
-    useEffect(()=>{
+    async function ucitajDrzave() {
+        const odgovor = await DrzaveService.get()
+        setDrzave(odgovor.data)
+    }
+
+    useEffect(() => {
         ucitajPutovanje()
+        ucitajDrzave()
     }, [])
 
     async function promijeni(putovanje) {
@@ -32,6 +40,7 @@ export default function PutovanjePromjena() {
     function obradiSubmit(e) {
         e.preventDefault()
         const podaci = new FormData(e.target)
+
         promijeni({
             naziv: podaci.get('naziv'),
             destinacija: podaci.get('destinacija'),
@@ -49,45 +58,75 @@ export default function PutovanjePromjena() {
             <Form onSubmit={obradiSubmit}>
 
                 <Form.Group controlId="naziv">
-                    <Form.Label> Naziv </Form.Label>
-                    <Form.Control type="text" name="naziv" required 
-                    defaultValue={putovanje.naziv}/>
+                    <Form.Label>Naziv</Form.Label>
+                    <Form.Control
+                        type="text"
+                        name="naziv"
+                        required
+                        defaultValue={putovanje.naziv}
+                    />
                 </Form.Group>
 
                 <Form.Group controlId="destinacija">
-                    <Form.Label> Destinacija </Form.Label>
-                    <Form.Control type="text" name="destinacija" 
-                    defaultValue={putovanje.destinacija}/>
+                    <Form.Label>Destinacija</Form.Label>
+                    <Form.Control
+                        type="text"
+                        name="destinacija"
+                        defaultValue={putovanje.destinacija}
+                    />
                 </Form.Group>
 
                 <Form.Group controlId="drzava">
-                    <Form.Label> Država </Form.Label>
-                    <Form.Control type="text" name="drzava"
-                    defaultValue={putovanje.drzava} />
+                    <Form.Label>Država</Form.Label>
+                    <Form.Select
+                        name="drzava"
+                        defaultValue={putovanje.drzava || ""}
+                        required
+                    >
+                        <option value="">Odaberi državu</option>
+                        {drzave.map((drzava) => (
+                            <option
+                                key={drzava.sifra}
+                                value={drzava.naziv}
+                            >
+                                {drzava.naziv}
+                            </option>
+                        ))}
+                    </Form.Select>
                 </Form.Group>
 
                 <Form.Group controlId="datumPolaska">
-                    <Form.Label> Datum polaska </Form.Label>
-                    <Form.Control type="date" name="datumPolaska" 
-                    defaultValue={putovanje.datumPolaska}/>
+                    <Form.Label>Datum polaska</Form.Label>
+                    <Form.Control
+                        type="date"
+                        name="datumPolaska"
+                        defaultValue={putovanje.datumPolaska}
+                    />
                 </Form.Group>
 
                 <Form.Group controlId="datumPovratka">
-                    <Form.Label> Datum povratka </Form.Label>
-                    <Form.Control type="date" name="datumPovratka" 
-                    defaultValue={putovanje.datumPovratka}/>
+                    <Form.Label>Datum povratka</Form.Label>
+                    <Form.Control
+                        type="date"
+                        name="datumPovratka"
+                        defaultValue={putovanje.datumPovratka}
+                    />
                 </Form.Group>
 
                 <Form.Group controlId="budzet">
-                    <Form.Label> Budžet </Form.Label>
-                    <Form.Control type="number" name="budzet" step={0.01} 
-                    defaultValue={putovanje.budzet}/>
+                    <Form.Label>Budžet</Form.Label>
+                    <Form.Control
+                        type="number"
+                        name="budzet"
+                        step={0.01}
+                        defaultValue={putovanje.budzet}
+                    />
                 </Form.Group>
-
 
                 <Row className="mt-4">
                     <Col>
-                        <Link to={RouteNames.PUTOVANJA}
+                        <Link
+                            to={RouteNames.PUTOVANJA}
                             className="btn btn-danger"
                         >
                             Odustani
@@ -102,5 +141,4 @@ export default function PutovanjePromjena() {
             </Form>
         </>
     )
-
 }
