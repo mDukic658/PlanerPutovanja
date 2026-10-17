@@ -1,3 +1,16 @@
+:root {
+    --wheat: #faf5e8;
+    --charcoal: #1f2937;
+    --pacific-blue: #1ca9c9;
+    --mango-orange: #ff8243;
+    --sage-green: #556b2f;
+    --terracotta: #c8553d;
+}
+
+body{
+    background-color: var(--wheat);
+}
+
 .app {
     min-height: 500px;
 }
@@ -6,25 +19,135 @@
     text-align: right;
 }
 
-.lista-pakiranja-tabs {
-    margin-bottom: 20px;
+
+.navbar {
+    background-color: var(--charcoal) !important;
 }
 
-.lista-pakiranja-tabs .nav-link {
-    background-color: white;
-    color: black;
-    border: 1px solid gray;
-    border-radius: 5px;
-    margin-right: 5px;
+.navbar-brand {
+    color: var(--wheat) !important;
+    font-weight: bold;
 }
 
-.lista-pakiranja-tabs .nav-link:hover {
-    background-color: lightgray;
-    color: black;
+.navbar-brand:hover {
+    color: var(--pacific-blue) !important;
 }
 
-.lista-pakiranja-tabs .nav-link.active {
-    background-color: green;
-    color: white;
-    border-color: green;
+.navbar .nav-link {
+    color: var(--wheat) !important;
+}
+
+.navbar-toggler-icon {
+    filter: invert(1);
+}
+
+.navbar .dropdown-menu {
+    background-color: var(--charcoal) !important;
+    border: none;
+}
+
+.navbar .dropdown-menu .dropdown-item {
+    color: var(--wheat) !important;
+}
+
+.navbar .dropdown-item:hover {
+    background-color: var(--pacific-blue) !important;
+    color: white !important;
+}
+
+
+.mb-5 h1 {
+    color: var(--charcoal);
+    font-weight: 700;
+    padding-top: 2rem;
+}
+
+.mb-5 p {
+    color: var(--charcoal);
+    max-width: 600px;
+}
+
+.mb-5 .btn-primary {
+    background-color: var(--pacific-blue);
+    border-color: var(--pacific-blue);
+}
+
+.mb-5 .btn-primary:hover {
+    background-color: var(--mango-orange);
+    border-color: var(--mango-orange);
+}
+
+h2 {
+    color: var(--charcoal);
+    font-weight: 600;
+    padding-bottom: 1rem;
+}
+
+
+.card {
+  background-color: white;
+  border-radius: 10px;
+  border-color: var(--charcoal);
+  text-align: center;
+}
+
+.card-title {
+  color: var(--charcoal);
+  font-weight: 600;
+}
+
+.card-text {
+  color: var(--charcoal);
+}
+
+.card-text svg {
+  color: var(--pacific-blue);
+  margin-right: 0.5rem;
+}
+
+.card .btn-outline-primary {
+  color: var(--pacific-blue);
+  border-color: var(--pacific-blue);
+}
+
+.card .btn-outline-primary:hover {
+  background-color: var(--pacific-blue);
+  border-color: var(--pacific-blue);
+  color: white;
+}
+
+
+.footer-hr {
+  margin-top: 3rem;
+}
+
+.footer-text {
+  color: var(--charcoal);
+  text-align: center;
+  font-size: 0.9rem;
+  padding-bottom: 1.5rem;
+}
+
+
+h3.LP{
+     color: var(--charcoal);
+  font-weight: 600;
+}
+
+h4 {
+  color: var(--charcoal);
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+/* Dugme "Uredi listu pakiranja" */
+.btn-primary {
+  background-color: var(--pacific-blue);
+  border-color: var(--pacific-blue);
+  margin-bottom: 1rem;
+}
+
+.btn-primary:hover {
+  background-color: var(--mango-orange);
+  border-color: var(--mango-orange);
 }

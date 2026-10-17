@@ -37,8 +37,8 @@ function App() {
             <Route path={RouteNames.DRZAVE_PROMJENA} element={<DrzavaPromjena />} />
           </Routes>
         </Container>
-        <hr />
-        &copy; {IME_APLIKACIJE}
+        <hr className="footer-hr" />
+        <p className="footer-text">&copy; {IME_APLIKACIJE}</p>
       </Container>
     </>
   )

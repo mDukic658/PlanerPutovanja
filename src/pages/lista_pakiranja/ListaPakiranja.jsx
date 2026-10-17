@@ -62,7 +62,7 @@ export default function ListaPakiranja() {
 
     return (
         <>
-            <h3>Lista pakiranja</h3>
+            <h3 className="LP">Lista pakiranja</h3>
 
             <Tabs
                 defaultActiveKey={1}
