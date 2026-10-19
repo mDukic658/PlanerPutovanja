@@ -80,7 +80,13 @@ export default function PutovanjePromjena() {
                     <Form.Label>Država</Form.Label>
                     <Form.Select
                         name="drzava"
-                        defaultValue={putovanje.drzava || ""}
+                        value={putovanje.drzava || ""}
+                        onChange={(e) =>
+                            setPutovanje({
+                                ...putovanje,
+                                drzava: e.target.value
+                            })
+                        }
                         required
                     >
                         <option value="">Odaberi državu</option>

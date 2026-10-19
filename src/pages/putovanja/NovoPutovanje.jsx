@@ -2,10 +2,29 @@ import { Button, Col, Form, Row } from "react-bootstrap"
 import { Link, useNavigate } from "react-router-dom"
 import { RouteNames } from "../../constants"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
+import DrzaveService from '../../services/drzave/DrzaveService'
+import { useEffect, useState } from "react"
+import { CountrySelect, CitySelect } from "react-country-state-city"
+import "react-country-state-city/dist/react-country-state-city.css"
 
 export default function NovoPutovanje() {
 
     const navigate = useNavigate()
+
+    const [drzave, setDrzave] = useState([])
+    const [odabranaDrzava, setOdabranaDrzava] = useState("")
+    const [odabraniGrad, setOdabraniGrad] = useState(null)
+    const [countryid, setCountryid] = useState(0)
+    const [stateid, setStateid] = useState(0)
+
+    async function ucitajDrzave() {
+        const odgovor = await DrzaveService.get()
+        setDrzave(odgovor.data)
+    }
+
+    useEffect(() => {
+        ucitajDrzave()
+    }, [])
 
     async function dodaj(putovanje) {
         await PutovanjaService.dodaj(putovanje).then(() => {
@@ -37,14 +56,34 @@ export default function NovoPutovanje() {
                     <Form.Control type="text" name="naziv" required />
                 </Form.Group>
 
+                <Form.Group controlId="drzava">
+                    <Form.Label> Država </Form.Label>
+                    <Form.Select
+                        name="drzava"
+                        required
+                        defaultValue=""
+                        onChange={(e) => {
+                            const odabrana = drzave.find(
+                                (drzava) => drzava.naziv === e.target.value
+                            )
+
+                            if (odabrana) {
+                                
+                            }
+                        }}
+                    >
+                        <option value="">Odaberi državu</option>
+                        {drzave.map((drzava) => (
+                            <option key={drzava.sifra} value={drzava.naziv}>
+                                {drzava.naziv}
+                            </option>
+                        ))}
+                    </Form.Select>
+                </Form.Group>
+
                 <Form.Group controlId="destinacija">
                     <Form.Label> Destinacija </Form.Label>
                     <Form.Control type="text" name="destinacija" />
-                </Form.Group>
-
-                <Form.Group controlId="drzava">
-                    <Form.Label> Država </Form.Label>
-                    <Form.Control type="text" name="drzava" />
                 </Form.Group>
 
                 <Form.Group controlId="datumPolaska">
@@ -65,16 +104,16 @@ export default function NovoPutovanje() {
 
                 <Row className="mt-4">
                     <Col>
-                    <Link to={RouteNames.PUTOVANJA}
-                    className="btn btn-danger"
-                    >
-                    Odustani
-                    </Link>
+                        <Link to={RouteNames.PUTOVANJA}
+                            className="btn btn-danger"
+                        >
+                            Odustani
+                        </Link>
                     </Col>
                     <Col>
-                    <Button type="submit" variant="success">
-                        Dodaj
-                    </Button>
+                        <Button type="submit" variant="success">
+                            Dodaj
+                        </Button>
                     </Col>
                 </Row>
             </Form>
