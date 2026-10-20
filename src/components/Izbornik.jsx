@@ -37,6 +37,9 @@ export default function Izbornik() {
                             <NavDropdown.Item
                                 onClick={() => { navigate(RouteNames.DRZAVE) }}
                             >Države</NavDropdown.Item>
+                            <NavDropdown.Item
+                                onClick={() => { navigate(RouteNames.GENERIRANJE_PODATAKA) }}
+                            >Generiranje podataka</NavDropdown.Item>
                         </NavDropdown>
                     </Nav>
                 </Navbar.Collapse>

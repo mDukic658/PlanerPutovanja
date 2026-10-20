@@ -33,6 +33,7 @@ async function dodaj(putovanje) {
         putovanje.sifra = 1
     } else {
         const maxSifra = Math.max(...putovanja.map(p => p.sifra))
+        putovanje.sifra = maxSifra + 1
     }
 
     putovanja.push(putovanje)

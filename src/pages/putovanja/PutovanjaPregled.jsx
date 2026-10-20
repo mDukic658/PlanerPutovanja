@@ -56,9 +56,9 @@ export default function PutovanjePregled() {
                 </thead>
                 <tbody>
 
-                    {putovanja && putovanja.map((putovanja) => (
+                    {putovanja && putovanja.map((p) => (
 
-                        <tr key={putovanja.sifra}>
+                        <tr key={p.sifra}>
                             <td className="lead">
                                 {putovanja.naziv}
                             </td>

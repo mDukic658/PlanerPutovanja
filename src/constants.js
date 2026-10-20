@@ -21,4 +21,5 @@ export const RouteNames = {
     GENERIRANJE_PODATAKA: '/generiraj-podatke'
 }
 
-export const DATA_SOURCE = 'memorija'
+// memorija, localStorage, firebase
+export const DATA_SOURCE = 'localStorage'
