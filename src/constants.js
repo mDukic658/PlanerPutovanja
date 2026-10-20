@@ -16,7 +16,9 @@ export const RouteNames = {
 
     DRZAVE: '/drzave',
     DRZAVE_DODAJ: '/drzave/novo',
-    DRZAVE_PROMJENA: '/drzave/promjena/:sifra'
+    DRZAVE_PROMJENA: '/drzave/promjena/:sifra',
+
+    GENERIRANJE_PODATAKA: '/generiraj-podatke'
 }
 
 export const DATA_SOURCE = 'memorija'
