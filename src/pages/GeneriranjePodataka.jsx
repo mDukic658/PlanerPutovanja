@@ -6,7 +6,6 @@ import PredmetiService from '../services/predmeti/PredmetiService'
 import PutovanjaService from '../services/putovanja/PutovanjaService'
 import PakiranjaService from '../services/lista_pakiranja/PakiranjaService'
 
-
 export default function GeneriranjePodataka() {
 
     const [brojDrzava, setBrojDrzava] = useState(10)
@@ -49,15 +48,15 @@ export default function GeneriranjePodataka() {
     }
 
     const generirajPutovanja = async (broj) => {
-        const rezultat = await DrzaveService.get();
-        const drzave = rezultat.data;
+        const rezultat = await DrzaveService.get()
+        const drzave = rezultat.data
 
         if (drzave.length === 0) {
-            throw new Error('Nema dostupnih država. Prvo generirajte države.');
+            throw new Error('Nema dostupnih država. Prvo generirajte države.')
         }
 
         for (let i = 0; i < broj; i++) {
-            const randomDrzava = drzave[faker.number.int({ min: 0, max: drzave.length - 1 })];
+            const randomDrzava = drzave[faker.number.int({ min: 0, max: drzave.length - 1 })]
             const datumPolaska = faker.date.soon({ days: 365 })
             const grad = faker.location.city()
 

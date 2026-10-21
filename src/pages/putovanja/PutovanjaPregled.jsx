@@ -60,20 +60,20 @@ export default function PutovanjePregled() {
 
                         <tr key={p.sifra}>
                             <td className="lead">
-                                {putovanja.naziv}
+                                {p.naziv}
                             </td>
 
-                            <td> {putovanja.destinacija} </td>
-                            <td> {putovanja.drzava} </td>
+                            <td> {p.destinacija} </td>
+                            <td> {p.drzava} </td>
                             <td>
-                                <FormatDatuma datum={putovanja.datumPolaska} />
+                                <FormatDatuma datum={p.datumPolaska} />
                             </td>
                             <td>
-                                <FormatDatuma datum={putovanja.datumPovratka} />
+                                <FormatDatuma datum={p.datumPovratka} />
                             </td>
                             <td className="desno">
                                 <NumericFormat
-                                    value={putovanja.budzet}
+                                    value={p.budzet}
                                     displayType={'text'}
                                     decimalSeparator=","
                                     decimalScale={2}
@@ -84,14 +84,14 @@ export default function PutovanjePregled() {
                             </td>
                             <td>
                                 <Button
-                                    onClick={() => { navigate(`/putovanja/${putovanja.sifra}`) }}>
+                                    onClick={() => { navigate(`/putovanja/${p.sifra}`) }}>
                                     Promijeni
                                 </Button>
                             </td>
                             <td>
                                 <Button
                                 variant="danger"
-                                onClick = {() => obrisi(putovanja.sifra)} >
+                                onClick = {() => obrisi(p.sifra)} >
                                     Izbriši
                                 </Button>
                             </td>

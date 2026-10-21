@@ -4,8 +4,7 @@ import { RouteNames } from "../../constants"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import DrzaveService from '../../services/drzave/DrzaveService'
 import { useEffect, useState } from "react"
-import { CountrySelect, CitySelect } from "react-country-state-city"
-import "react-country-state-city/dist/react-country-state-city.css"
+
 
 export default function NovoPutovanje() {
 
@@ -35,6 +34,82 @@ export default function NovoPutovanje() {
     function obradiSubmit(e) {
         e.preventDefault()
         const podaci = new FormData(e.target)
+
+        if (!podaci.get('naziv') || podaci.get('naziv').trim().length === 0) {
+            alert("Naziv je obavezan i ne smije sadržavati samo razmake!")
+            return
+        }
+
+        if (podaci.get('naziv').trim().length < 3 || podaci.get('naziv').trim().length > 50) {
+            alert("Naziv mora imati najmanje 3 znaka i najviše 50!")
+            return
+        }
+
+        
+
+        if (!podaci.get('destinacija') || podaci.get('destinacija').trim().length === 0) {
+            alert("Destinacija je obavezna!")
+            return
+        }
+
+        if (podaci.get('destinacija').trim().length < 2 || podaci.get('destinacija').trim().length > 50) {
+            alert("Destinacija mora imati najmanje 2 znaka i najviše 50!")
+            return
+        }
+
+
+
+        if (!podaci.get('drzava') || podaci.get('drzava') === "") {
+            alert("Morate odabrati državu!")
+            return
+        }
+
+
+        const datumPolaska = new Date(podaci.get('datumPolaska'))
+        const danas = new Date()
+        danas.setHours(0, 0, 0, 0)
+
+         if (datumPolaska < danas) {
+            alert("Datum polaska ne može biti u prošlosti!")
+            return
+        }
+
+        if (!podaci.get('datumPolaska') || podaci.get('datumPolaska') === "") {
+            alert("Morate odabrati datum polaska!")
+            return
+        }
+
+
+
+        if (!podaci.get('datumPovratka') || podaci.get('datumPovratka') === "") {
+            alert("Morate odabrati datum povratka!")
+            return
+        }
+
+        const datumPovratka = new Date(podaci.get('datumPovratka'))
+
+        if (datumPovratka <= datumPolaska) {
+            alert("Datum povratka mora biti nakon datuma polaska!")
+            return
+        }
+
+
+
+        if (!podaci.get('budzet') || podaci.get('budzet') === "") {
+            alert("Budžet je obavezan!")
+            return
+        }
+
+        if (isNaN(podaci.get('budzet')) || podaci.get('budzet') < 0) {
+            alert("Budžet ne može biti negativan broj!")
+            return
+        }
+
+        if (podaci.get('budzet') > 100000) {
+            alert("Budžet ne može biti veći od 100000 €!")
+            return
+        }
+
         dodaj({
             naziv: podaci.get('naziv'),
             destinacija: podaci.get('destinacija'),
@@ -68,7 +143,7 @@ export default function NovoPutovanje() {
                             )
 
                             if (odabrana) {
-                                
+
                             }
                         }}
                     >
@@ -88,12 +163,21 @@ export default function NovoPutovanje() {
 
                 <Form.Group controlId="datumPolaska">
                     <Form.Label> Datum polaska </Form.Label>
-                    <Form.Control type="date" name="datumPolaska" />
+                    <Form.Control
+                        type="date"
+                        onClick={(e) => e.target.showPicker()}
+                        onFocus={(e) => e.target.showPicker()}
+                        name="datumPolaska"
+                    />
                 </Form.Group>
 
                 <Form.Group controlId="datumPovratka">
                     <Form.Label> Datum povratka </Form.Label>
-                    <Form.Control type="date" name="datumPovratka" />
+                    <Form.Control
+                        type="date"
+                        onClick={(e) => e.target.showPicker()}
+                        onFocus={(e) => e.target.showPicker()}
+                        name="datumPovratka" />
                 </Form.Group>
 
                 <Form.Group controlId="budzet">
