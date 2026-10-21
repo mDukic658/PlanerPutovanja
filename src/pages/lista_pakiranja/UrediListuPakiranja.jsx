@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import PakiranjaService from "../../services/lista_pakiranja/PakiranjaService"
 import PredmetiService from "../../services/predmeti/PredmetiService"
 import Pakiranje from "./Pakiranje"
 import NovoPakiranje from "./NovoPakiranje"
 import { Button } from "react-bootstrap"
+import { RouteNames } from "../../constants"
 
 export default function UrediListuPakiranja() {
 
@@ -74,6 +75,10 @@ export default function UrediListuPakiranja() {
     return (
         <>
             <h3>Uredi listu pakiranja</h3>
+
+            <Link to={RouteNames.LISTA_PAKIRANJA} className="btn secondary mb-3" >
+            Natrag na pregled pakiranja
+            </Link>
 
             <h4>{putovanje.naziv}</h4>
 

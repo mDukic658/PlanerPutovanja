@@ -50,8 +50,7 @@ export default function PutovanjePregled() {
                         <th>Datum Polaska</th>
                         <th>Datum povratka</th>
                         <th>Budžet</th>
-                        <th>Promjena</th>
-                        <th>Brisanje</th>
+                        <th>Akcija</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -87,8 +86,7 @@ export default function PutovanjePregled() {
                                     onClick={() => { navigate(`/putovanja/${p.sifra}`) }}>
                                     Promijeni
                                 </Button>
-                            </td>
-                            <td>
+
                                 <Button
                                 variant="danger"
                                 onClick = {() => obrisi(p.sifra)} >

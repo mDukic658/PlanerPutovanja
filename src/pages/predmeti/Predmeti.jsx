@@ -45,9 +45,7 @@ export default function Predmeti() {
             <Table hover striped bordered>
                 <thead>
                     <tr>
-                        <th>Šifra</th>
                         <th>Naziv</th>
-                        <th>Akcija</th>
                         <th>Akcija</th>
                     </tr>
                 </thead>
@@ -55,7 +53,6 @@ export default function Predmeti() {
                 <tbody>
                     {predmeti.map((predmet) => (
                         <tr key={predmet.sifra}>
-                            <td>{predmet.sifra}</td>
                             <td>{predmet.naziv}</td>
                             <td>
                                 <Button
@@ -66,8 +63,7 @@ export default function Predmeti() {
                                 >
                                     Promijeni
                                 </Button>
-                            </td>
-                            <td>
+                            
                                 <Button 
                                 variant="danger"
                                 onClick={() => obrisi(predmet.sifra)}>

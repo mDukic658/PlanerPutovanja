@@ -88,7 +88,7 @@ export default function NovoPutovanje() {
 
         const datumPovratka = new Date(podaci.get('datumPovratka'))
 
-        if (datumPovratka <= datumPolaska) {
+        if (datumPovratka < datumPolaska) {
             alert("Datum povratka mora biti nakon datuma polaska!")
             return
         }

@@ -38,9 +38,7 @@ export default function DrzavePregled() {
             <Table hover striped bordered responsive>
                 <thead>
                     <tr>
-                        <th>Šifra</th>
                         <th>Naziv države</th>
-                        <th>Akcija</th>
                         <th>Akcija</th>
                     </tr>
                 </thead>
@@ -48,7 +46,6 @@ export default function DrzavePregled() {
                 <tbody>
                     {drzave.map((drzava) => (
                         <tr key={drzava.sifra}>
-                            <td>{drzava.sifra}</td>
                             <td>{drzava.naziv}</td>
                             <td>
                                 <Button
@@ -64,8 +61,7 @@ export default function DrzavePregled() {
                                 >
                                     Promijeni
                                 </Button>
-                            </td>
-                            <td>
+
                                 <Button
                                     variant="danger"
                                     onClick={() => obrisi(drzava.sifra)}
