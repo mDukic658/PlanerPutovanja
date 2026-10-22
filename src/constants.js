@@ -18,7 +18,11 @@ export const RouteNames = {
     DRZAVE_DODAJ: '/drzave/novo',
     DRZAVE_PROMJENA: '/drzave/promjena/:sifra',
 
-    GENERIRANJE_PODATAKA: '/generiraj-podatke'
+    GENERIRANJE_PODATAKA: '/generiraj-podatke',
+
+    ITINERAR: '/itinerar',
+    ITINERAR_PROMJENA: '/itinerar/promjena/:sifra',
+    ITINERAR_DODAJ: '/novo/itinerar'
 }
 
 // memorija, localStorage, firebase

@@ -16,6 +16,9 @@ import DrzavePregled from './pages/drzave/DrzavePregled'
 import DrzavaPromjena from './pages/drzave/DrzavaPromjena'
 import NovaDrzava from './pages/drzave/NovaDrzava'
 import GeneriranjePodataka from './pages/GeneriranjePodataka'
+import ItinerarPregled from './pages/Itinerar/ItinerarPregled'
+import ItinerarPromjena from './pages/Itinerar/ItinerarPromjena'
+import ItinerarNovo from './pages/Itinerar/ItinerarNovo'
 
 function App() {
 
@@ -37,6 +40,9 @@ function App() {
             <Route path={RouteNames.DRZAVE_DODAJ} element={<NovaDrzava />} />
             <Route path={RouteNames.DRZAVE_PROMJENA} element={<DrzavaPromjena />} />
             <Route path={RouteNames.GENERIRANJE_PODATAKA} element={<GeneriranjePodataka />} />
+            <Route path= {RouteNames.ITINERAR} element={<ItinerarPregled />} />
+            <Route  path={RouteNames.ITINERAR_PROMJENA} element={ <ItinerarPromjena /> } />
+            <Route  path={RouteNames.ITINERAR_DODAJ} element={ <ItinerarNovo /> } />
           </Routes>
         </Container>
         <hr className="footer-hr" />
