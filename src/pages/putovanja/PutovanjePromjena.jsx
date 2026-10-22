@@ -105,6 +105,8 @@ export default function PutovanjePromjena() {
                     <Form.Label>Datum polaska</Form.Label>
                     <Form.Control
                         type="date"
+                        onClick={(e) => e.target.showPicker()}
+                        onFocus={(e) => e.target.showPicker()}
                         name="datumPolaska"
                         defaultValue={putovanje.datumPolaska}
                     />
@@ -114,6 +116,8 @@ export default function PutovanjePromjena() {
                     <Form.Label>Datum povratka</Form.Label>
                     <Form.Control
                         type="date"
+                        onClick={(e) => e.target.showPicker()}
+                        onFocus={(e) => e.target.showPicker()}
                         name="datumPovratka"
                         defaultValue={putovanje.datumPovratka}
                     />
