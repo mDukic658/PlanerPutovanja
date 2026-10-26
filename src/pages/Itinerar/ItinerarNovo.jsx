@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { Button, Card, Form } from "react-bootstrap"
 import { Link, useNavigate } from "react-router-dom"
 import { RouteNames } from "../../constants"
-import PutovanjaService from "../../services/putovanjaPutovanjaService"
+import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import ItinerarService from "../../services/itinerar/ItinerarService"
 
 
