@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button, Badge, Card, Form, Row, Col } from "react-bootstrap"
 import { RouteNames } from "../../constants";
 import PutovanjaService from '../../services/putovanja/PutovanjaService'
@@ -13,6 +13,16 @@ export default function ItinerarPregled() {
     const [stavke, setStavke] = useState([])
 
     const navigate = useNavigate()
+
+    const [searchParams] = useSearchParams()
+
+    useEffect(() => {
+        const sifra = searchParams.get('putovanjeSifra')
+
+        if (sifra) {
+            setOdabranaSifra(parseInt(sifra, 10))
+        }
+    }, [searchParams])
 
     useEffect(() => {
         ucitajPutovanja()
@@ -75,7 +85,7 @@ export default function ItinerarPregled() {
 
             {putovanje && (
                 <Link
-                    to={RouteNames.ITINERAR_DODAJ}
+                    to={`${RouteNames.ITINERAR_DODAJ}?putovanjeSifra=${odabranaSifra}`}
                     className="btn btn-success w-100 my-3"
                 >
                     Dodavanje nove stavke itinerara
@@ -106,7 +116,11 @@ export default function ItinerarPregled() {
                                         <Card.Footer>
                                             <Button
                                                 size="sm"
-                                                onClick={() => { navigate(`${RouteNames.ITINERAR}/promjena/${s.sifra}`) }}>
+                                                onClick={() => {
+                                                    navigate(
+                                                        `${RouteNames.ITINERAR}/promjena/${s.sifra}?putovanjeSifra=${odabranaSifra}`
+                                                    )
+                                                }}>
                                                 Promijeni
                                             </Button>
 

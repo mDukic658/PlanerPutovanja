@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Button, Card, Form } from "react-bootstrap"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate, useSearchParams } from "react-router-dom"
 import { RouteNames } from "../../constants"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import ItinerarService from "../../services/itinerar/ItinerarService"
@@ -10,9 +10,12 @@ export default function ItinerarNovo() {
 
     const navigate = useNavigate()
 
+    const [searchParams] = useSearchParams()
+    const putovanjeSifra = searchParams.get('putovanjeSifra')
+
     const [putovanja, setPutovanja] = useState([])
     const [stavka, setStavka] = useState({
-        putovanjeSifra: null,
+        putovanjeSifra: putovanjeSifra || '',
         dan: 1,
         vrijeme: '',
         naziv: '',
@@ -36,8 +39,18 @@ export default function ItinerarNovo() {
 
     async function spremi(e) {
         e.preventDefault()
-        await ItinerarService.dodaj(stavka)
-        navigate(RouteNames.ITINERAR)
+
+        const novaStavka = {
+            ...stavka,
+            putovanjeSifra: parseInt(stavka.putovanjeSifra, 10),
+            dan: parseInt(stavka.dan, 10)
+        }
+
+        await ItinerarService.dodaj(novaStavka)
+
+        navigate(
+            `${RouteNames.ITINERAR}?putovanjeSifra=${novaStavka.putovanjeSifra}`
+        )
     }
 
     return (
@@ -78,9 +91,10 @@ export default function ItinerarNovo() {
                             <Form.Label>Vrijeme</Form.Label>
                             <Form.Control
                                 type="time"
+                                onChange={promijeniVrijednost}
+                                onClick={(e) => e.currentTarget.showPicker()}
                                 name="vrijeme"
                                 value={stavka.vrijeme}
-                                onChange={promijeniVrijednost}
                             />
                         </Form.Group>
 
@@ -111,7 +125,7 @@ export default function ItinerarNovo() {
 
                         <Link
                             to={RouteNames.ITINERAR}
-                            className="btn btn-secondary ms-2"
+                            className="btn btn-danger ms-2"
                         >
                             Odustani
                         </Link>
