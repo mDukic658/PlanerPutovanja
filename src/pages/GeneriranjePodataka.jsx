@@ -5,6 +5,7 @@ import DrzaveService from '../services/drzave/DrzaveService'
 import PredmetiService from '../services/predmeti/PredmetiService'
 import PutovanjaService from '../services/putovanja/PutovanjaService'
 import PakiranjaService from '../services/lista_pakiranja/PakiranjaService'
+import ItinerarService from "../services/itinerar/ItinerarService";
 
 export default function GeneriranjePodataka() {
 
@@ -12,6 +13,7 @@ export default function GeneriranjePodataka() {
     const [brojPredmeta, setBrojPredmeta] = useState(30)
     const [brojPutovanja, setBrojPutovanja] = useState(10)
     const [brojPakiranja, setBrojPakiranja] = useState(10)
+    const [brojItinerara, setBrojItinerara] = useState(10)
     const [poruka, setPoruka] = useState(null)
     const [loading, setLoading] = useState(false)
 
@@ -56,18 +58,26 @@ export default function GeneriranjePodataka() {
         }
 
         for (let i = 0; i < broj; i++) {
-            const randomDrzava = drzave[faker.number.int({ min: 0, max: drzave.length - 1 })]
+            const randomDrzava = drzave[
+                faker.number.int({ min: 0, max: drzave.length - 1 })
+            ]
+
             const datumPolaska = faker.date.soon({ days: 365 })
             const grad = faker.location.city()
 
-            await PutovanjaService.dodaj({
+            const putovanje = {
                 naziv: 'Putovanje u ' + grad,
                 destinacija: grad,
                 drzava: randomDrzava.naziv,
                 datumPolaska: datumPolaska.toISOString().split('T')[0],
-                datumPovratka: faker.date.soon({ days: 20, refDate: datumPolaska }).toISOString().split('T')[0],
+                datumPovratka: faker.date.soon({
+                    days: 20,
+                    refDate: datumPolaska
+                }).toISOString().split('T')[0],
                 budzet: faker.number.int({ min: 500, max: 5000 })
-            })
+            }
+
+            await PutovanjaService.dodaj(putovanje)
         }
     }
 
@@ -91,6 +101,59 @@ export default function GeneriranjePodataka() {
                 predmetSifra: randomPredmet.sifra,
                 putovanjeSifra: randomPutovanje.sifra,
                 spakirano: faker.datatype.boolean()
+            })
+        }
+    }
+
+    const generirajItinerar = async (broj) => {
+        const rezultat = await PutovanjaService.get()
+        const putovanja = rezultat.data
+
+        if (putovanja.length === 0) {
+            throw new Error('Nema dostupnih putovanja. Prvo generirajte putovanja.')
+        }
+
+        const aktivnosti = [
+            'Razgledavanje grada',
+            'Posjet muzeju',
+            'Obilazak povijesnih znamenitosti',
+            'Ručak u lokalnom restoranu',
+            'Posjet gradskoj tržnici',
+            'Šetnja parkom',
+            'Posjet galeriji',
+            'Razgledavanje dvorca',
+            'Odlazak na vidikovac',
+            'Večera u restoranu',
+            'Posjet lokalnom kafiću',
+            'Obilazak kulturnih znamenitosti',
+            'Posjet zoološkom vrtu',
+            'Izlet u prirodu',
+            'Razgledavanje poznatih građevina'
+        ]
+
+        const biljeske = [
+            'Provjeriti radno vrijeme',
+            'Rezervirati ulaznice unaprijed',
+            'Ponijeti fotoaparat',
+            'Isprobati lokalnu kuhinju',
+            'Provjeriti cijene ulaznica',
+            'Planirati dovoljno vremena za obilazak',
+            'Provjeriti dostupnost javnog prijevoza',
+            'Ponijeti udobnu obuću'
+        ]
+
+        for (let i = 0; i < broj; i++) {
+            const putovanje = faker.helpers.arrayElement(putovanja)
+
+            const sat = faker.number.int({ min: 8, max: 20 })
+            const minute = faker.helpers.arrayElement(['00', '30'])
+
+            await ItinerarService.dodaj({
+                putovanjeSifra: putovanje.sifra,
+                dan: faker.number.int({ min: 1, max: 5 }),
+                vrijeme: `${String(sat).padStart(2, '0')}:${minute}`,
+                naziv: faker.helpers.arrayElement(aktivnosti),
+                biljeska: faker.helpers.arrayElement(biljeske)
             })
         }
     }
@@ -170,6 +233,19 @@ export default function GeneriranjePodataka() {
             max: 50,
             generiraj: (broj) => generirajPutovanja(broj),
             handler: (e) => handleGeneriraj(e, generirajPutovanja, brojPutovanja, 'putovanja')
+        },
+        {
+            naziv: 'Itinerar',
+            broj: brojItinerara,
+            setBroj: setBrojItinerara,
+            max: 200,
+            generiraj: (broj) => generirajItinerar(broj),
+            handler: (e) => handleGeneriraj(
+                e,
+                generirajItinerar,
+                brojItinerara,
+                'stavki itinerara'
+            )
         },
         {
             naziv: 'Pakiranja',
@@ -255,6 +331,16 @@ export default function GeneriranjePodataka() {
                     <Button variant="danger" onClick={() => obrisiSve(PutovanjaService, 'putovanja')}
                         disabled={loading} className="w-100 mb-2">
                         {loading ? 'Brisanje...' : 'Obriši sva putovanja'}
+                    </Button>
+                </Col>
+                <Col md={3}>
+                    <Button
+                        variant="danger"
+                        onClick={() => obrisiSve(ItinerarService, 'stavki itinerara')}
+                        disabled={loading}
+                        className="w-100 mb-2"
+                    >
+                        {loading ? 'Brisanje...' : 'Obriši sve itinerare'}
                     </Button>
                 </Col>
                 <Col md={3}>
