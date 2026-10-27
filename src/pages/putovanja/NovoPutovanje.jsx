@@ -4,6 +4,7 @@ import { RouteNames } from "../../constants"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import DrzaveService from '../../services/drzave/DrzaveService'
 import { useEffect, useState } from "react"
+import PretragaDrzava from "../../components/PretragaDrzava"
 
 
 export default function NovoPutovanje() {
@@ -45,7 +46,7 @@ export default function NovoPutovanje() {
             return
         }
 
-        
+
 
         if (!podaci.get('destinacija') || podaci.get('destinacija').trim().length === 0) {
             alert("Destinacija je obavezna!")
@@ -69,7 +70,7 @@ export default function NovoPutovanje() {
         const danas = new Date()
         danas.setHours(0, 0, 0, 0)
 
-         if (datumPolaska < danas) {
+        if (datumPolaska < danas) {
             alert("Datum polaska ne može biti u prošlosti!")
             return
         }
@@ -132,28 +133,11 @@ export default function NovoPutovanje() {
                 </Form.Group>
 
                 <Form.Group controlId="drzava">
-                    <Form.Label> Država </Form.Label>
-                    <Form.Select
-                        name="drzava"
-                        required
-                        defaultValue=""
-                        onChange={(e) => {
-                            const odabrana = drzave.find(
-                                (drzava) => drzava.naziv === e.target.value
-                            )
-
-                            if (odabrana) {
-
-                            }
-                        }}
-                    >
-                        <option value="">Odaberi državu</option>
-                        {drzave.map((drzava) => (
-                            <option key={drzava.sifra} value={drzava.naziv}>
-                                {drzava.naziv}
-                            </option>
-                        ))}
-                    </Form.Select>
+                    <PretragaDrzava
+                        drzave={drzave}
+                        odabranaDrzava={odabranaDrzava}
+                        onOdaberi={setOdabranaDrzava}
+                    />
                 </Form.Group>
 
                 <Form.Group controlId="destinacija">

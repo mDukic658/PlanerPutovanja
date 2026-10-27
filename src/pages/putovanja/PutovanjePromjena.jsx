@@ -4,6 +4,7 @@ import { RouteNames } from "../../constants"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import DrzaveService from "../../services/drzave/DrzaveService"
 import { useState, useEffect } from "react"
+import PretragaDrzava from "../../components/PretragaDrzava"
 
 export default function PutovanjePromjena() {
 
@@ -41,6 +42,11 @@ export default function PutovanjePromjena() {
         e.preventDefault()
         const podaci = new FormData(e.target)
 
+        if (!podaci.get("drzava")) {
+            alert("Morate odabrati državu!")
+            return
+        }
+
         promijeni({
             naziv: podaci.get('naziv'),
             destinacija: podaci.get('destinacija'),
@@ -77,28 +83,16 @@ export default function PutovanjePromjena() {
                 </Form.Group>
 
                 <Form.Group controlId="drzava">
-                    <Form.Label>Država</Form.Label>
-                    <Form.Select
-                        name="drzava"
-                        value={putovanje.drzava || ""}
-                        onChange={(e) =>
+                    <PretragaDrzava
+                        drzave={drzave}
+                        odabranaDrzava={putovanje.drzava}
+                        onOdaberi={(drzava) =>
                             setPutovanje({
                                 ...putovanje,
-                                drzava: e.target.value
+                                drzava: drzava
                             })
                         }
-                        required
-                    >
-                        <option value="">Odaberi državu</option>
-                        {drzave.map((drzava) => (
-                            <option
-                                key={drzava.sifra}
-                                value={drzava.naziv}
-                            >
-                                {drzava.naziv}
-                            </option>
-                        ))}
-                    </Form.Select>
+                    />
                 </Form.Group>
 
                 <Form.Group controlId="datumPolaska">
