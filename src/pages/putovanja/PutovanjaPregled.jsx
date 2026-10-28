@@ -5,6 +5,8 @@ import FormatDatuma from "../../components/FormatDatuma"
 import { NumericFormat } from "react-number-format"
 import { Link, useNavigate } from "react-router-dom"
 import { RouteNames } from "../../constants"
+import { BsSuitcase2Fill } from "react-icons/bs"
+import { FaPlus, FaPen, FaTrash } from "react-icons/fa"
 
 export default function PutovanjePregled() {
 
@@ -13,7 +15,6 @@ export default function PutovanjePregled() {
     const navigate = useNavigate()
 
     useEffect(() => {
-        console.log('Došao na pregled putovanja')
         ucitajPutovanja()
     }, [])
 
@@ -23,8 +24,8 @@ export default function PutovanjePregled() {
         })
     }
 
-    async function obrisi(sifra){
-        if(!confirm('Sigurno obrisati?')){
+    async function obrisi(sifra) {
+        if (!confirm('Sigurno obrisati?')) {
             return
         }
 
@@ -33,82 +34,102 @@ export default function PutovanjePregled() {
     }
 
     return (
-        <>
+            <section className="pregled-putovanja" >
 
-            <Link to={RouteNames.PUTOVANJA_DODAJ}
-                className="btn btn-success w-100 my-3"
-            >
-                Dodavanje novog putovanja
-            </Link>
+                <div className="putovanje-zaglavlje" >
+                    <h2>
+                        <BsSuitcase2Fill />
+                        Putovanja
+                    </h2>
 
-            <Table hover striped bordered>
-                <thead>
-                    <tr>
-                        <th>Naziv</th>
-                        <th>Destinacija</th>
-                        <th>Država</th>
-                        <th>Datum Polaska</th>
-                        <th>Datum povratka</th>
-                        <th>Budžet</th>
-                        <th>Akcija</th>
-                    </tr>
-                </thead>
-                <tbody>
+                    <Link to={RouteNames.PUTOVANJA_DODAJ}
+                        className="btn btn-primary"
+                    >
+                        <FaPlus />
+                        Novo Putovanje
+                    </Link>
+                </div>
 
-                    {putovanja && putovanja.map((p) => (
+                <div className="putovanje-tablica" >
+                    <Table hover responsive striped bordered className="mb-0" >
+                        <thead>
+                            <tr>
+                                <th>Naziv</th>
+                                <th>Destinacija</th>
+                                <th>Država</th>
+                                <th>Datum Polaska</th>
+                                <th>Datum povratka</th>
+                                <th>Budžet</th>
+                                <th>Akcija</th>
+                            </tr>
+                        </thead>
+                        <tbody>
 
-                        <tr key={p.sifra}>
-                            <td className="lead">
-                                {p.naziv}
-                            </td>
+                            {putovanja && putovanja.map((p) => (
 
-                            <td> {p.destinacija} </td>
-                            <td> {p.drzava} </td>
-                            <td>
-                                <FormatDatuma datum={p.datumPolaska} />
-                            </td>
-                            <td>
-                                <FormatDatuma datum={p.datumPovratka} />
-                            </td>
-                            <td className="desno">
-                                <NumericFormat
-                                    value={p.budzet}
-                                    displayType={'text'}
-                                    decimalSeparator=","
-                                    decimalScale={2}
-                                    fixedDecimalScale
-                                    thousandSeparator='.'
-                                    suffix=" €"
-                                />
-                            </td>
-                            <td>
-                                <Button
-                                    onClick={() => { navigate(`/putovanja/${p.sifra}`) }}>
-                                    Promijeni
-                                </Button>
+                                <tr key={p.sifra}>
+                                    <td className="putovanje-naziv">
+                                        {p.naziv}
+                                    </td>
 
-                                <Button
-                                variant="danger"
-                                onClick = {() => obrisi(p.sifra)} >
-                                    Izbriši
-                                </Button>
-                            </td>
-                        </tr>
+                                    <td> {p.destinacija} </td>
+                                    <td> {p.drzava} </td>
+                                    <td>
+                                        <FormatDatuma datum={p.datumPolaska} />
+                                    </td>
+                                    <td>
+                                        <FormatDatuma datum={p.datumPovratka} />
+                                    </td>
+                                    <td className="desno">
+                                        <NumericFormat
+                                            value={p.budzet}
+                                            displayType={'text'}
+                                            decimalSeparator=","
+                                            decimalScale={2}
+                                            fixedDecimalScale
+                                            thousandSeparator='.'
+                                            suffix=" €"
+                                        />
+                                    </td>
+                                    <td>
+                                        <div className="putovanja-akcije" >
+                                            <Button
+                                                onClick={() => { navigate(`/putovanja/${p.sifra}`) }}>
+                                                <FaPen />
+                                                Promijeni
+                                            </Button>
 
-                    ))}
+                                            <Button
+                                                variant="danger"
+                                                onClick={() => obrisi(p.sifra)} >
+                                                <FaTrash />
+                                                Izbriši
+                                            </Button>
+                                        </div>
+                                    </td>
+                                </tr>
 
-                </tbody>
-            </Table>
+                            ))}
 
-            Ukupno &nbsp;
-            <Badge pill bg="success">
-                {putovanja && putovanja.length}
-            </Badge>
-            &nbsp; putovanja
+                            {putovanja.length === 0 && (
+                                <tr>
+                                    <td colSpan={7} className="putovanja-prazno">
+                                        Trenutno nemaš niti jedno putovanje.
+                                    </td>
+                                </tr>
+                            )}
 
-            {/* <pre>
-                {JSON.stringify(putovanja, null, 2)}
-            </pre> */}
-        </>
+                        </tbody>
+                    </Table>
+                </div>
+
+                <div className="putovanja-ukupno" >
+                    Ukupno &nbsp;
+                    <Badge pill bg="success">
+                        {putovanja && putovanja.length}
+                    </Badge>
+                    &nbsp; putovanja
+                </div>
+            </section>
     )
 }

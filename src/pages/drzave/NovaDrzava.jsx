@@ -1,7 +1,8 @@
-import { Button, Col, Form, Row } from 'react-bootstrap'
+import { Button, Form } from 'react-bootstrap'
 import { Link, useNavigate } from 'react-router-dom'
 import { RouteNames } from '../../constants'
 import DrzaveService from '../../services/drzave/DrzaveService'
+import { FaArrowLeft, FaGlobeEurope, FaPlus, FaTimes } from 'react-icons/fa'
 
 export default function NovaDrzava() {
     const navigate = useNavigate()
@@ -23,36 +24,52 @@ export default function NovaDrzava() {
     }
 
     return (
-        <>
-            <h3>Dodavanje nove države</h3>
+        <section className="nova-drzava">
 
-            <Form onSubmit={obradiSubmit}>
+            <Link
+                to={RouteNames.DRZAVE}
+                className="natrag-na-pregled"
+            >
+                <FaArrowLeft />
+                Natrag na pregled država
+            </Link>
+
+            <h2 className="nova-drzava-naslov">
+                <FaGlobeEurope />
+                Dodavanje nove države
+            </h2>
+
+            <Form
+                onSubmit={obradiSubmit}
+                className="nova-drzava-obrazac"
+            >
                 <Form.Group controlId="naziv">
                     <Form.Label>Naziv države</Form.Label>
+
                     <Form.Control
                         type="text"
                         name="naziv"
+                        placeholder="Npr. Hrvatska"
                         required
                     />
                 </Form.Group>
 
-                <Row className="mt-4">
-                    <Col>
-                        <Link
-                            to={RouteNames.DRZAVE}
-                            className="btn btn-danger"
-                        >
-                            Odustani
-                        </Link>
-                    </Col>
+                <div className="nova-drzava-akcije">
+                    <Link
+                        to={RouteNames.DRZAVE}
+                        className="btn btn-outline-secondary"
+                    >
+                        <FaTimes />
+                        Odustani
+                    </Link>
 
-                    <Col>
-                        <Button type="submit" variant="success">
-                            Dodaj
-                        </Button>
-                    </Col>
-                </Row>
+                    <Button type="submit" variant="primary">
+                        <FaPlus />
+                        Dodaj državu
+                    </Button>
+                </div>
             </Form>
-        </>
+
+        </section>
     )
 }

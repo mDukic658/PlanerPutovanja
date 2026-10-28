@@ -5,6 +5,7 @@ import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import DrzaveService from "../../services/drzave/DrzaveService"
 import { useState, useEffect } from "react"
 import PretragaDrzava from "../../components/PretragaDrzava"
+import { FaPen, FaSave, FaTimes, FaArrowLeft } from "react-icons/fa"
 
 export default function PutovanjePromjena() {
 
@@ -58,91 +59,121 @@ export default function PutovanjePromjena() {
     }
 
     return (
-        <>
-            <h3>Promjena putovanja</h3>
+        <section className="promjena-putovanja">
 
-            <Form onSubmit={obradiSubmit}>
+            <Link
+                to={RouteNames.PUTOVANJA}
+                className="natrag-na-pregled"
+            >
+                <FaArrowLeft />
+                Natrag na pregled putovanja
+            </Link>
 
-                <Form.Group controlId="naziv">
-                    <Form.Label>Naziv</Form.Label>
-                    <Form.Control
-                        type="text"
-                        name="naziv"
-                        required
-                        defaultValue={putovanje.naziv}
-                    />
-                </Form.Group>
+            <h2 className="promjena-putovanja-naslov">
+                <FaPen />
+                Promjena putovanja
+            </h2>
 
-                <Form.Group controlId="destinacija">
-                    <Form.Label>Destinacija</Form.Label>
-                    <Form.Control
-                        type="text"
-                        name="destinacija"
-                        defaultValue={putovanje.destinacija}
-                    />
-                </Form.Group>
+            <Form
+                onSubmit={obradiSubmit}
+                className="putovanje-obrazac"
+            >
+                <Row className="g-3">
 
-                <Form.Group controlId="drzava">
-                    <PretragaDrzava
-                        drzave={drzave}
-                        odabranaDrzava={putovanje.drzava}
-                        onOdaberi={(drzava) =>
-                            setPutovanje({
-                                ...putovanje,
-                                drzava: drzava
-                            })
-                        }
-                    />
-                </Form.Group>
-
-                <Form.Group controlId="datumPolaska">
-                    <Form.Label>Datum polaska</Form.Label>
-                    <Form.Control
-                        type="date"
-                        onClick={(e) => e.target.showPicker()}
-                        onFocus={(e) => e.target.showPicker()}
-                        name="datumPolaska"
-                        defaultValue={putovanje.datumPolaska}
-                    />
-                </Form.Group>
-
-                <Form.Group controlId="datumPovratka">
-                    <Form.Label>Datum povratka</Form.Label>
-                    <Form.Control
-                        type="date"
-                        onClick={(e) => e.target.showPicker()}
-                        onFocus={(e) => e.target.showPicker()}
-                        name="datumPovratka"
-                        defaultValue={putovanje.datumPovratka}
-                    />
-                </Form.Group>
-
-                <Form.Group controlId="budzet">
-                    <Form.Label>Budžet</Form.Label>
-                    <Form.Control
-                        type="number"
-                        name="budzet"
-                        step={0.01}
-                        defaultValue={putovanje.budzet}
-                    />
-                </Form.Group>
-
-                <Row className="mt-4">
-                    <Col>
-                        <Link
-                            to={RouteNames.PUTOVANJA}
-                            className="btn btn-danger"
-                        >
-                            Odustani
-                        </Link>
+                    <Col xs={12}>
+                        <Form.Group controlId="naziv">
+                            <Form.Label>Naziv</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="naziv"
+                                required
+                                defaultValue={putovanje.naziv}
+                            />
+                        </Form.Group>
                     </Col>
-                    <Col>
-                        <Button type="submit" variant="success">
-                            Promijeni
-                        </Button>
+
+                    <Col xs={12} md={6}>
+                        <Form.Group controlId="destinacija">
+                            <Form.Label>Destinacija</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="destinacija"
+                                defaultValue={putovanje.destinacija}
+                            />
+                        </Form.Group>
                     </Col>
+
+                    <Col xs={12} md={6}>
+                        <Form.Group controlId="drzava">
+                            <PretragaDrzava
+                                drzave={drzave}
+                                odabranaDrzava={putovanje.drzava}
+                                onOdaberi={(drzava) =>
+                                    setPutovanje({
+                                        ...putovanje,
+                                        drzava: drzava
+                                    })
+                                }
+                            />
+                        </Form.Group>
+                    </Col>
+
+                    <Col xs={12} md={6}>
+                        <Form.Group controlId="datumPolaska">
+                            <Form.Label>Datum polaska</Form.Label>
+                            <Form.Control
+                                type="date"
+                                onClick={(e) => e.target.showPicker()}
+                                onFocus={(e) => e.target.showPicker()}
+                                name="datumPolaska"
+                                defaultValue={putovanje.datumPolaska}
+                            />
+                        </Form.Group>
+                    </Col>
+
+                    <Col xs={12} md={6}>
+                        <Form.Group controlId="datumPovratka">
+                            <Form.Label>Datum povratka</Form.Label>
+                            <Form.Control
+                                type="date"
+                                onClick={(e) => e.target.showPicker()}
+                                onFocus={(e) => e.target.showPicker()}
+                                name="datumPovratka"
+                                defaultValue={putovanje.datumPovratka}
+                            />
+                        </Form.Group>
+                    </Col>
+
+                    <Col xs={12} md={6}>
+                        <Form.Group controlId="budzet">
+                            <Form.Label>Budžet (€)</Form.Label>
+                            <Form.Control
+                                type="number"
+                                name="budzet"
+                                step={0.01}
+                                defaultValue={putovanje.budzet}
+                            />
+                        </Form.Group>
+                    </Col>
+
                 </Row>
+
+                <div className="putovanje-obrazac-akcije">
+                    <Link
+                        to={RouteNames.PUTOVANJA}
+                        className="btn btn-outline-secondary"
+                    >
+                        <FaTimes />
+                        Odustani
+                    </Link>
+
+                    <Button type="submit" variant="primary">
+                        <FaSave />
+                        Spremi promjene
+                    </Button>
+                </div>
+
             </Form>
-        </>
+        </section>
     )
 }

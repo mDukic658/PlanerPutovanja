@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, useSearchParams, Link } from "react-router-dom"
-import { Button, Card, Form } from "react-bootstrap";
+import { Button, Row, Form, Col } from "react-bootstrap";
 import ItinerarService from "../../services/itinerar/ItinerarService"
 import { RouteNames } from "../../constants"
+import { FaArrowLeft, FaPen, FaSave, FaTimes } from "react-icons/fa";
 
 export default function ItinerarPromjena() {
 
@@ -62,14 +63,30 @@ export default function ItinerarPromjena() {
     }
 
     return (
-        <>
-            <h2 className="my-3">Promjena stavke itinerara</h2>
+        <section className="promjena-itinerara">
 
-            <Card>
-                <Card.Body>
-                    <Form onSubmit={spremi}>
+            <Link
+                to={
+                    putovanjeSifra
+                        ? `${RouteNames.ITINERAR}?putovanjeSifra=${putovanjeSifra}`
+                        : RouteNames.ITINERAR
+                }
+                className="natrag-na-pregled"
+            >
+                <FaArrowLeft />
+                Natrag na pregled itinerara
+            </Link>
 
-                        <Form.Group className="mb-3">
+            <h2 className="promjena-itinerara-naslov">
+                <FaPen />
+                Promjena stavke itinerara
+            </h2>
+
+            <Form onSubmit={spremi} className="itinerar-obrazac">
+                <Row className="g-3">
+
+                    <Col xs={12} md={6}>
+                        <Form.Group controlId="dan">
                             <Form.Label>Dan</Form.Label>
                             <Form.Control
                                 type="number"
@@ -80,8 +97,10 @@ export default function ItinerarPromjena() {
                                 required
                             />
                         </Form.Group>
+                    </Col>
 
-                        <Form.Group className="mb-3">
+                    <Col xs={12} md={6}>
+                        <Form.Group controlId="vrijeme">
                             <Form.Label>Vrijeme</Form.Label>
                             <Form.Control
                                 type="time"
@@ -91,8 +110,10 @@ export default function ItinerarPromjena() {
                                 required
                             />
                         </Form.Group>
+                    </Col>
 
-                        <Form.Group className="mb-3">
+                    <Col xs={12}>
+                        <Form.Group controlId="naziv">
                             <Form.Label>Naziv</Form.Label>
                             <Form.Control
                                 type="text"
@@ -102,8 +123,10 @@ export default function ItinerarPromjena() {
                                 required
                             />
                         </Form.Group>
+                    </Col>
 
-                        <Form.Group className="mb-3">
+                    <Col xs={12}>
+                        <Form.Group controlId="biljeska">
                             <Form.Label>Bilješka</Form.Label>
                             <Form.Control
                                 as="textarea"
@@ -113,25 +136,30 @@ export default function ItinerarPromjena() {
                                 onChange={promijeniVrijednost}
                             />
                         </Form.Group>
+                    </Col>
 
-                        <Button type="submit" variant="success">
-                            Spremi promjene
-                        </Button>
+                </Row>
 
-                        <Link
-                            to={
-                                putovanjeSifra
-                                    ? `${RouteNames.ITINERAR}?putovanjeSifra=${putovanjeSifra}`
-                                    : RouteNames.ITINERAR
-                            }
-                            className="btn btn-danger ms-2"
-                        >
-                            Odustani
-                        </Link>
+                <div className="itinerar-obrazac-akcije">
+                    <Link
+                        to={
+                            putovanjeSifra
+                                ? `${RouteNames.ITINERAR}?putovanjeSifra=${putovanjeSifra}`
+                                : RouteNames.ITINERAR
+                        }
+                        className="btn btn-outline-secondary"
+                    >
+                        <FaTimes />
+                        Odustani
+                    </Link>
 
-                    </Form>
-                </Card.Body>
-            </Card>
-        </>
+                    <Button type="submit" variant="primary">
+                        <FaSave />
+                        Spremi promjene
+                    </Button>
+                </div>
+            </Form>
+
+        </section>
     )
 }

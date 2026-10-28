@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react"
-import { Button, Card, Form } from "react-bootstrap"
+import { Button, Col, Form, Row} from "react-bootstrap"
 import { Link, useNavigate, useSearchParams } from "react-router-dom"
 import { RouteNames } from "../../constants"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import ItinerarService from "../../services/itinerar/ItinerarService"
+import { FaArrowLeft, FaPlus, FaTimes } from "react-icons/fa"
 
 
 export default function ItinerarNovo() {
@@ -54,29 +55,50 @@ export default function ItinerarNovo() {
     }
 
     return (
-        <>
 
-            <h2 className="my-3">Nova stavka itinerara</h2>
+        <section className="novi-itinerar">
 
-            <Card>
-                <Card.Body>
-                    <Form onSubmit={spremi}>
+            <Link
+                to={
+                    stavka.putovanjeSifra
+                        ? `${RouteNames.ITINERAR}?putovanjeSifra=${stavka.putovanjeSifra}`
+                        : RouteNames.ITINERAR
+                }
+                className="natrag-na-pregled"
+            >
+                <FaArrowLeft />
+                Natrag na pregled itinerara
+            </Link>
 
-                        <Form.Group className="mb-3">
+            <h2 className="novi-itinerar-naslov">
+                <FaPlus />
+                Nova stavka itinerara
+            </h2>
+
+            <Form onSubmit={spremi} className="itinerar-obrazac">
+                <Row className="g-3">
+
+                    <Col xs={12}>
+                        <Form.Group controlId="putovanjeSifra">
                             <Form.Label>Putovanje</Form.Label>
                             <Form.Select
                                 name="putovanjeSifra"
-                                value={stavka.putovanjeSifra ?? ''}
+                                value={stavka.putovanjeSifra ?? ""}
                                 onChange={promijeniVrijednost}
                             >
                                 <option value="">Odaberi putovanje</option>
+
                                 {putovanja && putovanja.map((p) => (
-                                    <option key={p.sifra} value={p.sifra}>{p.naziv}</option>
+                                    <option key={p.sifra} value={p.sifra}>
+                                        {p.naziv}
+                                    </option>
                                 ))}
                             </Form.Select>
                         </Form.Group>
+                    </Col>
 
-                        <Form.Group className="mb-3">
+                    <Col xs={12} md={6}>
+                        <Form.Group controlId="dan">
                             <Form.Label>Dan</Form.Label>
                             <Form.Control
                                 type="number"
@@ -86,55 +108,72 @@ export default function ItinerarNovo() {
                                 onChange={promijeniVrijednost}
                             />
                         </Form.Group>
+                    </Col>
 
-                        <Form.Group className="mb-3">
+                    <Col xs={12} md={6}>
+                        <Form.Group controlId="vrijeme">
                             <Form.Label>Vrijeme</Form.Label>
                             <Form.Control
                                 type="time"
-                                onChange={promijeniVrijednost}
-                                onClick={(e) => e.currentTarget.showPicker()}
                                 name="vrijeme"
                                 value={stavka.vrijeme}
+                                onChange={promijeniVrijednost}
+                                onClick={(e) => e.currentTarget.showPicker()}
                             />
                         </Form.Group>
+                    </Col>
 
-                        <Form.Group className="mb-3">
+                    <Col xs={12}>
+                        <Form.Group controlId="naziv">
                             <Form.Label>Naziv</Form.Label>
                             <Form.Control
                                 type="text"
                                 name="naziv"
+                                placeholder="Npr. Razgledavanje grada"
                                 value={stavka.naziv}
                                 onChange={promijeniVrijednost}
                             />
                         </Form.Group>
+                    </Col>
 
-                        <Form.Group className="mb-3">
+                    <Col xs={12}>
+                        <Form.Group controlId="biljeska">
                             <Form.Label>Bilješka</Form.Label>
                             <Form.Control
                                 as="textarea"
                                 rows={3}
                                 name="biljeska"
+                                placeholder="Dodatne informacije o aktivnosti..."
                                 value={stavka.biljeska}
                                 onChange={promijeniVrijednost}
                             />
                         </Form.Group>
+                    </Col>
 
-                        <Button type="submit" variant="success">
-                            Spremi
-                        </Button>
+                </Row>
 
-                        <Link
-                            to={RouteNames.ITINERAR}
-                            className="btn btn-danger ms-2"
-                        >
-                            Odustani
-                        </Link>
+                <div className="itinerar-obrazac-akcije">
+                    <Link
+                        to={
+                            stavka.putovanjeSifra
+                                ? `${RouteNames.ITINERAR}?putovanjeSifra=${stavka.putovanjeSifra}`
+                                : RouteNames.ITINERAR
+                        }
+                        className="btn btn-outline-secondary"
+                    >
+                        <FaTimes />
+                        Odustani
+                    </Link>
 
-                    </Form>
-                </Card.Body>
-            </Card>
+                    <Button type="submit" variant="primary">
+                        <FaPlus />
+                        Dodaj aktivnost
+                    </Button>
+                </div>
+            </Form>
 
-        </>
+        </section>
+
     )
 
 

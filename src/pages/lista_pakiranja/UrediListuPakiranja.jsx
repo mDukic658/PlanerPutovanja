@@ -7,6 +7,7 @@ import Pakiranje from "./Pakiranje"
 import NovoPakiranje from "./NovoPakiranje"
 import { Button } from "react-bootstrap"
 import { RouteNames } from "../../constants"
+import { FaArrowLeft, FaPen, FaTrash, FaPlus, FaMapMarkerAlt } from "react-icons/fa"
 
 export default function UrediListuPakiranja() {
 
@@ -73,57 +74,92 @@ export default function UrediListuPakiranja() {
     }
 
     return (
-        <>
-            <h3>Uredi listu pakiranja</h3>
+        <section className="uredivanje-pakiranja">
 
-            <Link to={RouteNames.LISTA_PAKIRANJA} className="btn secondary mb-3" >
-            Natrag na pregled pakiranja
+            <Link
+                to={RouteNames.LISTA_PAKIRANJA}
+                className="natrag-na-pregled"
+            >
+                <FaArrowLeft />
+                Natrag na pregled pakiranja
             </Link>
 
-            <h4>{putovanje.naziv}</h4>
+            <h2 className="uredivanje-pakiranja-naslov">
+                <FaPen />
+                Uredi listu pakiranja
+            </h2>
 
-            <p>
-                {putovanje.destinacija}, {putovanje.drzava}
-            </p>
+            <div className="uredivanje-pakiranja-kartica">
 
-            <h5>Predmeti za putovanje</h5>
+                <div className="uredivanje-pakiranja-putovanje">
+                    <h3>{putovanje.naziv}</h3>
 
-            {pakiranja
-                .filter((pakiranje) =>
+                    <p className="pakiranja-lokacija">
+                        <FaMapMarkerAlt />
+                        {putovanje.destinacija},
+                        {" "}{putovanje.drzava}
+                    </p>
+                </div>
+
+                <h4 className="pakiranja-podnaslov">
+                    Predmeti za putovanje
+                </h4>
+
+                <div className="pakiranja-stavke">
+                    {pakiranja
+                        .filter((pakiranje) =>
+                            pakiranje.putovanjeSifra === parseInt(params.sifra)
+                        )
+                        .map((pakiranje) => (
+                            <div
+                                key={pakiranje.predmetSifra}
+                                className="pakiranje-red"
+                            >
+                                <Pakiranje
+                                    pakiranje={pakiranje}
+                                    predmeti={predmeti}
+                                    promijeni={promijeni}
+                                />
+
+                                <Button
+                                    variant="danger"
+                                    size="sm"
+                                    onClick={() =>
+                                        obrisi(
+                                            pakiranje.predmetSifra,
+                                            pakiranje.putovanjeSifra
+                                        )
+                                    }
+                                >
+                                    <FaTrash />
+                                    Obriši
+                                </Button>
+                            </div>
+                        ))}
+                </div>
+
+                {!pakiranja.some((pakiranje) =>
                     pakiranje.putovanjeSifra === parseInt(params.sifra)
-                )
-                .map((pakiranje) => (
-                    <div key={pakiranje.predmetSifra}>
+                ) && (
+                        <p className="pakiranja-prazno">
+                            Lista je prazna. Dodaj prvi predmet ispod.
+                        </p>
+                    )}
 
-                        <Pakiranje
-                            pakiranje={pakiranje}
-                            predmeti={predmeti}
-                            promijeni={promijeni}
-                        />
+                <div className="pakiranja-dodavanje">
+                    <h4 className="pakiranja-podnaslov">
+                        <FaPlus />
+                        Dodaj predmet
+                    </h4>
 
-                        <Button
-                            variant="danger"
-                            size="sm"
-                            onClick={() =>
-                                obrisi(
-                                    pakiranje.predmetSifra,
-                                    pakiranje.putovanjeSifra
-                                )
-                            }
-                        >
-                            Obriši
-                        </Button>
+                    <NovoPakiranje
+                        putovanjeSifra={parseInt(params.sifra)}
+                        ucitajPakiranja={ucitajPakiranja}
+                    />
+                </div>
 
-                    </div>
-                ))
-            }
+            </div>
 
-            <h5 className="mt-4">Dodaj predmet</h5>
-
-            <NovoPakiranje
-                putovanjeSifra={parseInt(params.sifra)}
-                ucitajPakiranja={ucitajPakiranja}
-            />
-        </>
+        </section>
     )
 }

@@ -1,8 +1,9 @@
-import { Button, Col, Form, Row } from 'react-bootstrap'
+import { Button, Form } from 'react-bootstrap'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { RouteNames } from '../../constants'
 import DrzaveService from '../../services/drzave/DrzaveService'
 import { useState, useEffect } from 'react'
+import { FaArrowLeft, FaPen, FaSave, FaTimes } from 'react-icons/fa'
 
 export default function DrzavaPromjena() {
     const navigate = useNavigate()
@@ -37,12 +38,28 @@ export default function DrzavaPromjena() {
     }
 
     return (
-        <>
-            <h3>Promjena države</h3>
+         <section className="promjena-drzave">
 
-            <Form onSubmit={obradiSubmit}>
-                <Form.Group controlId="naziv" className="mb-3">
+            <Link
+                to={RouteNames.DRZAVE}
+                className="natrag-na-pregled"
+            >
+                <FaArrowLeft />
+                Natrag na pregled država
+            </Link>
+
+            <h2 className="promjena-drzave-naslov">
+                <FaPen />
+                Promjena države
+            </h2>
+
+            <Form
+                onSubmit={obradiSubmit}
+                className="promjena-drzave-obrazac"
+            >
+                <Form.Group controlId="naziv">
                     <Form.Label>Naziv države</Form.Label>
+
                     <Form.Control
                         type="text"
                         name="naziv"
@@ -57,23 +74,22 @@ export default function DrzavaPromjena() {
                     />
                 </Form.Group>
 
-                <Row className="mt-4">
-                    <Col>
-                        <Link
-                            to={RouteNames.DRZAVE}
-                            className="btn btn-danger"
-                        >
-                            Odustani
-                        </Link>
-                    </Col>
+                <div className="promjena-drzave-akcije">
+                    <Link
+                        to={RouteNames.DRZAVE}
+                        className="btn btn-outline-secondary"
+                    >
+                        <FaTimes />
+                        Odustani
+                    </Link>
 
-                    <Col>
-                        <Button type="submit" variant="success">
-                            Promijeni
-                        </Button>
-                    </Col>
-                </Row>
+                    <Button type="submit" variant="primary">
+                        <FaSave />
+                        Spremi promjene
+                    </Button>
+                </div>
             </Form>
-        </>
+
+        </section>
     )
 }

@@ -4,6 +4,7 @@ import { Button, Table } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 import DrzaveService from '../../services/drzave/DrzaveService'
 import { RouteNames } from '../../constants'
+import { FaGlobeEurope, FaPlus, FaPen, FaTrash } from 'react-icons/fa'
 
 export default function DrzavePregled() {
     const navigate = useNavigate()
@@ -24,55 +25,84 @@ export default function DrzavePregled() {
     }
 
     return (
-        <>
-            <h3>Države</h3>
+        <section className="pregled-drzava">
 
-            <Button
-                variant="success"
-                className="mb-3"
-                onClick={() => navigate(RouteNames.DRZAVE_DODAJ)}
-            >
-                Dodaj državu
-            </Button>
+            <div className="drzave-zaglavlje">
+                <h2>
+                    <FaGlobeEurope />
+                    Države
+                </h2>
 
-            <Table hover striped bordered responsive>
-                <thead>
-                    <tr>
-                        <th>Naziv države</th>
-                        <th>Akcija</th>
-                    </tr>
-                </thead>
+                <Button
+                    variant="primary"
+                    onClick={() => navigate(RouteNames.DRZAVE_DODAJ)}
+                >
+                    <FaPlus />
+                    Dodaj državu
+                </Button>
+            </div>
 
-                <tbody>
-                    {drzave.map((drzava) => (
-                        <tr key={drzava.sifra}>
-                            <td>{drzava.naziv}</td>
-                            <td>
-                                <Button
-                                    variant="success"
-                                    onClick={() =>
-                                        navigate(
-                                            RouteNames.DRZAVE_PROMJENA.replace(
-                                                ':sifra',
-                                                String(drzava.sifra)
-                                            )
-                                        )
-                                    }
-                                >
-                                    Promijeni
-                                </Button>
-
-                                <Button
-                                    variant="danger"
-                                    onClick={() => obrisi(drzava.sifra)}
-                                >
-                                    Obriši
-                                </Button>
-                            </td>
+            <div className="drzave-tablica">
+                <Table hover responsive className="mb-0">
+                    <thead>
+                        <tr>
+                            <th>Naziv države</th>
+                            <th>Akcija</th>
                         </tr>
-                    ))}
-                </tbody>
-            </Table>
-        </>
+                    </thead>
+
+                    <tbody>
+                        {drzave.map((drzava) => (
+                            <tr key={drzava.sifra}>
+                                <td className="drzava-naziv">
+                                    {drzava.naziv}
+                                </td>
+
+                                <td>
+                                    <div className="drzave-akcije">
+                                        <Button
+                                            variant="primary"
+                                            onClick={() =>
+                                                navigate(
+                                                    RouteNames.DRZAVE_PROMJENA.replace(
+                                                        ':sifra',
+                                                        String(drzava.sifra)
+                                                    )
+                                                )
+                                            }
+                                        >
+                                            <FaPen />
+                                            Promijeni
+                                        </Button>
+
+                                        <Button
+                                            variant="danger"
+                                            onClick={() => obrisi(drzava.sifra)}
+                                        >
+                                            <FaTrash />
+                                            Obriši
+                                        </Button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+
+                        {drzave.length === 0 && (
+                            <tr>
+                                <td colSpan={2} className="drzave-prazno">
+                                    Trenutno nema dodanih država.
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </Table>
+            </div>
+
+            <p className="drzave-ukupno">
+                Ukupno država:
+                <span>{drzave.length}</span>
+            </p>
+
+        </section>
     )
 }

@@ -1,8 +1,9 @@
 import { Button, Form } from "react-bootstrap"
-import { useNavigate, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import { useEffect, useState } from "react"
 import PredmetiService from "../../services/predmeti/PredmetiService"
 import { RouteNames } from "../../constants"
+import { FaArrowLeft, FaPen, FaSave, FaTimes } from "react-icons/fa"
 
 export default function PredmetPromjena() {
 
@@ -43,11 +44,25 @@ export default function PredmetPromjena() {
     }
 
     return (
-        <>
-            <h3>Promjena predmeta</h3>
+        <section className="promjena-predmeta">
 
-            <Form onSubmit={obradiSubmit}>
+            <Link
+                to={RouteNames.PREDMETI}
+                className="natrag-na-pregled"
+            >
+                <FaArrowLeft />
+                Natrag na pregled predmeta
+            </Link>
 
+            <h2 className="promjena-predmeta-naslov">
+                <FaPen />
+                Promjena predmeta
+            </h2>
+
+            <Form
+                onSubmit={obradiSubmit}
+                className="promjena-predmeta-obrazac"
+            >
                 <Form.Group controlId="naziv">
                     <Form.Label>Naziv predmeta</Form.Label>
 
@@ -59,26 +74,25 @@ export default function PredmetPromjena() {
                     />
                 </Form.Group>
 
-                <Button
-                    type="submit"
-                    variant="success"
-                    className="mt-2"
-                >
-                    Spremi promjene
-                </Button>
+                <div className="promjena-predmeta-akcije">
+                    <Button
+                        type="button"
+                        variant="outline-secondary"
+                        onClick={() => {
+                            navigate(RouteNames.PREDMETI)
+                        }}
+                    >
+                        <FaTimes />
+                        Odustani
+                    </Button>
 
-                <Button
-                    type="button"
-                    variant="danger"
-                    className="mt-2 ms-2"
-                    onClick={() => {
-                        navigate(RouteNames.PREDMETI)
-                    }}
-                >
-                    Odustani
-                </Button>
-
+                    <Button type="submit" variant="primary">
+                        <FaSave />
+                        Spremi promjene
+                    </Button>
+                </div>
             </Form>
-        </>
+
+        </section>
     )
 }

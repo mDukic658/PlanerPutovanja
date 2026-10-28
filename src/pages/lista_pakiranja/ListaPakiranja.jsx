@@ -5,6 +5,7 @@ import PredmetiService from "../../services/predmeti/PredmetiService"
 import { Button, Tab, Tabs } from "react-bootstrap"
 import Pakiranje from "./Pakiranje"
 import { useNavigate } from "react-router-dom"
+import { FaSuitcaseRolling, FaPen, FaMapMarkerAlt } from "react-icons/fa"
 
 export default function ListaPakiranja() {
 
@@ -61,52 +62,90 @@ export default function ListaPakiranja() {
     }
 
     return (
-        <>
-            <h3 className="LP">Lista pakiranja</h3>
+         <section className="pregled-pakiranja">
 
-            <Tabs
-                defaultActiveKey={1}
-                variant="pills"
-                className="lista-pakiranja-tabs mb-3"
-            >
-                {putovanja && putovanja.map((putovanje) => (
-                    <Tab
-                        eventKey={putovanje.sifra}
-                        title={putovanje.naziv}
-                        key={putovanje.sifra}
-                    >
-                        <h4>{putovanje.naziv}</h4>
+            <h2 className="pakiranja-naslov">
+                <FaSuitcaseRolling />
+                Lista pakiranja
+            </h2>
 
-                        <p>
-                            {putovanje.destinacija}, {putovanje.drzava}
-                        </p>
-
-                        <Button
-                            variant="primary"
-                            onClick={() => {
-                                navigate('/lista/pakiranja/' + putovanje.sifra)
-                            }}
+            {putovanja.length === 0 ? (
+                <p className="pakiranja-prazno">
+                    Prvo dodaj putovanje kako bi mogao napraviti listu pakiranja.
+                </p>
+            ) : (
+                <Tabs
+                    key={putovanja[0].sifra}
+                    defaultActiveKey={putovanja[0].sifra}
+                    variant="pills"
+                    className="lista-pakiranja-tabs"
+                >
+                    {putovanja.map((putovanje) => (
+                        <Tab
+                            eventKey={putovanje.sifra}
+                            title={putovanje.naziv}
+                            key={putovanje.sifra}
                         >
-                            Uredi listu pakiranja
-                        </Button>
+                            <div className="pakiranja-pregled-kartica">
 
-                        {pakiranja
-                            .filter((pakiranje) =>
-                                pakiranje.putovanjeSifra === putovanje.sifra
-                            )
-                            .map((pakiranje) => (
-                                <Pakiranje
-                                    key={pakiranje.predmetSifra}
-                                    pakiranje={pakiranje}
-                                    predmeti={predmeti}
-                                    promijeni={promijeni}
-                                />
-                            ))
-                        }
+                                <div className="pakiranja-zaglavlje">
+                                    <div>
+                                        <h3>{putovanje.naziv}</h3>
 
-                    </Tab>
-                ))}
-            </Tabs>
-        </>
+                                        <p className="pakiranja-lokacija">
+                                            <FaMapMarkerAlt />
+                                            {putovanje.destinacija},
+                                            {" "}{putovanje.drzava}
+                                        </p>
+                                    </div>
+
+                                    <Button
+                                        variant="primary"
+                                        onClick={() => {
+                                            navigate(
+                                                "/lista/pakiranja/" + putovanje.sifra
+                                            )
+                                        }}
+                                    >
+                                        <FaPen />
+                                        Uredi listu pakiranja
+                                    </Button>
+                                </div>
+
+                                <div className="pakiranja-stavke">
+                                    {pakiranja
+                                        .filter((pakiranje) =>
+                                            pakiranje.putovanjeSifra === putovanje.sifra
+                                        )
+                                        .map((pakiranje) => (
+                                            <div
+                                                className="pakiranje-red"
+                                                key={pakiranje.predmetSifra}
+                                            >
+                                                <Pakiranje
+                                                    pakiranje={pakiranje}
+                                                    predmeti={predmeti}
+                                                    promijeni={promijeni}
+                                                />
+                                            </div>
+                                        ))}
+                                </div>
+
+                                {!pakiranja.some((pakiranje) =>
+                                    pakiranje.putovanjeSifra === putovanje.sifra
+                                ) && (
+                                    <p className="pakiranja-prazno">
+                                        Još nema predmeta za ovo putovanje.
+                                        Dodaj ih kroz uređivanje liste.
+                                    </p>
+                                )}
+
+                            </div>
+                        </Tab>
+                    ))}
+                </Tabs>
+            )}
+
+        </section>
     )
 }

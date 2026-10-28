@@ -4,6 +4,7 @@ import { Button, Badge, Card, Form, Row, Col } from "react-bootstrap"
 import { RouteNames } from "../../constants";
 import PutovanjaService from '../../services/putovanja/PutovanjaService'
 import ItinerarService from '../../services/itinerar/ItinerarService'
+import { FaRoute, FaPlus, FaPen, FaTrash, FaClock, FaCalendarDay } from "react-icons/fa";
 
 
 export default function ItinerarPregled() {
@@ -18,6 +19,9 @@ export default function ItinerarPregled() {
 
     const navigate = useNavigate()
 
+    const [searchParams] = useSearchParams()
+    const putovanjeSifra = searchParams.get("putovanjeSifra")
+
 
     useEffect(() => {
         ucitajPutovanja()
@@ -28,8 +32,25 @@ export default function ItinerarPregled() {
             setStavke([])
             return
         }
-        ucitajStavke()
-    }, [])
+
+        ItinerarService.getByPutovanje(odabranaSifra).then((odgovor) => {
+            setStavke(odgovor.data)
+        })
+
+    }, [odabranaSifra])
+
+    useEffect(() => {
+        if (!putovanjeSifra) return
+
+        const putovanje = putovanja.find(
+            (p) => p.sifra === Number(putovanjeSifra)
+        )
+
+        if (putovanje) {
+            setOdabranoPutovanje(putovanje)
+            setOdabranaSifra(putovanje.sifra)
+        }
+    }, [putovanja, putovanjeSifra])
 
 
     async function ucitajPutovanja() {
@@ -66,11 +87,11 @@ export default function ItinerarPregled() {
     function filtrirajPutovanje() {
         //if (!pretragaPutovanje) return []
 
-        const sortiranaPutovanja = [...putovanja].sort((a, b) => 
+        const sortiranaPutovanja = [...putovanja].sort((a, b) =>
             new Date(b.datumPolaska) - new Date(a.datumPolaska)
         );
         //console.log('pretragaPutovanje', pretragaPutovanje)
-        if(pretragaPutovanje===''){
+        if (pretragaPutovanje === '') {
             return sortiranaPutovanja
         }
 
@@ -116,134 +137,183 @@ export default function ItinerarPregled() {
     function postaviOdabranoPutovanje(sifra) {
         setOdabranoPutovanje(putovanja.find(p => p.sifra === sifra))
         setOdabranaSifra(sifra)
-        ucitajStavke()
     }
 
     return (
 
-        <>
+        <section className="pregled-itinerara">
 
-            <h2 className="my-3" > Itinerar </h2>
+            <div className="itinerar-zaglavlje">
+                <h2>
+                    <FaRoute />
+                    Itinerar
+                </h2>
 
+                {odabranoPutovanje.sifra > 0 && (
+                    <Link
+                        to={`${RouteNames.ITINERAR_DODAJ}?putovanjeSifra=${odabranaSifra}`}
+                        className="btn btn-primary"
+                    >
+                        <FaPlus />
+                        Dodaj aktivnost
+                    </Link>
+                )}
+            </div>
 
-            <Form.Group className="mb-3 position-relative">
-                <Form.Label className="fw-bold">Odaberi putovanje <span style={{color: 'red'}}>
-                    {odabranoPutovanje.naziv}
-                    </span> </Form.Label>
-                <Form.Control
-                    type="text"
-                    placeholder="Pretraži putovanja..."
-                    value={pretragaPutovanje}
-                    onChange={(e) => {
-                        setPretragaPutovanje(e.target.value)
-                        setOdabraniIndex(-1)
-                        setPrikaziAutocomplete(true)
-                    }}
-                    onFocus={() => {setPrikaziAutocomplete(true)}}
-                    onBlur={()=>setPrikaziAutocomplete(false)}
-                    onKeyUp={handleKeyUp}
-                />
-                {prikaziAutocomplete && (
-                    <div className="position-absolute w-100 bg-white border rounded shadow-sm" style={{ zIndex: 1000, maxHeight: '200px', overflowY: 'auto' }}>
-                        {filtrirajPutovanje().map((o, index) => (
-                            <div
-                                key={o.sifra}
-                                className="p-2 cursor-pointer"
-                                style={{
-                                    cursor: 'pointer',
-                                    backgroundColor: index === odabraniIndex ? '#007bff' : 'white',
-                                    color: index === odabraniIndex ? 'white' : 'black'
-                                }}
-                                onClick={() => {
-                                    postaviOdabranoPutovanje(o.sifra)
-                                    setPrikaziAutocomplete(false)
-                                    setPretragaPutovanje('')
-                                    setOdabraniIndex(-1)
-                                }}
-                                onMouseEnter={(e) => {
-                                    setOdabraniIndex(index)
-                                }}
-                            >
-                                {o.naziv}
-                            </div>
-                        ))}
+            <div className="itinerar-odabir">
+                <Form.Group
+                    controlId="pretragaPutovanja"
+                    className="position-relative"
+                >
+                    <Form.Label>Odaberi putovanje</Form.Label>
+
+                    <Form.Control
+                        type="text"
+                        placeholder="Pretraži putovanja..."
+                        value={pretragaPutovanje}
+                        onChange={(e) => {
+                            setPretragaPutovanje(e.target.value)
+                            setOdabraniIndex(-1)
+                            setPrikaziAutocomplete(true)
+                        }}
+                        onFocus={() => setPrikaziAutocomplete(true)}
+                        onBlur={() => setPrikaziAutocomplete(false)}
+                        onKeyUp={handleKeyUp}
+                        autoComplete="off"
+                    />
+
+                    {prikaziAutocomplete && (
+                        <div className="itinerar-prijedlozi">
+                            {filtrirajPutovanje().map((o, index) => (
+                                <div
+                                    key={o.sifra}
+                                    className={
+                                        index === odabraniIndex
+                                            ? "itinerar-prijedlog aktivan"
+                                            : "itinerar-prijedlog"
+                                    }
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={() => {
+                                        postaviOdabranoPutovanje(o.sifra)
+                                        setPrikaziAutocomplete(false)
+                                        setPretragaPutovanje("")
+                                        setOdabraniIndex(-1)
+                                    }}
+                                    onMouseEnter={() => {
+                                        setOdabraniIndex(index)
+                                    }}
+                                >
+                                    {o.naziv}
+                                </div>
+                            ))}
+
+                            {filtrirajPutovanje().length === 0 && (
+                                <div className="p-3">
+                                    Nema pronađenih putovanja.
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </Form.Group>
+
+                {odabranoPutovanje.sifra > 0 && (
+                    <div className="itinerar-odabrano">
+                        <strong>{odabranoPutovanje.naziv}</strong>
+                        <span>
+                            {odabranoPutovanje.destinacija},
+                            {" "}{odabranoPutovanje.drzava}
+                        </span>
                     </div>
                 )}
-            </Form.Group>
+            </div>
 
-            {odabranoPutovanje.sifra>0 && (
-                <Link
-                    to={`${RouteNames.ITINERAR_DODAJ}?putovanjeSifra=${odabranaSifra}`}
-                    className="btn btn-success w-100 my-3"
-                >
-                    Dodavanje nove stavke itinerara
-                </Link>
+            {Object.entries(poDanima)
+                .sort(([a], [b]) => Number(a) - Number(b))
+                .map(([dan, stavkeDana]) => (
+                    <div key={dan} className="itinerar-dan">
+
+                        <h3>
+                            <FaCalendarDay />
+                            Dan {dan}
+                        </h3>
+
+                        <Row xs={1} md={2} lg={3} className="g-3">
+                            {[...stavkeDana]
+                                .sort((a, b) =>
+                                    a.vrijeme.localeCompare(b.vrijeme)
+                                )
+                                .map((s) => (
+                                    <Col key={s.sifra}>
+                                        <Card className="itinerar-kartica h-100">
+                                            <Card.Body>
+                                                <div className="itinerar-vrijeme">
+                                                    <FaClock />
+                                                    {s.vrijeme}
+                                                </div>
+
+                                                <Card.Title>
+                                                    {s.naziv}
+                                                </Card.Title>
+
+                                                {s.biljeska && (
+                                                    <Card.Text>
+                                                        {s.biljeska}
+                                                    </Card.Text>
+                                                )}
+                                            </Card.Body>
+
+                                            <Card.Footer>
+                                                <Button
+                                                    size="sm"
+                                                    variant="primary"
+                                                    onClick={() => {
+                                                        navigate(
+                                                            `${RouteNames.ITINERAR}/promjena/${s.sifra}?putovanjeSifra=${odabranaSifra}`
+                                                        )
+                                                    }}
+                                                >
+                                                    <FaPen />
+                                                    Promijeni
+                                                </Button>
+
+                                                <Button
+                                                    size="sm"
+                                                    variant="danger"
+                                                    onClick={() => obrisi(s.sifra)}
+                                                >
+                                                    <FaTrash />
+                                                    Izbriši
+                                                </Button>
+                                            </Card.Footer>
+                                        </Card>
+                                    </Col>
+                                ))}
+                        </Row>
+                    </div>
+                ))}
+
+            {!odabranoPutovanje.sifra && (
+                <p className="itinerar-prazno">
+                    Odaberi putovanje za prikaz aktivnosti.
+                </p>
             )}
 
-            {Object.entries(poDanima).map(([dan, stavkeDana]) => (
-
-                <div key={dan} className="mb-4">
-                    <h5>Dan {dan}</h5>
-
-                    <Row xs={1} md={2} lg={3} className="g-3">
-                        {stavkeDana
-                            .sort((a, b) => a.vrijeme.localeCompare(b.vrijeme))
-                            .map((s) => (
-
-                                <Col key={s.sifra}>
-                                    <Card className="h-100">
-                                        <Card.Body>
-                                            <Card.Title>{s.naziv}</Card.Title>
-                                            <Card.Subtitle className="mb-2 text-muted">
-                                                {s.vrijeme}
-                                            </Card.Subtitle>
-                                            {s.biljeska && (
-                                                <Card.Text>{s.biljeska}</Card.Text>
-                                            )}
-                                        </Card.Body>
-                                        <Card.Footer>
-                                            <Button
-                                                size="sm"
-                                                onClick={() => {
-                                                    navigate(
-                                                        `${RouteNames.ITINERAR}/promjena/${s.sifra}?putovanjeSifra=${odabranaSifra}`
-                                                    )
-                                                }}>
-                                                Promijeni
-                                            </Button>
-
-                                            <Button
-                                                size="sm"
-                                                variant="danger"
-                                                className="ms-2"
-                                                onClick={() => obrisi(s.sifra)} >
-                                                Izbriši
-                                            </Button>
-                                        </Card.Footer>
-                                    </Card>
-                                </Col>
-
-                            ))}
-                    </Row>
-                </div>
-
-            ))}
-
-            {odabranoPutovanje.sifra>0 && stavke.length === 0 && (
-                <p>Nema stavki za ovo putovanje.</p>
+            {odabranoPutovanje.sifra > 0 && stavke.length === 0 && (
+                <p className="itinerar-prazno">
+                    Još nema aktivnosti za ovo putovanje.
+                </p>
             )}
 
-            {odabranoPutovanje.sifra>0 && (
-                <>
-                    Ukupno &nbsp;
-                    <Badge pill bg="success">
-                        {stavke && stavke.length}
+            {odabranoPutovanje.sifra > 0 && (
+                <div className="itinerar-ukupno">
+                    Ukupno aktivnosti:
+                    <Badge pill bg="primary">
+                        {stavke.length}
                     </Badge>
-                    &nbsp; stavki itinerara
-                </>
+                </div>
             )}
 
-        </>
+        </section>
 
     )
 

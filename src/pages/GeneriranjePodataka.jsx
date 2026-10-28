@@ -6,6 +6,7 @@ import PredmetiService from '../services/predmeti/PredmetiService'
 import PutovanjaService from '../services/putovanja/PutovanjaService'
 import PakiranjaService from '../services/lista_pakiranja/PakiranjaService'
 import ItinerarService from "../services/itinerar/ItinerarService";
+import { DATA_SOURCE } from "../constants";
 
 export default function GeneriranjePodataka() {
 
@@ -16,6 +17,8 @@ export default function GeneriranjePodataka() {
     const [brojItinerara, setBrojItinerara] = useState(10)
     const [poruka, setPoruka] = useState(null)
     const [loading, setLoading] = useState(false)
+
+    const generiranjeZabranjeno = DATA_SOURCE === 'memorija'
 
     const faker = new Faker({
         locale: [hr, en, base]
@@ -190,6 +193,15 @@ export default function GeneriranjePodataka() {
 
     const handleGeneriraj = async (e, generiraj, broj, naziv) => {
         e.preventDefault()
+
+        if (generiranjeZabranjeno) {
+            setPoruka({
+                tip: "warning",
+                tekst: "Generiranje podataka nije dopušteno dok je izvor podataka memorija."
+            })
+            return
+        }
+
         setLoading(true)
         setPoruka(null)
 
@@ -265,6 +277,14 @@ export default function GeneriranjePodataka() {
                 Generirajte testne podatke s lažnim (fake) podacima na hrvatskom jeziku.
             </p>
 
+            {generiranjeZabranjeno && (
+                <Alert variant="warning">
+                    Generiranje podataka je onemogućeno jer je u constants.js
+                    postavljen izvor podataka „memorija”.
+                    Za generiranje odaberi „localStorage”.
+                </Alert>
+            )}
+
             {poruka && (
                 <Alert variant={poruka.tip} dismissible onClose={() => setPoruka(null)}>
                     {poruka.tekst}
@@ -283,7 +303,7 @@ export default function GeneriranjePodataka() {
                                     max={k.max}
                                     value={k.broj}
                                     onChange={(e) => k.setBroj(parseInt(e.target.value))}
-                                    disabled={loading}
+                                    disabled={loading || generiranjeZabranjeno}
                                 />
                                 <Form.Text className="text-muted">
                                     1-{k.max}
@@ -292,7 +312,7 @@ export default function GeneriranjePodataka() {
                             <Button
                                 variant="primary"
                                 type="submit"
-                                disabled={loading}
+                                disabled={loading || generiranjeZabranjeno}
                                 className="w-100"
                             >
                                 {loading ? 'Generiranje...' : `Generiraj ${k.naziv.toLowerCase()}`}

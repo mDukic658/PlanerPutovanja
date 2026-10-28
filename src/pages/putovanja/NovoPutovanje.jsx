@@ -5,6 +5,7 @@ import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import DrzaveService from '../../services/drzave/DrzaveService'
 import { useEffect, useState } from "react"
 import PretragaDrzava from "../../components/PretragaDrzava"
+import { FaArrowLeft, FaPlaneDeparture, FaPlus, FaTimes } from "react-icons/fa"
 
 
 export default function NovoPutovanje() {
@@ -122,70 +123,115 @@ export default function NovoPutovanje() {
     }
 
     return (
-        <>
-            <h3>Dodavanje novog putovanja</h3>
+        <section className="novo-putovanje">
 
-            <Form onSubmit={obradiSubmit}>
+            <Link
+                to={RouteNames.PUTOVANJA}
+                className="natrag-na-pregled"
+            >
+                <FaArrowLeft />
+                Natrag na pregled putovanja
+            </Link>
 
-                <Form.Group controlId="naziv">
-                    <Form.Label> Naziv </Form.Label>
-                    <Form.Control type="text" name="naziv" required />
-                </Form.Group>
+            <h2 className="novo-putovanje-naslov">
+                <FaPlaneDeparture />
+                Dodavanje novog putovanja
+            </h2>
 
-                <Form.Group controlId="drzava">
-                    <PretragaDrzava
-                        drzave={drzave}
-                        odabranaDrzava={odabranaDrzava}
-                        onOdaberi={setOdabranaDrzava}
-                    />
-                </Form.Group>
+            <Form
+                onSubmit={obradiSubmit}
+                className="putovanje-obrazac"
+            >
+                <Row className="g-3">
 
-                <Form.Group controlId="destinacija">
-                    <Form.Label> Destinacija </Form.Label>
-                    <Form.Control type="text" name="destinacija" />
-                </Form.Group>
-
-                <Form.Group controlId="datumPolaska">
-                    <Form.Label> Datum polaska </Form.Label>
-                    <Form.Control
-                        type="date"
-                        onClick={(e) => e.target.showPicker()}
-                        onFocus={(e) => e.target.showPicker()}
-                        name="datumPolaska"
-                    />
-                </Form.Group>
-
-                <Form.Group controlId="datumPovratka">
-                    <Form.Label> Datum povratka </Form.Label>
-                    <Form.Control
-                        type="date"
-                        onClick={(e) => e.target.showPicker()}
-                        onFocus={(e) => e.target.showPicker()}
-                        name="datumPovratka" />
-                </Form.Group>
-
-                <Form.Group controlId="budzet">
-                    <Form.Label> Budžet </Form.Label>
-                    <Form.Control type="number" name="budzet" step={0.01} />
-                </Form.Group>
-
-
-                <Row className="mt-4">
-                    <Col>
-                        <Link to={RouteNames.PUTOVANJA}
-                            className="btn btn-danger"
-                        >
-                            Odustani
-                        </Link>
+                    <Col xs={12}>
+                        <Form.Group controlId="naziv">
+                            <Form.Label>Naziv</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="naziv"
+                                placeholder="Npr. Ljetovanje u Italiji"
+                                required
+                            />
+                        </Form.Group>
                     </Col>
-                    <Col>
-                        <Button type="submit" variant="success">
-                            Dodaj
-                        </Button>
+
+                    <Col xs={12} md={6}>
+                        <Form.Group controlId="drzava">
+                            <PretragaDrzava
+                                drzave={drzave}
+                                odabranaDrzava={odabranaDrzava}
+                                onOdaberi={setOdabranaDrzava}
+                            />
+                        </Form.Group>
                     </Col>
+
+                    <Col xs={12} md={6}>
+                        <Form.Group controlId="destinacija">
+                            <Form.Label>Destinacija</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="destinacija"
+                                placeholder="Npr. Rim"
+                            />
+                        </Form.Group>
+                    </Col>
+
+                    <Col xs={12} md={6}>
+                        <Form.Group controlId="datumPolaska">
+                            <Form.Label>Datum polaska</Form.Label>
+                            <Form.Control
+                                type="date"
+                                onClick={(e) => e.target.showPicker()}
+                                onFocus={(e) => e.target.showPicker()}
+                                name="datumPolaska"
+                            />
+                        </Form.Group>
+                    </Col>
+
+                    <Col xs={12} md={6}>
+                        <Form.Group controlId="datumPovratka">
+                            <Form.Label>Datum povratka</Form.Label>
+                            <Form.Control
+                                type="date"
+                                onClick={(e) => e.target.showPicker()}
+                                onFocus={(e) => e.target.showPicker()}
+                                name="datumPovratka"
+                            />
+                        </Form.Group>
+                    </Col>
+
+                    <Col xs={12} md={6}>
+                        <Form.Group controlId="budzet">
+                            <Form.Label>Budžet (€)</Form.Label>
+                            <Form.Control
+                                type="number"
+                                name="budzet"
+                                step={0.01}
+                                placeholder="Npr. 800"
+                            />
+                        </Form.Group>
+                    </Col>
+
                 </Row>
+
+                <div className="putovanje-obrazac-akcije">
+                    <Link
+                        to={RouteNames.PUTOVANJA}
+                        className="btn btn-outline-secondary"
+                    >
+                        <FaTimes />
+                        Odustani
+                    </Link>
+
+                    <Button type="submit" variant="primary">
+                        <FaPlus />
+                        Dodaj putovanje
+                    </Button>
+                </div>
+
             </Form>
-        </>
+        </section>
     )
 
 }
