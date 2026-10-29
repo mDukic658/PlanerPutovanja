@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import PakiranjaService from "../../services/lista_pakiranja/PakiranjaService"
 import PredmetiService from "../../services/predmeti/PredmetiService"
-import { Button, Tab, Tabs } from "react-bootstrap"
+import { Button, Tab, Tabs, ProgressBar } from "react-bootstrap"
 import Pakiranje from "./Pakiranje"
 import { useNavigate } from "react-router-dom"
 import { FaSuitcaseRolling, FaPen, FaMapMarkerAlt } from "react-icons/fa"
@@ -61,8 +61,48 @@ export default function ListaPakiranja() {
         ucitajPakiranja()
     }
 
+    function prikaziNapredak(putovanjeSifra) {
+
+        const stavke = pakiranja.filter(
+            (pakiranje) => pakiranje.putovanjeSifra === putovanjeSifra
+        )
+
+        const ukupno = stavke.length
+        const spakirano = stavke.filter(
+            (pakiranje) => pakiranje.spakirano
+        ).length
+
+        const postotak = ukupno === 0
+            ? 0
+            : Math.round((spakirano / ukupno) * 100)
+
+        return (
+            <div className="mb-4">
+                <p className="mb-2">
+                    Spakirano <strong>{spakirano}</strong> od{" "}
+                    <strong>{ukupno}</strong> predmeta
+                </p>
+
+                <ProgressBar
+                    now={postotak}
+                    label={`${postotak}%`}
+                    variant={postotak === 100 ? "success" : "primary"}
+                    aria-label="Napredak pakiranja"
+                />
+
+                {ukupno > 0 && spakirano === ukupno && (
+                    <p className="text-success mt-2 mb-0">
+                        Sve je spakirano!
+                    </p>
+                )}
+            </div>
+        )
+
+    }
+
     return (
-         <section className="pregled-pakiranja">
+
+        <section className="pregled-pakiranja">
 
             <h2 className="pakiranja-naslov">
                 <FaSuitcaseRolling />
@@ -112,6 +152,8 @@ export default function ListaPakiranja() {
                                     </Button>
                                 </div>
 
+                                {prikaziNapredak(putovanje.sifra)}
+
                                 <div className="pakiranja-stavke">
                                     {pakiranja
                                         .filter((pakiranje) =>
@@ -134,11 +176,11 @@ export default function ListaPakiranja() {
                                 {!pakiranja.some((pakiranje) =>
                                     pakiranje.putovanjeSifra === putovanje.sifra
                                 ) && (
-                                    <p className="pakiranja-prazno">
-                                        Još nema predmeta za ovo putovanje.
-                                        Dodaj ih kroz uređivanje liste.
-                                    </p>
-                                )}
+                                        <p className="pakiranja-prazno">
+                                            Još nema predmeta za ovo putovanje.
+                                            Dodaj ih kroz uređivanje liste.
+                                        </p>
+                                    )}
 
                             </div>
                         </Tab>

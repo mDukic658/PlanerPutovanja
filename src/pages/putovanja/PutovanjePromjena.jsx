@@ -6,10 +6,12 @@ import DrzaveService from "../../services/drzave/DrzaveService"
 import { useState, useEffect } from "react"
 import PretragaDrzava from "../../components/PretragaDrzava"
 import { FaPen, FaSave, FaTimes, FaArrowLeft } from "react-icons/fa"
+import { useObavijesti } from "../../components/Obavijesti"
 
 export default function PutovanjePromjena() {
 
     const navigate = useNavigate()
+    const obavijesti = useObavijesti()
     const params = useParams()
     const [putovanje, setPutovanje] = useState([])
     const [drzave, setDrzave] = useState([])
@@ -34,9 +36,15 @@ export default function PutovanjePromjena() {
     }, [])
 
     async function promijeni(putovanje) {
-        await PutovanjaService.promijeni(params.sifra, putovanje).then(() => {
+        try {
+            await PutovanjaService.promijeni(params.sifra, putovanje)
+
+            obavijesti("Promjene putovanja su spremljene.")
             navigate(RouteNames.PUTOVANJA)
-        })
+        } catch (error) {
+            console.error(error)
+            obavijesti("Spremanje promjena nije uspjelo.", "danger")
+        }
     }
 
     function obradiSubmit(e) {
@@ -44,7 +52,7 @@ export default function PutovanjePromjena() {
         const podaci = new FormData(e.target)
 
         if (!podaci.get("drzava")) {
-            alert("Morate odabrati državu!")
+            obavijesti("Morate odabrati državu!", "danger")
             return
         }
 

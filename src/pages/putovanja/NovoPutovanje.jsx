@@ -6,12 +6,14 @@ import DrzaveService from '../../services/drzave/DrzaveService'
 import { useEffect, useState } from "react"
 import PretragaDrzava from "../../components/PretragaDrzava"
 import { FaArrowLeft, FaPlaneDeparture, FaPlus, FaTimes } from "react-icons/fa"
+import { useObavijesti } from "../../components/Obavijesti"
 
 
 export default function NovoPutovanje() {
 
     const navigate = useNavigate()
 
+    const obavijesti = useObavijesti()
     const [drzave, setDrzave] = useState([])
     const [odabranaDrzava, setOdabranaDrzava] = useState("")
     const [odabraniGrad, setOdabraniGrad] = useState(null)
@@ -28,9 +30,15 @@ export default function NovoPutovanje() {
     }, [])
 
     async function dodaj(putovanje) {
-        await PutovanjaService.dodaj(putovanje).then(() => {
+        try {
+            await PutovanjaService.dodaj(putovanje)
+
+            obavijesti("Putovanje je uspješno dodano.")
             navigate(RouteNames.PUTOVANJA)
-        })
+        } catch (error) {
+            console.error(error)
+            obavijesti("Dodavanje putovanja nije uspjelo.", "danger")
+        }
     }
 
     function obradiSubmit(e) {

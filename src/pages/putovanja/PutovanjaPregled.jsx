@@ -7,12 +7,15 @@ import { Link, useNavigate } from "react-router-dom"
 import { RouteNames } from "../../constants"
 import { BsSuitcase2Fill } from "react-icons/bs"
 import { FaPlus, FaPen, FaTrash } from "react-icons/fa"
+import { useObavijesti } from "../../components/Obavijesti"
 
 export default function PutovanjePregled() {
 
     const [putovanja, setPutovanja] = useState([])
 
     const navigate = useNavigate()
+
+    const obavijesti = useObavijesti()
 
     useEffect(() => {
         ucitajPutovanja()
@@ -29,107 +32,124 @@ export default function PutovanjePregled() {
             return
         }
 
-        await PutovanjaService.obrisi(sifra)
-        ucitajPutovanja()
+        try {
+            await PutovanjaService.obrisi(sifra)
+        } catch (error) {
+            console.error(error)
+            obavijesti("Brisanje putovanja nije uspjelo.", "danger")
+            return
+        }
+
+        obavijesti("Putovanje je obrisano.")
+
+        try {
+            await ucitajPutovanja()
+        } catch (error) {
+            console.error(error)
+            obavijesti(
+                "Putovanje je obrisano, ali osvježavanje popisa nije uspjelo.",
+                "danger"
+            )
+        }
     }
 
     return (
-            <section className="pregled-putovanja" >
+        <section className="pregled-putovanja" >
 
-                <div className="putovanje-zaglavlje" >
-                    <h2>
-                        <BsSuitcase2Fill />
-                        Putovanja
-                    </h2>
+            <div className="putovanje-zaglavlje" >
+                <h2>
+                    <BsSuitcase2Fill />
+                    Putovanja
+                </h2>
 
-                    <Link to={RouteNames.PUTOVANJA_DODAJ}
-                        className="btn btn-primary"
-                    >
-                        <FaPlus />
-                        Novo Putovanje
-                    </Link>
-                </div>
+                <Link to={RouteNames.PUTOVANJA_DODAJ}
+                    className="btn btn-primary"
+                >
+                    <FaPlus />
+                    Novo Putovanje
+                </Link>
+            </div>
 
-                <div className="putovanje-tablica" >
-                    <Table hover responsive striped bordered className="mb-0" >
-                        <thead>
-                            <tr>
-                                <th>Naziv</th>
-                                <th>Destinacija</th>
-                                <th>Država</th>
-                                <th>Datum Polaska</th>
-                                <th>Datum povratka</th>
-                                <th>Budžet</th>
-                                <th>Akcija</th>
+            <div className="putovanje-tablica" >
+                <Table hover responsive striped bordered className="mb-0" >
+                    <thead>
+                        <tr>
+                            <th>Naziv</th>
+                            <th>Destinacija</th>
+                            <th>Država</th>
+                            <th>Datum Polaska</th>
+                            <th>Datum povratka</th>
+                            <th>Budžet</th>
+                            <th>Akcija</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        {putovanja && putovanja.map((p) => (
+
+                            <tr key={p.sifra}>
+                                <td className="putovanje-naziv">
+                                    {p.naziv}
+                                </td>
+
+                                <td> {p.destinacija} </td>
+                                <td> {p.drzava} </td>
+                                <td>
+                                    <FormatDatuma datum={p.datumPolaska} />
+                                </td>
+                                <td>
+                                    <FormatDatuma datum={p.datumPovratka} />
+                                </td>
+                                <td className="desno">
+                                    <NumericFormat
+                                        value={p.budzet}
+                                        displayType={'text'}
+                                        decimalSeparator=","
+                                        decimalScale={2}
+                                        fixedDecimalScale
+                                        thousandSeparator='.'
+                                        suffix=" €"
+                                    />
+                                </td>
+                                <td>
+                                    <div className="putovanja-akcije" >
+                                        <Button
+                                            onClick={() => { navigate(`/putovanja/${p.sifra}`) }}>
+                                            <FaPen />
+                                            Promijeni
+                                        </Button>
+
+                                        <Button
+                                            variant="danger"
+                                            onClick={() => obrisi(p.sifra)} >
+                                            <FaTrash />
+                                            Izbriši
+                                        </Button>
+                                    </div>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
 
-                            {putovanja && putovanja.map((p) => (
+                        ))}
 
-                                <tr key={p.sifra}>
-                                    <td className="putovanje-naziv">
-                                        {p.naziv}
-                                    </td>
+                        {putovanja.length === 0 && (
+                            <tr>
+                                <td colSpan={7} className="putovanja-prazno">
+                                    Trenutno nemaš niti jedno putovanje.
+                                </td>
+                            </tr>
+                        )}
 
-                                    <td> {p.destinacija} </td>
-                                    <td> {p.drzava} </td>
-                                    <td>
-                                        <FormatDatuma datum={p.datumPolaska} />
-                                    </td>
-                                    <td>
-                                        <FormatDatuma datum={p.datumPovratka} />
-                                    </td>
-                                    <td className="desno">
-                                        <NumericFormat
-                                            value={p.budzet}
-                                            displayType={'text'}
-                                            decimalSeparator=","
-                                            decimalScale={2}
-                                            fixedDecimalScale
-                                            thousandSeparator='.'
-                                            suffix=" €"
-                                        />
-                                    </td>
-                                    <td>
-                                        <div className="putovanja-akcije" >
-                                            <Button
-                                                onClick={() => { navigate(`/putovanja/${p.sifra}`) }}>
-                                                <FaPen />
-                                                Promijeni
-                                            </Button>
+                    </tbody>
+                </Table>
+            </div>
 
-                                            <Button
-                                                variant="danger"
-                                                onClick={() => obrisi(p.sifra)} >
-                                                <FaTrash />
-                                                Izbriši
-                                            </Button>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                            ))}
-
-                            {putovanja.length === 0 && (
-                                <tr>
-                                    <td colSpan={7} className="putovanja-prazno">
-                                        Trenutno nemaš niti jedno putovanje.
-                                    </td>
-                                </tr>
-                            )}
-
-                        </tbody>
-                    </Table>
-                </div>
-
-                <div className="putovanja-ukupno" >
-                    Ukupno &nbsp;
-                    <Badge pill bg="success">
-                        {putovanja && putovanja.length}
-                    </Badge>
-                    &nbsp; putovanja
-                </div>
-            </section>
+            <div className="putovanja-ukupno" >
+                Ukupno &nbsp;
+                <Badge pill bg="success">
+                    {putovanja && putovanja.length}
+                </Badge>
+                &nbsp; putovanja
+            </div>
+        </section>
     )
 }

@@ -20,16 +20,28 @@ async function dodaj(pakiranje) {
     pakiranja.push(pakiranje)
 }
 
-async function promijeni(sifra, pakiranje){
-    const index = nadiIndex(sifra)
-    pakiranja[index] = {...pakiranja[index], ...pakiranje}
+async function promijeni(predmetSifra, putovanjeSifra, pakiranje) {
+    const index = pakiranja.findIndex(
+        (stavka) =>
+            stavka.predmetSifra === predmetSifra &&
+            stavka.putovanjeSifra === putovanjeSifra
+    )
+
+    if (index === -1) {
+        throw new Error("Stavka pakiranja nije pronađena.")
+    }
+
+    pakiranja[index] = {
+        ...pakiranja[index],
+        ...pakiranje
+    }
 }
 
-function nadiIndex(sifra){
+function nadiIndex(sifra) {
     return pakiranja.findIndex(p => p.sifra === parseInt(sifra))
 }
 
-async function obrisi(sifra){
+async function obrisi(sifra) {
     const index = nadiIndex(sifra)
     pakiranja.splice(index, 1)
 }
@@ -38,6 +50,6 @@ export default {
     get,
     getByPutovanje,
     dodaj,
-    promijeni, 
+    promijeni,
     obrisi
 }
