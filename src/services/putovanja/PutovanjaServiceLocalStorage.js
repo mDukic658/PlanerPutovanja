@@ -57,10 +57,35 @@ async function obrisi(sifra) {
     spremiUStorage(putovanja)
 }
 
+async function dohvatiStranicu(stranica = 1, velicinaStranice = 6) {
+
+    const putovanja = dohvatiSveIzStorage()
+    const pocetniIndeks = (stranica - 1) * velicinaStranice
+    const zavrsniIndeks = pocetniIndeks + velicinaStranice
+
+    const podaciStranice = putovanja.slice(
+        pocetniIndeks,
+        zavrsniIndeks
+    )
+
+    const ukupnoStavki = putovanja.length
+    const ukupnoStranica = Math.ceil(
+        ukupnoStavki / velicinaStranice
+    )
+
+    return {
+        data: podaciStranice,
+        ukupnoStranica,
+        ukupnoStavki
+    }
+
+}
+
 export default {
     get,
     getBySifra,
     dodaj,
     promijeni,
-    obrisi
+    obrisi,
+    dohvatiStranicu
 }

@@ -1,42 +1,111 @@
 import { useEffect, useState } from "react"
-import { Button, Form, Table } from "react-bootstrap"
+import { Button, Form, Table, Pagination } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
 import PredmetiService from "../../services/predmeti/PredmetiService"
 import { RouteNames } from "../../constants"
 import { FaListUl, FaPlus, FaPen, FaTrash } from "react-icons/fa"
+import { useObavijesti } from "../../components/Obavijesti"
 
 export default function Predmeti() {
 
     const navigate = useNavigate()
+    const obavijesti = useObavijesti()
 
     const [predmeti, setPredmeti] = useState([])
+    const [trenutnaStranica, setTrenutnuStranicu] = useState(1)
+    const [ukupnoStranica, setUkupnoStranica] = useState(0)
+    const [ukupnoStavki, setUkupnoStavki] = useState(0)
+
+    const velicinaStranice = 10
+
 
     useEffect(() => {
-        ucitajPredmete()
-    }, [])
-
-    async function ucitajPredmete() {
-        await PredmetiService.get().then((odgovor) => {
-            setPredmeti(odgovor.data)
+        ucitajPredmete(trenutnaStranica).catch((error) => {
+            console.error(error)
+            obavijesti("Učitavanje predmeta nije uspjelo.", "danger")
         })
+    }, [trenutnaStranica])
+
+    async function ucitajPredmete(stranica) {
+        const odgovor = await PredmetiService.dohvatiStranicu(
+            stranica,
+            velicinaStranice
+        )
+
+        setPredmeti(odgovor.data)
+        setUkupnoStranica(odgovor.ukupnoStranica)
+        setUkupnoStavki(odgovor.ukupnoStavki)
+    }
+
+    function promijeniStranicu(stranica) {
+        setTrenutnuStranicu(stranica)
     }
 
     async function obradiSubmit(e) {
         e.preventDefault()
 
-        const podaci = new FormData(e.target)
+        const obrazac = e.currentTarget
+        const podaci = new FormData(obrazac)
+        const naziv = podaci.get("naziv").trim()
 
-        await PredmetiService.dodaj({
-            naziv: podaci.get('naziv')
-        })
+        if (!naziv) {
+            obavijesti("Unesi naziv predmeta.", "danger")
+            return
+        }
 
-        e.target.reset()
-        ucitajPredmete()
+        try {
+            await PredmetiService.dodaj({ naziv })
+        } catch (error) {
+            console.error(error)
+            obavijesti("Dodavanje predmeta nije uspjelo.", "danger")
+            return
+        }
+
+        obrazac.reset()
+        obavijesti("Predmet je dodan.")
+
+        try {
+            await ucitajPredmete(trenutnaStranica)
+        } catch (error) {
+            console.error(error)
+            obavijesti(
+                "Predmet je dodan, ali osvježavanje popisa nije uspjelo.",
+                "danger"
+            )
+        }
     }
 
     async function obrisi(sifra) {
-        await PredmetiService.obrisi(sifra)
-        ucitajPredmete()
+        try {
+            await PredmetiService.obrisi(sifra)
+        } catch (error) {
+            console.error(error)
+            obavijesti("Brisanje predmeta nije uspjelo.", "danger")
+            return
+        }
+
+        obavijesti("Predmet je obrisan.")
+
+        const noveUkupneStavke = ukupnoStavki - 1
+
+        const noveUkupneStranice = Math.max(
+            1,
+            Math.ceil(noveUkupneStavke / velicinaStranice)
+        )
+
+        if (trenutnaStranica > noveUkupneStranice) {
+            setTrenutnuStranicu(noveUkupneStranice)
+        } else {
+            try {
+                await ucitajPredmete(trenutnaStranica)
+            } catch (error) {
+                console.error(error)
+                obavijesti(
+                    "Predmet je obrisan, ali osvježavanje popisa nije uspjelo.",
+                    "danger"
+                )
+            }
+        }
     }
 
     return (
@@ -44,7 +113,7 @@ export default function Predmeti() {
 
             <h2 className="predmeti-naslov">
                 <FaListUl />
-                Predmeti
+                {" "}  Predmeti
             </h2>
 
             <div className="predmeti-tablica">
@@ -77,7 +146,7 @@ export default function Predmeti() {
                                             }}
                                         >
                                             <FaPen />
-                                            Promijeni
+                                            {" "}Promijeni
                                         </Button>
 
                                         <Button
@@ -85,7 +154,7 @@ export default function Predmeti() {
                                             onClick={() => obrisi(predmet.sifra)}
                                         >
                                             <FaTrash />
-                                            Obriši
+                                            {" "}Obriši
                                         </Button>
                                     </div>
                                 </td>
@@ -103,9 +172,94 @@ export default function Predmeti() {
                 </Table>
             </div>
 
+            {ukupnoStranica > 1 && (
+                <nav
+                    aria-label="Stranice predmeta"
+                    className="mt-4"
+                >
+                    <Pagination className="justify-content-center flex-wrap">
+
+                        <Pagination.First
+                            disabled={trenutnaStranica === 1}
+                            onClick={() => promijeniStranicu(1)}
+                        />
+
+                        <Pagination.Prev
+                            disabled={trenutnaStranica === 1}
+                            onClick={() =>
+                                promijeniStranicu(trenutnaStranica - 1)
+                            }
+                        />
+
+                        {Array.from(
+                            { length: ukupnoStranica },
+                            (_, indeks) => {
+                                const brojStranice = indeks + 1
+
+                                if (
+                                    brojStranice === 1 ||
+                                    brojStranice === ukupnoStranica ||
+                                    (
+                                        brojStranice >= trenutnaStranica - 2 &&
+                                        brojStranice <= trenutnaStranica + 2
+                                    )
+                                ) {
+                                    return (
+                                        <Pagination.Item
+                                            key={brojStranice}
+                                            active={
+                                                brojStranice === trenutnaStranica
+                                            }
+                                            onClick={() =>
+                                                promijeniStranicu(brojStranice)
+                                            }
+                                        >
+                                            {brojStranice}
+                                        </Pagination.Item>
+                                    )
+                                }
+
+                                if (
+                                    brojStranice === trenutnaStranica - 3 ||
+                                    brojStranice === trenutnaStranica + 3
+                                ) {
+                                    return (
+                                        <Pagination.Ellipsis
+                                            key={brojStranice}
+                                            disabled
+                                        />
+                                    )
+                                }
+
+                                return null
+                            }
+                        )}
+
+                        <Pagination.Next
+                            disabled={
+                                trenutnaStranica === ukupnoStranica
+                            }
+                            onClick={() =>
+                                promijeniStranicu(trenutnaStranica + 1)
+                            }
+                        />
+
+                        <Pagination.Last
+                            disabled={
+                                trenutnaStranica === ukupnoStranica
+                            }
+                            onClick={() =>
+                                promijeniStranicu(ukupnoStranica)
+                            }
+                        />
+
+                    </Pagination>
+                </nav>
+            )}
+
             <p className="predmeti-ukupno">
                 Ukupno predmeta:
-                <span>{predmeti.length}</span>
+                <span>{ukupnoStavki}</span>
             </p>
 
             <Form
@@ -114,7 +268,7 @@ export default function Predmeti() {
             >
                 <h3>
                     <FaPlus />
-                    Dodaj predmet
+                    {" "}Dodaj predmet
                 </h3>
 
                 <Form.Group controlId="naziv">
@@ -134,7 +288,7 @@ export default function Predmeti() {
                     className="mt-3"
                 >
                     <FaPlus />
-                    Dodaj predmet
+                    {" "}Dodaj predmet
                 </Button>
             </Form>
 

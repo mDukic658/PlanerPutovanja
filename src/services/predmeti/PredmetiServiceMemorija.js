@@ -33,7 +33,7 @@ async function promijeni(sifra, predmet) {
 }
 
 function nadiIndex(sifra) {
-    return predmet.findIndex(p => p.sifra === parseInt(sifra))
+    return predmeti.findIndex(p => p.sifra === parseInt(sifra))
 }
 
 async function obrisi(sifra) {
@@ -41,10 +41,27 @@ async function obrisi(sifra) {
     predmeti.splice(index, 1)
 }
 
+async function dohvatiStranicu(stranica = 1, velicinaStranice = 10){
+    const pocetniIndeks = (stranica - 1) * velicinaStranice
+    const zavrsniIndeks = pocetniIndeks + velicinaStranice
+
+    const ukupnoStavki = predmeti.length
+    const ukupnoStranica = Math.ceil(
+        ukupnoStavki / velicinaStranice
+    )
+
+    return {
+        data: predmeti.slice(pocetniIndeks, zavrsniIndeks),
+        ukupnoStranica,
+        ukupnoStavki
+    }
+}
+
 export default {
     get,
     dodaj,
     getBySifra,
     promijeni,
-    obrisi
+    obrisi,
+    dohvatiStranicu
 }
