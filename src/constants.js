@@ -22,7 +22,9 @@ export const RouteNames = {
 
     ITINERAR: '/itinerar',
     ITINERAR_PROMJENA: '/itinerar/promjena/:sifra',
-    ITINERAR_DODAJ: '/novo/itinerar'
+    ITINERAR_DODAJ: '/novo/itinerar',
+
+    KALENDAR: '/kalendar'
 }
 
 // memorija, localStorage, firebase

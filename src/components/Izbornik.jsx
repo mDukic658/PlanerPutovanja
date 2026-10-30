@@ -19,17 +19,20 @@ export default function Izbornik() {
                         <Nav.Link
                             onClick={() => { navigate(RouteNames.HOME) }}
                         >Početna</Nav.Link>
+                        <Nav.Link as={Link} to={RouteNames.KALENDAR} >
+                            Kalendar
+                        </Nav.Link>
                         <NavDropdown title="Evidencija pakiranja" id="basic-nav-dropdown">
                             <NavDropdown.Item
-                            onClick={() => {navigate(RouteNames.LISTA_PAKIRANJA)}}>
-                                    Lista pakiranja
+                                onClick={() => { navigate(RouteNames.LISTA_PAKIRANJA) }}>
+                                Lista pakiranja
                             </NavDropdown.Item>
                             <NavDropdown.Item
-                            onClick={() => {navigate(RouteNames.PREDMETI)}}>
-                                    Predmeti
+                                onClick={() => { navigate(RouteNames.PREDMETI) }}>
+                                Predmeti
                             </NavDropdown.Item>
                         </NavDropdown>
-                        
+
                         <NavDropdown title="Programi" id="basic-nav-dropdown">
                             <NavDropdown.Item
                                 onClick={() => { navigate(RouteNames.PUTOVANJA) }}
@@ -38,7 +41,7 @@ export default function Izbornik() {
                                 onClick={() => { navigate(RouteNames.DRZAVE) }}
                             >Države</NavDropdown.Item>
                             <NavDropdown.Item
-                            onClick={() => { navigate(RouteNames.ITINERAR)}} >
+                                onClick={() => { navigate(RouteNames.ITINERAR) }} >
                                 Itinerar</NavDropdown.Item>
                             <NavDropdown.Item
                                 onClick={() => { navigate(RouteNames.GENERIRANJE_PODATAKA) }}

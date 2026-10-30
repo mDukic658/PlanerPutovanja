@@ -19,6 +19,7 @@ import GeneriranjePodataka from './pages/GeneriranjePodataka'
 import ItinerarPregled from './pages/Itinerar/ItinerarPregled'
 import ItinerarPromjena from './pages/Itinerar/ItinerarPromjena'
 import ItinerarNovo from './pages/Itinerar/ItinerarNovo'
+import Kalendar from './pages/Kalendar'
 
 function App() {
 
@@ -43,6 +44,7 @@ function App() {
             <Route path= {RouteNames.ITINERAR} element={<ItinerarPregled />} />
             <Route  path={RouteNames.ITINERAR_PROMJENA} element={ <ItinerarPromjena /> } />
             <Route  path={RouteNames.ITINERAR_DODAJ} element={ <ItinerarNovo /> } />
+            <Route path={RouteNames.KALENDAR} element={<Kalendar />} />
           </Routes>
         </Container>
         <hr className="footer-hr" />
