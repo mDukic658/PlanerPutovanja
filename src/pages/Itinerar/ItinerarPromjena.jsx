@@ -4,14 +4,18 @@ import { Button, Row, Form, Col } from "react-bootstrap";
 import ItinerarService from "../../services/itinerar/ItinerarService"
 import { RouteNames } from "../../constants"
 import { FaArrowLeft, FaPen, FaSave, FaTimes } from "react-icons/fa";
+import { useObavijesti } from "../../components/Obavijesti";
+import PutovanjaService from "../../services/putovanja/PutovanjaService";
 
 export default function ItinerarPromjena() {
 
     const navigate = useNavigate()
     const { sifra } = useParams()
     const [searchParams] = useSearchParams()
+    const obavijesti = useObavijesti()
 
     const putovanjeSifra = searchParams.get('putovanjeSifra')
+    const [nazivPutovanja, setNazivPutovanja] = useState("")
 
     const [stavka, setStavka] = useState({
         putovanjeSifra: "",
@@ -26,15 +30,35 @@ export default function ItinerarPromjena() {
     }, [sifra])
 
     async function ucitajStavku() {
-        const odgovor = await ItinerarService.getBySifra(sifra)
+        try {
+            const odgovor = await ItinerarService.getBySifra(sifra)
 
-        if (odgovor.data) {
+            if (!odgovor.data) {
+                obavijesti("Aktivnost nije pronađena.", "danger")
+                return
+            }
+
             setStavka(odgovor.data)
+
+            const odgovorPutovanja = await PutovanjaService.getBySifra(
+                odgovor.data.putovanjeSifra
+            )
+
+            setNazivPutovanja(
+                odgovorPutovanja.data?.naziv || "Putovanje nije pronađeno"
+            )
+        } catch (error) {
+            console.error(error)
+            obavijesti("Učitavanje podataka nije uspjelo.", "danger")
         }
     }
 
     function promijeniVrijednost(e) {
         const { name, value } = e.target
+
+        if (name === "putovanjeSifra") {
+            return
+        }
 
         setStavka(stara => ({
             ...stara,
@@ -45,21 +69,59 @@ export default function ItinerarPromjena() {
     async function spremi(e) {
         e.preventDefault()
 
-        const promijenjenaStavka = {
-            ...stavka,
-            putovanjeSifra: parseInt(stavka.putovanjeSifra, 10),
-            dan: parseInt(stavka.dan, 10)
+        const dan = Number(stavka.dan)
+
+        if (!Number.isInteger(dan) || dan < 1) {
+            obavijesti("Dan mora biti pozitivan cijeli broj.", "danger")
+            return
         }
 
-        await ItinerarService.promijeni(sifra, promijenjenaStavka)
+        if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(stavka.vrijeme)) {
+            obavijesti("Odaberi ispravno vrijeme aktivnosti.", "danger")
+            return
+        }
 
+        if (!stavka.naziv.trim()) {
+            obavijesti("Unesi naziv aktivnosti.", "danger")
+            return
+        }
+
+        let izvornaStavka
+
+        try {
+            const odgovor = await ItinerarService.getBySifra(sifra)
+            izvornaStavka = odgovor.data
+        } catch (error) {
+            console.error(error)
+            obavijesti("Učitavanje aktivnosti nije uspjelo.", "danger")
+            return
+        }
+
+        if (!izvornaStavka) {
+            obavijesti("Aktivnost nije pronađena.", "danger")
+            return
+        }
+
+        const promijenjenaStavka = {
+            ...stavka,
+            putovanjeSifra: izvornaStavka.putovanjeSifra,
+            dan,
+            naziv: stavka.naziv.trim()
+        }
+
+        try {
+            await ItinerarService.promijeni(sifra, promijenjenaStavka)
+        } catch (error) {
+            console.error(error)
+            obavijesti("Spremanje promjena nije uspjelo.", "danger")
+            return
+        }
+
+        obavijesti("Promjene aktivnosti su spremljene.")
 
         navigate(
-            putovanjeSifra
-                ? `${RouteNames.ITINERAR}?putovanjeSifra=${putovanjeSifra}`
-                : RouteNames.ITINERAR
+            `${RouteNames.ITINERAR}?putovanjeSifra=${izvornaStavka.putovanjeSifra}`
         )
-
     }
 
     return (
@@ -84,6 +146,19 @@ export default function ItinerarPromjena() {
 
             <Form onSubmit={spremi} className="itinerar-obrazac">
                 <Row className="g-3">
+
+                    <Col xs={12}>
+                        <Form.Group controlId="putovanjeSifra">
+                            <Form.Label>Putovanje</Form.Label>
+
+                            <Form.Control
+                                type="text"
+                                value={nazivPutovanja}
+                                placeholder="Učitavanje..."
+                                readOnly
+                            />
+                        </Form.Group>
+                    </Col>
 
                     <Col xs={12} md={6}>
                         <Form.Group controlId="dan">

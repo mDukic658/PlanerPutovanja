@@ -5,6 +5,7 @@ import { RouteNames } from "../../constants";
 import PutovanjaService from '../../services/putovanja/PutovanjaService'
 import ItinerarService from '../../services/itinerar/ItinerarService'
 import { FaRoute, FaPlus, FaPen, FaTrash, FaClock, FaCalendarDay } from "react-icons/fa";
+import { useObavijesti } from "../../components/Obavijesti";
 
 
 export default function ItinerarPregled() {
@@ -16,6 +17,7 @@ export default function ItinerarPregled() {
     const [pretragaPutovanje, setPretragaPutovanje] = useState('')
     const [prikaziAutocomplete, setPrikaziAutocomplete] = useState(false)
     const [odabraniIndex, setOdabraniIndex] = useState(-1)
+    const obavijesti = useObavijesti()
 
     const navigate = useNavigate()
 
@@ -72,6 +74,8 @@ export default function ItinerarPregled() {
 
         await ItinerarService.obrisi(sifra)
         ucitajStavke()
+
+        obavijesti("Aktivnost je obrisana")
     }
 
 
