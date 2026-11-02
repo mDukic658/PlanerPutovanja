@@ -5,11 +5,16 @@ import PredmetiService from "../../services/predmeti/PredmetiService"
 import { Button, Tab, Tabs, ProgressBar } from "react-bootstrap"
 import Pakiranje from "./Pakiranje"
 import { useNavigate } from "react-router-dom"
-import { FaSuitcaseRolling, FaPen, FaMapMarkerAlt } from "react-icons/fa"
+import { FaSuitcaseRolling, FaPen, FaMapMarkerAlt, FaFilePdf } from "react-icons/fa"
+import { useObavijesti } from "../../components/Obavijesti"
+import ListaPakiranjaPDFGenerator from "../../components/ListaPakiranjaPDFGenerator"
 
 export default function ListaPakiranja() {
 
     const navigate = useNavigate()
+
+    const obavijesti = useObavijesti()
+    const [generiranjePDFa, setGeneriranjePDFa] = useState(false)
 
     const [putovanja, setPutovanja] = useState([])
     const [pakiranja, setPakiranja] = useState([])
@@ -59,6 +64,32 @@ export default function ListaPakiranja() {
         )
 
         ucitajPakiranja()
+    }
+
+    async function generirajPDFZaPutovanje(putovanje) {
+
+        if (generiranjePDFa) return
+
+        setGeneriranjePDFa(true)
+
+        try {
+            const generiraj = ListaPakiranjaPDFGenerator({
+                putovanje,
+                pakiranja,
+                predmeti
+            })
+
+            await generiraj()
+        } catch (greska) {
+            console.error("Generiranje PDF-a nije uspjelo:", greska)
+
+            obavijesti(
+                "Generiranje PDF-a nije uspjelo.",
+                "danger"
+            )
+        } finally {
+            setGeneriranjePDFa(false)
+        }
     }
 
     function prikaziNapredak(putovanjeSifra) {
@@ -149,6 +180,15 @@ export default function ListaPakiranja() {
                                     >
                                         <FaPen />
                                         Uredi listu pakiranja
+                                    </Button>
+
+                                    <Button
+                                        variant="primary"
+                                        disabled={generiranjePDFa}
+                                        onClick={() => generirajPDFZaPutovanje(putovanje)}
+                                    >
+                                        <FaFilePdf className="me-2" />
+                                        {generiranjePDFa ? "Generiranje..." : "Preuzmi PDF"}
                                     </Button>
                                 </div>
 
