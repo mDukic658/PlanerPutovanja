@@ -12,6 +12,7 @@
   "dependencies": {
     "@faker-js/faker": "^10.6.0",
     "@re-dev/react-truncate": "^0.6.0",
+    "@react-pdf/renderer": "^4.9.0",
     "bootstrap": "^5.3.8",
     "dayjs": "^1.11.23",
     "react": "^19.2.8",
