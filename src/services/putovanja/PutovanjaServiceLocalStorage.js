@@ -1,6 +1,6 @@
 
 
-const STORAGE_KEY = 'putovanja'
+const STORAGE_KEY = 'marta_putovanja'
 
 function dohvatiSveIzStorage() {
     const podaci = localStorage.getItem(STORAGE_KEY)

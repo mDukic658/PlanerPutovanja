@@ -1,6 +1,6 @@
 
 
-const STORAGE_KEY = 'drzave'
+const STORAGE_KEY = 'marta_drzave'
 
 function dohvatiSveIzStorage() {
     const podaci = localStorage.getItem(STORAGE_KEY)

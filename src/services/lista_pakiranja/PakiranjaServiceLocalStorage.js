@@ -1,5 +1,5 @@
 
-const STORAGE_KEY = 'pakiranja'
+const STORAGE_KEY = 'marta_pakiranja'
 
 function dohvatiSveIzStorage(){
     const podaci = localStorage.getItem(STORAGE_KEY)
