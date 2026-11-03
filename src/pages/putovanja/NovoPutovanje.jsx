@@ -9,7 +9,9 @@ import { FaArrowLeft, FaPlaneDeparture, FaPlus, FaTimes } from "react-icons/fa"
 import { useObavijesti } from "../../components/Obavijesti"
 
 
-export default function NovoPutovanje() {
+export default function NovoPutovanje({
+    pocetniDatumi = {}, onSpremi, onOdustani
+}) {
 
     const navigate = useNavigate()
 
@@ -19,6 +21,14 @@ export default function NovoPutovanje() {
     const [odabraniGrad, setOdabraniGrad] = useState(null)
     const [countryid, setCountryid] = useState(0)
     const [stateid, setStateid] = useState(0)
+
+    function odustani() {
+        if (onOdustani) {
+            onOdustani()
+        } else {
+            navigate(RouteNames.PUTOVANJA)
+        }
+    }
 
     async function ucitajDrzave() {
         const odgovor = await DrzaveService.get()
@@ -32,12 +42,18 @@ export default function NovoPutovanje() {
     async function dodaj(putovanje) {
         try {
             await PutovanjaService.dodaj(putovanje)
-
-            obavijesti("Putovanje je uspješno dodano.")
-            navigate(RouteNames.PUTOVANJA)
         } catch (error) {
             console.error(error)
             obavijesti("Dodavanje putovanja nije uspjelo.", "danger")
+            return
+        }
+
+        obavijesti("Putovanje je uspješno dodano.")
+
+        if (onSpremi) {
+            await onSpremi()
+        } else {
+            navigate(RouteNames.PUTOVANJA)
         }
     }
 
@@ -133,13 +149,15 @@ export default function NovoPutovanje() {
     return (
         <section className="novo-putovanje">
 
-            <Link
-                to={RouteNames.PUTOVANJA}
-                className="natrag-na-pregled"
-            >
-                <FaArrowLeft />
-                Natrag na pregled putovanja
-            </Link>
+            {!onOdustani && (
+                <Link
+                    to={RouteNames.PUTOVANJA}
+                    className="natrag-na-pregled"
+                >
+                    <FaArrowLeft />
+                    Natrag na pregled putovanja
+                </Link>
+            )}
 
             <h2 className="novo-putovanje-naslov">
                 <FaPlaneDeparture />
@@ -193,6 +211,7 @@ export default function NovoPutovanje() {
                                 onClick={(e) => e.target.showPicker()}
                                 onFocus={(e) => e.target.showPicker()}
                                 name="datumPolaska"
+                                defaultValue={pocetniDatumi.datumPolaska || ""}
                             />
                         </Form.Group>
                     </Col>
@@ -205,6 +224,7 @@ export default function NovoPutovanje() {
                                 onClick={(e) => e.target.showPicker()}
                                 onFocus={(e) => e.target.showPicker()}
                                 name="datumPovratka"
+                                defaultValue={pocetniDatumi.datumPovratka || ""}
                             />
                         </Form.Group>
                     </Col>
@@ -224,13 +244,14 @@ export default function NovoPutovanje() {
                 </Row>
 
                 <div className="putovanje-obrazac-akcije">
-                    <Link
-                        to={RouteNames.PUTOVANJA}
-                        className="btn btn-outline-secondary"
+                    <Button
+                        type="button"
+                        variant="outline-secondary"
+                        onClick={odustani}
                     >
                         <FaTimes />
                         Odustani
-                    </Link>
+                    </Button>
 
                     <Button type="submit" variant="primary">
                         <FaPlus />
