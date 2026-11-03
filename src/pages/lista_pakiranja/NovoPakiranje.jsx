@@ -81,7 +81,8 @@ export default function NovoPakiranje({ putovanjeSifra, ucitajPakiranja }) {
         await PakiranjaService.dodaj({
             predmetSifra: predmetSifra,
             putovanjeSifra: putovanjeSifra,
-            spakirano: false
+            spakirano: false,
+            napomena: String(podaci.get("napomena") ?? "").trim()
         })
 
         e.target.reset()
@@ -160,6 +161,17 @@ export default function NovoPakiranje({ putovanjeSifra, ucitajPakiranja }) {
                         )}
                     </div>
                 )}
+            </Form.Group>
+
+            <Form.Group>
+                <Form.Label>Napomena</Form.Label>
+
+                <Form.Control 
+                as="textarea"
+                rows={3}
+                name="napomena"
+                placeholder="Npr. Ponijeti dva komada"
+                />
             </Form.Group>
 
             <Button

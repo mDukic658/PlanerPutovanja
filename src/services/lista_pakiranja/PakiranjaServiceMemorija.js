@@ -11,12 +11,6 @@ async function getByPutovanje(sifraPutovanja) {
 }
 
 async function dodaj(pakiranje) {
-    if (pakiranja.length === 0) {
-        pakiranje.sifra = 1
-    } else {
-        pakiranje.sifra = pakiranja[pakiranja.length - 1].sifra + 1
-    }
-
     pakiranja.push(pakiranje)
 }
 
@@ -37,12 +31,17 @@ async function promijeni(predmetSifra, putovanjeSifra, pakiranje) {
     }
 }
 
-function nadiIndex(sifra) {
-    return pakiranja.findIndex(p => p.sifra === parseInt(sifra))
-}
+async function obrisi(predmetSifra, putovanjeSifra) {
+    const index = pakiranja.findIndex(
+        (stavka) =>
+            stavka.predmetSifra === predmetSifra &&
+            stavka.putovanjeSifra === putovanjeSifra
+    )
 
-async function obrisi(sifra) {
-    const index = nadiIndex(sifra)
+    if (index === -1) {
+        throw new Error("Stavka pakiranja nije pronađena.")
+    }
+
     pakiranja.splice(index, 1)
 }
 

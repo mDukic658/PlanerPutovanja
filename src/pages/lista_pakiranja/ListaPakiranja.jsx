@@ -13,7 +13,6 @@ export default function ListaPakiranja() {
 
     const navigate = useNavigate()
 
-    const obavijesti = useObavijesti()
     const [generiranjePDFa, setGeneriranjePDFa] = useState(false)
 
     const [putovanja, setPutovanja] = useState([])
@@ -95,10 +94,12 @@ export default function ListaPakiranja() {
     function prikaziNapredak(putovanjeSifra) {
 
         const stavke = pakiranja.filter(
-            (pakiranje) => pakiranje.putovanjeSifra === putovanjeSifra
+            (pakiranje) =>
+                pakiranje.putovanjeSifra === putovanjeSifra
         )
 
         const ukupno = stavke.length
+
         const spakirano = stavke.filter(
             (pakiranje) => pakiranje.spakirano
         ).length
@@ -128,11 +129,9 @@ export default function ListaPakiranja() {
                 )}
             </div>
         )
-
     }
 
     return (
-
         <section className="pregled-pakiranja">
 
             <h2 className="pakiranja-naslov">
@@ -170,26 +169,32 @@ export default function ListaPakiranja() {
                                         </p>
                                     </div>
 
-                                    <Button
-                                        variant="primary"
-                                        onClick={() => {
-                                            navigate(
-                                                "/lista/pakiranja/" + putovanje.sifra
-                                            )
-                                        }}
-                                    >
-                                        <FaPen />
-                                        Uredi listu pakiranja
-                                    </Button>
+                                    <div className="d-flex flex-wrap gap-2">
+                                        <Button
+                                            variant="primary"
+                                            onClick={() => {
+                                                navigate(
+                                                    "/lista/pakiranja/" + putovanje.sifra
+                                                )
+                                            }}
+                                        >
+                                            <FaPen className="me-2" />
+                                            Uredi listu pakiranja
+                                        </Button>
 
-                                    <Button
-                                        variant="primary"
-                                        disabled={generiranjePDFa}
-                                        onClick={() => generirajPDFZaPutovanje(putovanje)}
-                                    >
-                                        <FaFilePdf className="me-2" />
-                                        {generiranjePDFa ? "Generiranje..." : "Preuzmi PDF"}
-                                    </Button>
+                                        <Button
+                                            variant="primary"
+                                            disabled={generiranjePDFa}
+                                            onClick={() =>
+                                                generirajPDFZaPutovanje(putovanje)
+                                            }
+                                        >
+                                            <FaFilePdf className="me-2" />
+                                            {generiranjePDFa
+                                                ? "Generiranje..."
+                                                : "Prikaži PDF"}
+                                        </Button>
+                                    </div>
                                 </div>
 
                                 {prikaziNapredak(putovanje.sifra)}
@@ -204,11 +209,29 @@ export default function ListaPakiranja() {
                                                 className="pakiranje-red"
                                                 key={pakiranje.predmetSifra}
                                             >
-                                                <Pakiranje
-                                                    pakiranje={pakiranje}
-                                                    predmeti={predmeti}
-                                                    promijeni={promijeni}
-                                                />
+                                                <div
+                                                    className="d-flex align-items-center"
+                                                    style={{ gap: "4rem" }}
+                                                >
+                                                    <Pakiranje
+                                                        pakiranje={pakiranje}
+                                                        predmeti={predmeti}
+                                                        promijeni={promijeni}
+                                                    />
+
+                                                    {pakiranje.napomena && (
+                                                        <p
+                                                            className="small mb-0"
+                                                            style={{
+                                                                minWidth: 0,
+                                                                whiteSpace: "pre-wrap",
+                                                                overflowWrap: "anywhere"
+                                                            }}
+                                                        >
+                                                            {pakiranje.napomena}
+                                                        </p>
+                                                    )}
+                                                </div>
                                             </div>
                                         ))}
                                 </div>
