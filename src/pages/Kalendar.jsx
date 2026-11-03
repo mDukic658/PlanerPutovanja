@@ -7,6 +7,8 @@ import PutovanjaService from "../services/putovanja/PutovanjaService"
 import ItinerarService from "../services/itinerar/ItinerarService"
 import PakiranjaService from "../services/lista_pakiranja/PakiranjaService"
 import { useObavijesti } from "../components/Obavijesti"
+import { Button, Modal } from "react-bootstrap"
+import NovoPutovanje from "./putovanja/NovoPutovanje"
 
 
 const localizer = dayjsLocalizer(dayjs)
@@ -20,6 +22,8 @@ export default function Kalendar() {
     const [pakiranja, setPakiranja] = useState([])
     const [ucitavanje, setUcitavanje] = useState(true)
     const [greska, setGreska] = useState("")
+    const [datumPolaska, setDatumPolaska] = useState("")
+    const [pocetniDatumi, setPocetniDatumi] = useState(null)
 
     useEffect(() => {
         ucitajPodatke()
@@ -57,6 +61,20 @@ export default function Kalendar() {
     async function ucitajPakiranja() {
         const odgovor = await PakiranjaService.get()
         setPakiranja(odgovor.data)
+    }
+
+    function prekiniOdabir(){
+        setDatumPolaska("")
+        setPocetniDatumi(null)
+    }
+
+    function odaberiDatum({ start, action }){
+
+        if(pocetniDatumi || action === "doubleClick") return
+
+        const datum = dayjs(start).format("DD-MM-YYYY")
+        const danas = dayjs().format
+
     }
 
     function pretvoriDatum(vrijednost) {
