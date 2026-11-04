@@ -8,10 +8,12 @@ import { useNavigate } from "react-router-dom"
 import { FaSuitcaseRolling, FaPen, FaMapMarkerAlt, FaFilePdf } from "react-icons/fa"
 import { useObavijesti } from "../../components/Obavijesti"
 import ListaPakiranjaPDFGenerator from "../../components/ListaPakiranjaPDFGenerator"
+import Napomena from "../../components/Napomena"
 
 export default function ListaPakiranja() {
 
     const navigate = useNavigate()
+    const obavijesti = useObavijesti()
 
     const [generiranjePDFa, setGeneriranjePDFa] = useState(false)
 
@@ -219,18 +221,10 @@ export default function ListaPakiranja() {
                                                         promijeni={promijeni}
                                                     />
 
-                                                    {pakiranje.napomena && (
-                                                        <p
-                                                            className="small mb-0"
-                                                            style={{
-                                                                minWidth: 0,
-                                                                whiteSpace: "pre-wrap",
-                                                                overflowWrap: "anywhere"
-                                                            }}
-                                                        >
-                                                            {pakiranje.napomena}
-                                                        </p>
-                                                    )}
+                                                    <Napomena
+                                                        pakiranje={pakiranje}
+                                                        ucitajPakiranja={ucitajPakiranja}
+                                                    />
                                                 </div>
                                             </div>
                                         ))}

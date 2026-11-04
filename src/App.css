@@ -1663,3 +1663,71 @@ h4 {
   color: var(--charcoal);
   text-decoration: underline;
 }
+
+/*Poravnanje predmeta i napomena*/
+
+.pakiranje-sadrzaj {
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) minmax(0, 2fr);
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  min-width: 0;
+}
+
+.napomena-prikaz {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.napomena-tekst {
+  color: var(--charcoal);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.napomena-tekst:empty {
+  display: none;
+}
+
+/* Vrijedi i preko Bootstrapovih stilova za link */
+.napomena-gumb.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 6px 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--sage-green);
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.napomena-gumb.btn:hover {
+  background-color: var(--wheat);
+  border-color: var(--sage-green);
+  color: var(--sage-green);
+  text-decoration: none;
+}
+
+.napomena-gumb.btn:focus-visible {
+  outline: 2px solid var(--pacific-blue);
+  outline-offset: 3px;
+  box-shadow: none;
+}
+
+@media (max-width: 575px) {
+  .pakiranje-sadrzaj {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .napomena-prikaz {
+    margin-left: 26px;
+  }
+}

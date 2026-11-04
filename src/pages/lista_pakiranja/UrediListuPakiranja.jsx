@@ -5,15 +5,13 @@ import PakiranjaService from "../../services/lista_pakiranja/PakiranjaService"
 import PredmetiService from "../../services/predmeti/PredmetiService"
 import Pakiranje from "./Pakiranje"
 import NovoPakiranje from "./NovoPakiranje"
-import { Button, Form } from "react-bootstrap"
+import { Button } from "react-bootstrap"
 import { RouteNames } from "../../constants"
 import { FaArrowLeft, FaPen, FaTrash, FaPlus, FaMapMarkerAlt } from "react-icons/fa"
-import { useObavijesti } from "../../components/Obavijesti"
 
 export default function UrediListuPakiranja() {
 
     const params = useParams()
-    const obavijesti = useObavijesti()
 
     const [putovanje, setPutovanje] = useState([])
     const [predmeti, setPredmeti] = useState([])
@@ -63,47 +61,6 @@ export default function UrediListuPakiranja() {
         )
 
         ucitajPakiranja()
-    }
-
-    async function spremiNapomenu(e, pakiranje) {
-        e.preventDefault()
-
-        const podaci = new FormData(e.currentTarget)
-        const napomena = String(podaci.get("napomena") ?? "").trim()
-        const prethodnaNapomena = String(pakiranje.napomena ?? "").trim()
-
-        if (napomena === prethodnaNapomena) {
-            obavijesti("Napomena nije promijenjena.", "info")
-            return
-        }
-
-        const novoPakiranje = {
-            ...pakiranje,
-            napomena
-        }
-
-        try {
-            await PakiranjaService.promijeni(
-                pakiranje.predmetSifra,
-                pakiranje.putovanjeSifra,
-                novoPakiranje
-            )
-        } catch (error) {
-            console.error(error)
-            obavijesti("Spremanje napomene nije uspjelo.", "danger")
-            return
-        }
-
-        obavijesti(
-            !napomena
-                ? "Napomena je uklonjena."
-                : prethodnaNapomena
-                    ? "Napomena je uspješno promijenjena."
-                    : "Napomena je uspješno dodana.",
-            "success"
-        )
-
-        await ucitajPakiranja()
     }
 
     async function obrisi(predmetSifra, putovanjeSifra) {
@@ -165,39 +122,17 @@ export default function UrediListuPakiranja() {
                                         promijeni={promijeni}
                                     />
 
-                                    <Form
-                                        className="mt-4 ms-4"
-                                        onSubmit={(e) =>
-                                            spremiNapomenu(e, pakiranje)
-                                        }
-                                    >
-                                        <Form.Group
-                                            controlId={`napomena-${pakiranje.putovanjeSifra}-${pakiranje.predmetSifra}`}
+                                    {pakiranje.napomena && (
+                                        <p
+                                            className="small text-muted mt-2 mb-0"
+                                            style={{
+                                                whiteSpace: "pre-wrap",
+                                                overflowWrap: "anywhere"
+                                            }}
                                         >
-                                            <Form.Label>
-                                                Napomena
-                                            </Form.Label>
-
-                                            <Form.Control
-                                                as="textarea"
-                                                rows={2}
-                                                name="napomena"
-                                                defaultValue={
-                                                    pakiranje.napomena ?? ""
-                                                }
-                                                placeholder="Napomena za ovaj predmet"
-                                            />
-                                        </Form.Group>
-
-                                        <Button
-                                            type="submit"
-                                            variant="primary"
-                                            size="sm"
-                                            className="mt-2"
-                                        >
-                                            Spremi napomenu
-                                        </Button>
-                                    </Form>
+                                            {pakiranje.napomena}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <Button
