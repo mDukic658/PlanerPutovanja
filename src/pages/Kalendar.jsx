@@ -11,6 +11,8 @@ import { Button, Modal } from "react-bootstrap"
 import NovoPutovanje from "./putovanja/NovoPutovanje"
 import ItinerarNovo from "./Itinerar/ItinerarNovo"
 import PutovanjePromjena from "./putovanja/PutovanjePromjena"
+import ItinerarPromjena from "./Itinerar/ItinerarPromjena"
+import GodisnjiPregled from "../components/GodisnjiPregled"
 
 const localizer = dayjsLocalizer(dayjs)
 
@@ -29,6 +31,12 @@ export default function Kalendar() {
     const [odabranoPutovanje, setOdabranoPutovanje] = useState(null)
     const [putovanjeZaUredivanje, setPutovanjeZaUredivanje] = useState(null)
     const [brisanje, setBrisanje] = useState(false)
+    const [odabranaAktivnost, setOdabranaAktivnost] = useState(null)
+    const [aktivnostZaUredivanje, setAktivnostZaUredivanje] = useState(null)
+    const [brisanjeAktivnosti, setBrisanjeAktivnosti] = useState(false)
+    const [godisnjiPrikaz, setGodisnjiPrikaz] = useState(false)
+    const [datumKalendara, setDatumKalendara] = useState(new Date())
+    const [pogledKalendara, setPogledKalendara] = useState("month")
 
     useEffect(() => {
         ucitajPodatke()
@@ -121,10 +129,76 @@ export default function Kalendar() {
     }
 
     function odaberiDogadaj(dogadaj) {
-        if (dogadaj.vrsta !== "putovanje") return
-
         prekiniOdabir()
-        setOdabranoPutovanje(dogadaj.putovanje)
+
+        if (dogadaj.vrsta === "putovanje") {
+            setOdabranoPutovanje(dogadaj.putovanje)
+        } else if (dogadaj.vrsta === "itinerar") {
+            setOdabranaAktivnost(dogadaj)
+        }
+    }
+
+    function urediOdabranuAktivnost() {
+        setAktivnostZaUredivanje(odabranaAktivnost.stavka)
+        setOdabranaAktivnost(null)
+    }
+
+    function zatvoriUredivanjeAktivnosti() {
+        setAktivnostZaUredivanje(null)
+    }
+
+    async function promjeneAktivnostiSpremljene() {
+        zatvoriUredivanjeAktivnosti()
+
+        try {
+            await ucitajItinerar()
+        } catch (error) {
+            console.error(error)
+
+            obavijesti(
+                "Promjene su spremljene, ali osvježavanje kalendara nije uspjelo.",
+                "danger"
+            )
+        }
+    }
+
+    async function obrisiOdabranuAktivnost() {
+        if (!odabranaAktivnost || brisanjeAktivnosti) return
+
+        const stavka = odabranaAktivnost.stavka
+
+        if (!window.confirm(
+            `Želite li obrisati aktivnost "${stavka.naziv}"?`
+        )) {
+            return
+        }
+
+        setBrisanjeAktivnosti(true)
+
+        try {
+            await ItinerarService.obrisi(stavka.sifra)
+        } catch (error) {
+            console.error(error)
+            obavijesti("Brisanje aktivnosti nije uspjelo.", "danger")
+            setBrisanjeAktivnosti(false)
+            return
+        }
+
+        setOdabranaAktivnost(null)
+        obavijesti("Aktivnost je obrisana.")
+
+        try {
+            await ucitajItinerar()
+        } catch (error) {
+            console.error(error)
+
+            obavijesti(
+                "Aktivnost je obrisana, ali osvježavanje kalendara nije uspjelo.",
+                "danger"
+            )
+        } finally {
+            setBrisanjeAktivnosti(false)
+        }
     }
 
     function dodajAktivnostOdabranomPutovanju() {
@@ -212,6 +286,22 @@ export default function Kalendar() {
         }
     }
 
+    function promijeniGodinu(pomak) {
+        setDatumKalendara((stariDatum) =>
+            dayjs(stariDatum)
+                .startOf("year")
+                .add(pomak, "year")
+                .toDate()
+        )
+    }
+
+    function otvoriMjesec(datum) {
+        prekiniOdabir()
+        setDatumKalendara(datum)
+        setPogledKalendara("month")
+        setGodisnjiPrikaz(false)
+    }
+
     function pretvoriDatum(vrijednost) {
         const [godina, mjesec, dan] = vrijednost
             .slice(0, 10)
@@ -219,6 +309,33 @@ export default function Kalendar() {
             .map(Number)
 
         return new Date(godina, mjesec - 1, dan)
+    }
+
+    function oznaciDatum(datum) {
+        const dan = dayjs(datum).format("YYYY-MM-DD")
+
+        const polazak = pocetniDatumi?.datumPolaska || datumPolaska
+        const povratak = pocetniDatumi?.datumPovratka
+
+        if (!polazak) return {}
+
+        const klase = []
+
+        if (dan === polazak) {
+            klase.push("kalendar-odabrani-polazak")
+        }
+
+        if (povratak && dan >= polazak && dan <= povratak) {
+            klase.push("kalendar-odabrano-razdoblje")
+
+            if (dan === povratak) {
+                klase.push("kalendar-odabrani-povratak")
+            }
+        }
+
+        return {
+            className: klase.join(" ")
+        }
     }
 
     function dohvatiNapredakPakiranja(putovanjeSifra) {
@@ -311,8 +428,59 @@ export default function Kalendar() {
 
             <h2>Kalendar putovanja</h2>
 
+            <div className="kalendar-prikazi d-flex flex-wrap align-items-center gap-2 mb-3">
+                <Button
+                    type="button"
+                    variant={godisnjiPrikaz ? "outline-primary" : "primary"}
+                    onClick={() => setGodisnjiPrikaz(false)}
+                >
+                    Kalendar
+                </Button>
+
+                <Button
+                    type="button"
+                    variant={godisnjiPrikaz ? "primary" : "outline-primary"}
+                    onClick={() => {
+                        prekiniOdabir()
+                        setGodisnjiPrikaz(true)
+                    }}
+                >
+                    Godina
+                </Button>
+            </div>
+
+            {godisnjiPrikaz && (
+                <div className="kalendar-godina-kontrole d-flex flex-wrap align-items-center gap-3 mb-3">
+                    <Button
+                        type="button"
+                        variant="outline-secondary"
+                        onClick={() => promijeniGodinu(-1)}
+                    >
+                        Prethodna godina
+                    </Button>
+
+                    <strong>{dayjs(datumKalendara).year()}</strong>
+
+                    <Button
+                        type="button"
+                        variant="outline-secondary"
+                        onClick={() => promijeniGodinu(1)}
+                    >
+                        Sljedeća godina
+                    </Button>
+
+                    <Button
+                        type="button"
+                        variant="outline-primary"
+                        onClick={() => setDatumKalendara(new Date())}
+                    >
+                        Ova godina
+                    </Button>
+                </div>
+            )}
+
             {datumPolaska ? (
-                <div className="d-flex align-items-center gap-3 mb-3">
+                <div className="kalendar-uputa kalendar-uputa-odabir d-flex align-items-center gap-3 mb-3">
                     <span>
                         Polazak: {dayjs(datumPolaska).format("DD.MM.YYYY.")}
                         {" — "}Sada odaberite datum povratka.
@@ -327,7 +495,11 @@ export default function Kalendar() {
                     </Button>
                 </div>
             ) : (
-                <p>Kliknite datum polaska, zatim datum povratka za dodavanje putovanja.</p>
+                <p className="kalendar-uputa" >
+                    {godisnjiPrikaz
+                        ? "Kliknite mjesec za otvaranje njegova kalendara. Plavo su označena putovanja, a narančastom točkom aktivnosti."
+                        : "Kliknite datum polaska, zatim datum povratka za dodavanje putovanja."}
+                </p>
             )}
 
             {ucitavanje ? (
@@ -336,6 +508,12 @@ export default function Kalendar() {
                 <div className="alert alert-danger" role="alert">
                     {greska}
                 </div>
+            ) : godisnjiPrikaz ? (
+                <GodisnjiPregled
+                    godina={dayjs(datumKalendara).year()}
+                    dogadaji={dogadaji}
+                    onOdaberiMjesec={otvoriMjesec}
+                />
             ) : (
                 <div className="kalendar-okvir">
                     <Calendar
@@ -344,13 +522,16 @@ export default function Kalendar() {
                         events={dogadaji}
                         startAccessor="start"
                         endAccessor="end"
-                        defaultView="month"
+                        date={datumKalendara}
+                        onNavigate={setDatumKalendara}
+                        onView={setPogledKalendara}
                         views={["month", "week", "day", "agenda"]}
                         style={{ height: 700 }}
                         popup
                         selectable
                         onSelectSlot={odaberiDatum}
                         onSelectEvent={odaberiDogadaj}
+                        dayPropGetter={oznaciDatum}
                         longPressThreshold={250}
                         eventPropGetter={(dogadaj) => ({
                             style: {
@@ -382,6 +563,7 @@ export default function Kalendar() {
             )}
 
             <Modal
+                className="kalendar-modal"
                 show={pocetniDatumi !== null}
                 onHide={prekiniOdabir}
                 size="lg"
@@ -403,6 +585,7 @@ export default function Kalendar() {
             </Modal>
 
             <Modal
+                className="kalendar-modal"
                 show={putovanjeZaAktivnost !== null}
                 onHide={zatvoriAktivnost}
                 size="lg"
@@ -426,6 +609,7 @@ export default function Kalendar() {
             </Modal>
 
             <Modal
+                className="kalendar-modal"
                 show={odabranoPutovanje !== null}
                 onHide={() => {
                     if (!brisanje) {
@@ -496,6 +680,7 @@ export default function Kalendar() {
             </Modal>
 
             <Modal
+                className="kalendar-modal"
                 show={putovanjeZaUredivanje !== null}
                 onHide={zatvoriUredivanje}
                 size="lg"
@@ -512,6 +697,100 @@ export default function Kalendar() {
                             pocetnaSifra={putovanjeZaUredivanje.sifra}
                             onSpremi={promjenePutovanjaSpremljene}
                             onOdustani={zatvoriUredivanje}
+                        />
+                    )}
+                </Modal.Body>
+            </Modal>
+
+            <Modal
+                className="kalendar-modal"
+                show={odabranaAktivnost !== null}
+                onHide={() => {
+                    if (!brisanjeAktivnosti) {
+                        setOdabranaAktivnost(null)
+                    }
+                }}
+                centered
+            >
+                <Modal.Header closeButton={!brisanjeAktivnosti}>
+                    <Modal.Title>
+                        {odabranaAktivnost?.stavka.naziv}
+                    </Modal.Title>
+                </Modal.Header>
+
+                <Modal.Body>
+                    {odabranaAktivnost && (
+                        <>
+                            <p>
+                                <strong>Putovanje: </strong>
+                                {odabranaAktivnost.putovanje.naziv}
+                            </p>
+
+                            <p>
+                                <strong>Datum: </strong>
+                                {dayjs(odabranaAktivnost.start)
+                                    .format("DD.MM.YYYY.")}
+                            </p>
+
+                            <p>
+                                <strong>Dan putovanja: </strong>
+                                {odabranaAktivnost.stavka.dan}
+                            </p>
+
+                            <p>
+                                <strong>Vrijeme: </strong>
+                                {odabranaAktivnost.stavka.vrijeme}
+                            </p>
+
+                            {odabranaAktivnost.stavka.biljeska && (
+                                <p style={{ whiteSpace: "pre-wrap" }}>
+                                    <strong>Bilješka: </strong>
+                                    {odabranaAktivnost.stavka.biljeska}
+                                </p>
+                            )}
+                        </>
+                    )}
+                </Modal.Body>
+
+                <Modal.Footer>
+                    <Button
+                        type="button"
+                        variant="outline-primary"
+                        onClick={urediOdabranuAktivnost}
+                        disabled={brisanjeAktivnosti}
+                    >
+                        Uredi
+                    </Button>
+
+                    <Button
+                        type="button"
+                        variant="danger"
+                        onClick={obrisiOdabranuAktivnost}
+                        disabled={brisanjeAktivnosti}
+                    >
+                        {brisanjeAktivnosti ? "Brisanje..." : "Obriši"}
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal
+                className="kalendar-modal"
+                show={aktivnostZaUredivanje !== null}
+                onHide={zatvoriUredivanjeAktivnosti}
+                size="lg"
+                centered
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Uredi aktivnost</Modal.Title>
+                </Modal.Header>
+
+                <Modal.Body>
+                    {aktivnostZaUredivanje && (
+                        <ItinerarPromjena
+                            key={aktivnostZaUredivanje.sifra}
+                            pocetnaSifra={aktivnostZaUredivanje.sifra}
+                            onSpremi={promjeneAktivnostiSpremljene}
+                            onOdustani={zatvoriUredivanjeAktivnosti}
                         />
                     )}
                 </Modal.Body>

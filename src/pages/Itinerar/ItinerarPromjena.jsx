@@ -15,6 +15,7 @@ export default function ItinerarPromjena({
 
     const navigate = useNavigate()
     const params = useParams()
+    const sifra = pocetnaSifra ?? params.sifra
     const [searchParams] = useSearchParams()
     const obavijesti = useObavijesti()
 
@@ -32,6 +33,21 @@ export default function ItinerarPromjena({
     useEffect(() => {
         ucitajStavku()
     }, [sifra])
+
+    function odustani() {
+        if (onOdustani) {
+            onOdustani()
+            return
+        }
+
+        const sifraPutovanja = stavka.putovanjeSifra || putovanjeSifra
+
+        navigate(
+            sifraPutovanja
+                ? `${RouteNames.ITINERAR}?putovanjeSifra=${sifraPutovanja}`
+                : RouteNames.ITINERAR
+        )
+    }
 
     async function ucitajStavku() {
         try {
@@ -123,25 +139,31 @@ export default function ItinerarPromjena({
 
         obavijesti("Promjene aktivnosti su spremljene.")
 
-        navigate(
-            `${RouteNames.ITINERAR}?putovanjeSifra=${izvornaStavka.putovanjeSifra}`
-        )
+        if (onSpremi) {
+            await onSpremi()
+        } else {
+            navigate(
+                `${RouteNames.ITINERAR}?putovanjeSifra=${izvornaStavka.putovanjeSifra}`
+            )
+        }
     }
 
     return (
         <section className="promjena-itinerara">
 
-            <Link
-                to={
-                    putovanjeSifra
-                        ? `${RouteNames.ITINERAR}?putovanjeSifra=${putovanjeSifra}`
-                        : RouteNames.ITINERAR
-                }
-                className="natrag-na-pregled"
-            >
-                <FaArrowLeft />
-                Natrag na pregled itinerara
-            </Link>
+            {!onOdustani && (
+                <Link
+                    to={
+                        putovanjeSifra
+                            ? `${RouteNames.ITINERAR}?putovanjeSifra=${putovanjeSifra}`
+                            : RouteNames.ITINERAR
+                    }
+                    className="natrag-na-pregled"
+                >
+                    <FaArrowLeft />
+                    Natrag na pregled itinerara
+                </Link>
+            )}
 
             <h2 className="promjena-itinerara-naslov">
                 <FaPen />
@@ -220,17 +242,14 @@ export default function ItinerarPromjena({
                 </Row>
 
                 <div className="itinerar-obrazac-akcije">
-                    <Link
-                        to={
-                            putovanjeSifra
-                                ? `${RouteNames.ITINERAR}?putovanjeSifra=${putovanjeSifra}`
-                                : RouteNames.ITINERAR
-                        }
-                        className="btn btn-outline-secondary"
+                    <Button
+                        type="button"
+                        variant="outline-secondary"
+                        onClick={odustani}
                     >
                         <FaTimes />
                         Odustani
-                    </Link>
+                    </Button>
 
                     <Button type="submit" variant="primary">
                         <FaSave />

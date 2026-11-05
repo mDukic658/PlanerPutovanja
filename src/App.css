@@ -1731,3 +1731,620 @@ h4 {
     margin-left: 26px;
   }
 }
+
+
+.godisnji-pregled {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.godisnji-mjesec {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid #d7dce1;
+  border-radius: 12px;
+  background: white;
+  color: var(--charcoal);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.godisnji-mjesec:hover {
+  border-color: var(--pacific-blue);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 8%);
+}
+
+.godisnji-mjesec:focus-visible {
+  outline: 3px solid var(--pacific-blue);
+  outline-offset: 3px;
+}
+
+.godisnji-mjesec-naslov {
+  font-size: 1.15rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.godisnji-dani {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-auto-rows: 32px;
+  gap: 4px;
+}
+
+.godisnji-dan-naziv,
+.godisnji-dan {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.godisnji-dan-naziv {
+  color: #64748b;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.godisnji-dan {
+  position: relative;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.godisnji-dan.ima-putovanje {
+  background: var(--pacific-blue);
+  color: var(--charcoal);
+}
+
+.godisnji-dan.je-danas {
+  outline: 2px solid var(--charcoal);
+  outline-offset: -2px;
+  font-weight: 700;
+}
+
+.godisnji-aktivnost {
+  position: absolute;
+  bottom: 2px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--mango-orange);
+}
+
+.godisnji-mjesec-sazetak {
+  margin-top: auto;
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 991px) {
+  .godisnji-pregled {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 575px) {
+  .godisnji-pregled {
+    grid-template-columns: 1fr;
+  }
+}
+
+.kalendar-stranica {
+  padding: 24px 0;
+  color: var(--charcoal);
+}
+
+.kalendar-stranica>h2 {
+  margin-bottom: 20px;
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  font-weight: 750;
+  letter-spacing: -0.03em;
+}
+
+/* GUMBI ZA ODABIR PRIKAZA */
+
+.kalendar-prikazi {
+  width: fit-content;
+  padding: 5px;
+  border: 1px solid #e2e5e8;
+  border-radius: 12px;
+  background: white;
+}
+
+.kalendar-prikazi .btn {
+  min-width: 110px;
+  padding: 9px 18px;
+  border: 0;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.kalendar-prikazi .btn-primary {
+  background: var(--pacific-blue);
+  color: var(--charcoal);
+}
+
+.kalendar-prikazi .btn-outline-primary {
+  background: transparent;
+  color: var(--charcoal);
+}
+
+.kalendar-prikazi .btn-outline-primary:hover {
+  background: var(--wheat);
+}
+
+/* UPUTE I ODABIR DATUMA */
+
+.kalendar-uputa {
+  margin-bottom: 20px;
+  padding: 14px 18px;
+  border: 1px solid #e0e5e9;
+  border-left: 4px solid var(--pacific-blue);
+  border-radius: 10px;
+  background: white;
+  color: var(--charcoal);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.kalendar-uputa-odabir {
+  border-left-color: var(--mango-orange);
+}
+
+.kalendar-uputa-odabir .btn {
+  margin-left: auto;
+  border-radius: 8px;
+}
+
+/* GODIŠNJE KONTROLE */
+
+.kalendar-godina-kontrole {
+  padding: 14px 18px;
+  border: 1px solid #e2e5e8;
+  border-radius: 12px;
+  background: white;
+}
+
+.kalendar-godina-kontrole strong {
+  font-size: 1.4rem;
+  font-weight: 750;
+}
+
+.kalendar-godina-kontrole .btn {
+  border-radius: 8px;
+}
+
+/* OKVIR KALENDARA */
+
+.kalendar-okvir {
+  padding: 22px;
+  overflow: hidden;
+  border: 1px solid #e2e5e8;
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 6px 24px rgb(31 41 55 / 5%);
+}
+
+.kalendar-stranica .rbc-calendar {
+  font-family: inherit;
+}
+
+/* ALATNA TRAKA KALENDARA */
+
+.kalendar-stranica .rbc-toolbar {
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.kalendar-stranica .rbc-toolbar-label {
+  padding: 0 12px;
+  color: var(--charcoal);
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.kalendar-stranica .rbc-toolbar button {
+  padding: 9px 14px;
+  border-color: #dce2e7;
+  background: white;
+  color: var(--charcoal);
+  font-size: 0.9rem;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.kalendar-stranica .rbc-toolbar button:hover {
+  border-color: var(--pacific-blue);
+  background: var(--wheat);
+}
+
+.kalendar-stranica .rbc-toolbar button.rbc-active,
+.kalendar-stranica .rbc-toolbar button.rbc-active:hover {
+  border-color: var(--pacific-blue);
+  background: var(--pacific-blue);
+  color: var(--charcoal);
+  box-shadow: none;
+}
+
+/* MREŽA I DANI */
+
+.kalendar-stranica .rbc-month-view,
+.kalendar-stranica .rbc-time-view,
+.kalendar-stranica .rbc-agenda-view {
+  border-color: #e2e7ec;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.kalendar-stranica .rbc-header {
+  padding: 12px 4px;
+  border-color: #e2e7ec;
+  background: #f8fafb;
+  color: var(--charcoal);
+  font-size: 0.85rem;
+  font-weight: 650;
+}
+
+.kalendar-stranica .rbc-day-bg+.rbc-day-bg,
+.kalendar-stranica .rbc-month-row+.rbc-month-row,
+.kalendar-stranica .rbc-time-content,
+.kalendar-stranica .rbc-time-header-content {
+  border-color: #e2e7ec;
+}
+
+.kalendar-stranica .rbc-date-cell {
+  padding: 7px 9px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.kalendar-stranica .rbc-off-range-bg {
+  background: #f5f6f7;
+}
+
+.kalendar-stranica .rbc-off-range {
+  color: #939da8;
+}
+
+.kalendar-stranica .rbc-today {
+  background: #edf9fc;
+}
+
+.kalendar-stranica .rbc-date-cell.rbc-now>button {
+  min-width: 28px;
+  padding: 3px 6px;
+  border-radius: 7px;
+  background: var(--charcoal);
+  color: white;
+}
+
+.kalendar-stranica .rbc-slot-selection {
+  background: var(--pacific-blue);
+  color: var(--charcoal);
+}
+
+/* PUTOVANJA I AKTIVNOSTI */
+
+.kalendar-stranica .rbc-event {
+  padding: 4px 7px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  transition: filter 0.15s;
+}
+
+.kalendar-stranica .rbc-event:hover {
+  filter: brightness(0.94);
+}
+
+.kalendar-stranica .rbc-event.rbc-selected {
+  outline: 2px solid var(--charcoal);
+  outline-offset: -2px;
+}
+
+.kalendar-stranica .rbc-event:focus-visible {
+  outline: 3px solid var(--charcoal);
+}
+
+.kalendar-stranica .rbc-show-more {
+  padding: 3px 7px;
+  background: transparent;
+  color: #08788f;
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+
+.kalendar-stranica .rbc-agenda-table {
+  color: var(--charcoal);
+}
+
+.kalendar-stranica .rbc-agenda-table td {
+  padding: 12px;
+  border-color: #e2e7ec;
+}
+
+.kalendar-stranica .rbc-current-time-indicator {
+  background: var(--terracotta);
+}
+
+/* DORADA GODIŠNJEG PREGLEDA */
+
+.kalendar-stranica .godisnji-mjesec {
+  box-shadow: 0 4px 16px rgb(31 41 55 / 3%);
+}
+
+.kalendar-stranica .godisnji-mjesec-naslov {
+  color: var(--charcoal);
+}
+
+.kalendar-stranica .godisnji-mjesec-sazetak {
+  padding-top: 12px;
+  border-top: 1px solid #edf0f2;
+}
+
+/* MODALI KALENDARA */
+
+.kalendar-modal .modal-content {
+  overflow: hidden;
+  border: 0;
+  border-radius: 16px;
+  background: white;
+  color: var(--charcoal);
+  box-shadow: 0 20px 70px rgb(0 0 0 / 18%);
+}
+
+.kalendar-modal .modal-header {
+  gap: 16px;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e7ebee;
+  background: var(--wheat);
+}
+
+.kalendar-modal .modal-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.kalendar-modal .modal-body {
+  padding: 24px;
+}
+
+.kalendar-modal .modal-footer {
+  gap: 8px;
+  padding: 16px 24px;
+  border-top: 1px solid #e7ebee;
+  background: #fafbfc;
+}
+
+.kalendar-modal .modal-footer .btn,
+.kalendar-modal .putovanje-obrazac-akcije .btn,
+.kalendar-modal .itinerar-obrazac-akcije .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 9px;
+  font-weight: 600;
+}
+
+.kalendar-modal .btn-primary {
+  border-color: var(--pacific-blue);
+  background: var(--pacific-blue);
+  color: var(--charcoal);
+}
+
+.kalendar-modal .btn-primary:hover {
+  border-color: #14849d;
+  background: #14849d;
+  color: white;
+}
+
+.kalendar-modal .btn-outline-primary {
+  border-color: #14849d;
+  color: #14849d;
+}
+
+.kalendar-modal .btn-outline-primary:hover {
+  background: #14849d;
+  color: white;
+}
+
+.kalendar-modal .btn-danger {
+  border-color: var(--terracotta);
+  background: var(--terracotta);
+}
+
+.kalendar-modal .btn-danger:hover {
+  border-color: #a6402c;
+  background: #a6402c;
+}
+
+/* OBRASCI UNUTAR MODALA */
+
+.kalendar-modal .modal-body>section {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.kalendar-modal .modal-body>section>h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 22px;
+  font-size: 1.1rem;
+  color: var(--charcoal);
+}
+
+.kalendar-modal .putovanje-obrazac,
+.kalendar-modal .itinerar-obrazac {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.kalendar-modal .form-label {
+  margin-bottom: 7px;
+  color: var(--charcoal);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.kalendar-modal .form-control,
+.kalendar-modal .form-select {
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #d7dfe5;
+  border-radius: 9px;
+  color: var(--charcoal);
+}
+
+.kalendar-modal .form-control:focus,
+.kalendar-modal .form-select:focus {
+  border-color: var(--pacific-blue);
+  box-shadow: 0 0 0 3px rgb(28 169 201 / 15%);
+}
+
+.kalendar-modal .form-control[readonly] {
+  background: #f3f5f7;
+  color: #586473;
+}
+
+.kalendar-modal textarea.form-control {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.kalendar-modal .putovanje-obrazac-akcije,
+.kalendar-modal .itinerar-obrazac-akcije {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid #e7ebee;
+}
+
+.kalendar-modal .modal-body p {
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.kalendar-modal .modal-body p:last-child {
+  margin-bottom: 0;
+}
+
+/* MANJI EKRANI */
+
+@media (max-width: 767px) {
+  .kalendar-stranica {
+    padding: 16px 0;
+  }
+
+  .kalendar-okvir {
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .kalendar-stranica .rbc-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .kalendar-stranica .rbc-toolbar-label {
+    order: -1;
+    text-align: center;
+  }
+
+  .kalendar-stranica .rbc-btn-group {
+    display: flex;
+    justify-content: center;
+  }
+
+  .kalendar-stranica .rbc-toolbar button {
+    flex: 1;
+    padding: 8px 6px;
+    font-size: 0.8rem;
+  }
+
+  .kalendar-stranica .rbc-header {
+    font-size: 0.72rem;
+  }
+
+  .kalendar-stranica .rbc-date-cell {
+    padding: 5px;
+  }
+
+  .kalendar-stranica .rbc-event {
+    padding: 3px 4px;
+    font-size: 0.7rem;
+  }
+
+  .kalendar-godina-kontrole {
+    justify-content: center;
+  }
+
+  .kalendar-modal .modal-header,
+  .kalendar-modal .modal-body,
+  .kalendar-modal .modal-footer {
+    padding: 16px;
+  }
+
+  .kalendar-modal .modal-footer .btn {
+    flex: 1 1 auto;
+  }
+
+  .kalendar-modal .putovanje-obrazac-akcije .btn,
+  .kalendar-modal .itinerar-obrazac-akcije .btn {
+    flex: 1;
+  }
+}
+
+/* Prvi odabrani datum */
+
+.kalendar-stranica .rbc-day-bg.kalendar-odabrani-polazak {
+  background: #bceaf4;
+  box-shadow: inset 0 0 0 2px var(--pacific-blue);
+}
+
+/* Odabrano razdoblje: obojena podloga i traka preko datuma */
+
+.kalendar-stranica .rbc-day-bg.kalendar-odabrano-razdoblje {
+  background-color: #e5f6fb;
+  background-image: linear-gradient(to bottom,
+      transparent 38px,
+      var(--pacific-blue) 38px,
+      var(--pacific-blue) 46px,
+      transparent 46px);
+}
+
+/* Početak i kraj razdoblja */
+
+.kalendar-stranica .rbc-day-bg.kalendar-odabrano-razdoblje.kalendar-odabrani-polazak {
+  background-color: #bceaf4;
+  box-shadow: inset 3px 0 0 var(--pacific-blue);
+}
+
+.kalendar-stranica .rbc-day-bg.kalendar-odabrano-razdoblje.kalendar-odabrani-povratak {
+  background-color: #bceaf4;
+  box-shadow: inset -3px 0 0 var(--pacific-blue);
+}
+
+/* Jednodnevno putovanje */
+
+.kalendar-stranica .rbc-day-bg.kalendar-odabrani-polazak.kalendar-odabrani-povratak {
+  box-shadow: inset 0 0 0 2px var(--pacific-blue);
+}
