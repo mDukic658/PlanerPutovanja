@@ -9,7 +9,8 @@ import PakiranjaService from "../services/lista_pakiranja/PakiranjaService"
 import { useObavijesti } from "../components/Obavijesti"
 import { Button, Modal } from "react-bootstrap"
 import NovoPutovanje from "./putovanja/NovoPutovanje"
-
+import ItinerarNovo from "./Itinerar/ItinerarNovo"
+import PutovanjePromjena from "./putovanja/PutovanjePromjena"
 
 const localizer = dayjsLocalizer(dayjs)
 
@@ -24,6 +25,10 @@ export default function Kalendar() {
     const [greska, setGreska] = useState("")
     const [datumPolaska, setDatumPolaska] = useState("")
     const [pocetniDatumi, setPocetniDatumi] = useState(null)
+    const [putovanjeZaAktivnost, setPutovanjeZaAktivnost] = useState(null)
+    const [odabranoPutovanje, setOdabranoPutovanje] = useState(null)
+    const [putovanjeZaUredivanje, setPutovanjeZaUredivanje] = useState(null)
+    const [brisanje, setBrisanje] = useState(false)
 
     useEffect(() => {
         ucitajPodatke()
@@ -63,18 +68,148 @@ export default function Kalendar() {
         setPakiranja(odgovor.data)
     }
 
-    function prekiniOdabir(){
+    function prekiniOdabir() {
         setDatumPolaska("")
         setPocetniDatumi(null)
     }
 
-    function odaberiDatum({ start, action }){
+    function odaberiDatum({ start, action }) {
+        if (pocetniDatumi || action === "doubleClick") return
 
-        if(pocetniDatumi || action === "doubleClick") return
+        const datum = dayjs(start).format("YYYY-MM-DD")
+        const danas = dayjs().format("YYYY-MM-DD")
 
-        const datum = dayjs(start).format("DD-MM-YYYY")
-        const danas = dayjs().format
+        if (datum < danas) {
+            obavijesti("Odaberite današnji ili budući datum.", "danger")
+            return
+        }
 
+        if (!datumPolaska) {
+            setDatumPolaska(datum)
+            return
+        }
+
+        if (datum < datumPolaska) {
+            obavijesti(
+                "Datum povratka ne može biti prije datuma polaska.",
+                "danger"
+            )
+            return
+        }
+
+        setPocetniDatumi({
+            datumPolaska,
+            datumPovratka: datum
+        })
+
+        setDatumPolaska("")
+    }
+
+    async function putovanjeSpremljeno() {
+        prekiniOdabir()
+
+        try {
+            await ucitajPutovanja()
+        } catch (error) {
+            console.error(error)
+
+            obavijesti(
+                "Putovanje je spremljeno, ali osvježavanje kalendara nije uspjelo.",
+                "danger"
+            )
+        }
+    }
+
+    function odaberiDogadaj(dogadaj) {
+        if (dogadaj.vrsta !== "putovanje") return
+
+        prekiniOdabir()
+        setOdabranoPutovanje(dogadaj.putovanje)
+    }
+
+    function dodajAktivnostOdabranomPutovanju() {
+        setPutovanjeZaAktivnost(odabranoPutovanje)
+        setOdabranoPutovanje(null)
+    }
+
+    function urediOdabranoPutovanje() {
+        setPutovanjeZaUredivanje(odabranoPutovanje)
+        setOdabranoPutovanje(null)
+    }
+
+    function zatvoriUredivanje() {
+        setPutovanjeZaUredivanje(null)
+    }
+
+    async function promjenePutovanjaSpremljene() {
+        zatvoriUredivanje()
+
+        try {
+            await ucitajPutovanja()
+        } catch (error) {
+            console.error(error)
+
+            obavijesti(
+                "Promjene su spremljene, ali osvježavanje kalendara nije uspjelo.",
+                "danger"
+            )
+        }
+    }
+
+    async function obrisiOdabranoPutovanje() {
+        if (!odabranoPutovanje || brisanje) return
+
+        if (!window.confirm(
+            `Želite li obrisati putovanje "${odabranoPutovanje.naziv}"?`
+        )) {
+            return
+        }
+
+        setBrisanje(true)
+
+        try {
+            await PutovanjaService.obrisi(odabranoPutovanje.sifra)
+        } catch (error) {
+            console.error(error)
+            obavijesti("Brisanje putovanja nije uspjelo.", "danger")
+            setBrisanje(false)
+            return
+        }
+
+        setOdabranoPutovanje(null)
+        obavijesti("Putovanje je obrisano.")
+
+        try {
+            await ucitajPutovanja()
+        } catch (error) {
+            console.error(error)
+
+            obavijesti(
+                "Putovanje je obrisano, ali osvježavanje kalendara nije uspjelo.",
+                "danger"
+            )
+        } finally {
+            setBrisanje(false)
+        }
+    }
+
+    function zatvoriAktivnost() {
+        setPutovanjeZaAktivnost(null)
+    }
+
+    async function aktivnostSpremljena() {
+        zatvoriAktivnost()
+
+        try {
+            await ucitajItinerar()
+        } catch (error) {
+            console.error(error)
+
+            obavijesti(
+                "Aktivnost je spremljena, ali osvježavanje kalendara nije uspjelo.",
+                "danger"
+            )
+        }
     }
 
     function pretvoriDatum(vrijednost) {
@@ -176,6 +311,25 @@ export default function Kalendar() {
 
             <h2>Kalendar putovanja</h2>
 
+            {datumPolaska ? (
+                <div className="d-flex align-items-center gap-3 mb-3">
+                    <span>
+                        Polazak: {dayjs(datumPolaska).format("DD.MM.YYYY.")}
+                        {" — "}Sada odaberite datum povratka.
+                    </span>
+
+                    <Button
+                        variant="outline-secondary"
+                        size="sm"
+                        onClick={prekiniOdabir}
+                    >
+                        Odustani
+                    </Button>
+                </div>
+            ) : (
+                <p>Kliknite datum polaska, zatim datum povratka za dodavanje putovanja.</p>
+            )}
+
             {ucitavanje ? (
                 <p>Učitavanje kalendara...</p>
             ) : greska ? (
@@ -194,6 +348,10 @@ export default function Kalendar() {
                         views={["month", "week", "day", "agenda"]}
                         style={{ height: 700 }}
                         popup
+                        selectable
+                        onSelectSlot={odaberiDatum}
+                        onSelectEvent={odaberiDogadaj}
+                        longPressThreshold={250}
                         eventPropGetter={(dogadaj) => ({
                             style: {
                                 backgroundColor:
@@ -222,6 +380,142 @@ export default function Kalendar() {
                     />
                 </div>
             )}
+
+            <Modal
+                show={pocetniDatumi !== null}
+                onHide={prekiniOdabir}
+                size="lg"
+                centered
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Dodaj putovanje</Modal.Title>
+                </Modal.Header>
+
+                <Modal.Body>
+                    {pocetniDatumi && (
+                        <NovoPutovanje
+                            pocetniDatumi={pocetniDatumi}
+                            onSpremi={putovanjeSpremljeno}
+                            onOdustani={prekiniOdabir}
+                        />
+                    )}
+                </Modal.Body>
+            </Modal>
+
+            <Modal
+                show={putovanjeZaAktivnost !== null}
+                onHide={zatvoriAktivnost}
+                size="lg"
+                centered
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>
+                        Dodaj aktivnost — {putovanjeZaAktivnost?.naziv}
+                    </Modal.Title>
+                </Modal.Header>
+
+                <Modal.Body>
+                    {putovanjeZaAktivnost && (
+                        <ItinerarNovo
+                            pocetnoPutovanjeSifra={putovanjeZaAktivnost.sifra}
+                            onSpremi={aktivnostSpremljena}
+                            onOdustani={zatvoriAktivnost}
+                        />
+                    )}
+                </Modal.Body>
+            </Modal>
+
+            <Modal
+                show={odabranoPutovanje !== null}
+                onHide={() => {
+                    if (!brisanje) {
+                        setOdabranoPutovanje(null)
+                    }
+                }}
+                centered
+            >
+                <Modal.Header closeButton={!brisanje}>
+                    <Modal.Title>
+                        {odabranoPutovanje?.naziv}
+                    </Modal.Title>
+                </Modal.Header>
+
+                <Modal.Body>
+                    {odabranoPutovanje && (
+                        <>
+                            <p>
+                                <strong>Destinacija: </strong>
+                                {odabranoPutovanje.destinacija}
+                                {odabranoPutovanje.drzava
+                                    ? `, ${odabranoPutovanje.drzava}`
+                                    : ""}
+                            </p>
+
+                            <p>
+                                <strong>Polazak: </strong>
+                                {dayjs(odabranoPutovanje.datumPolaska)
+                                    .format("DD.MM.YYYY.")}
+                            </p>
+
+                            <p>
+                                <strong>Povratak: </strong>
+                                {dayjs(odabranoPutovanje.datumPovratka)
+                                    .format("DD.MM.YYYY.")}
+                            </p>
+                        </>
+                    )}
+                </Modal.Body>
+
+                <Modal.Footer>
+                    <Button
+                        type="button"
+                        onClick={dodajAktivnostOdabranomPutovanju}
+                        disabled={brisanje}
+                    >
+                        Dodaj aktivnost
+                    </Button>
+
+                    <Button
+                        type="button"
+                        variant="outline-primary"
+                        onClick={urediOdabranoPutovanje}
+                        disabled={brisanje}
+                    >
+                        Uredi
+                    </Button>
+
+                    <Button
+                        type="button"
+                        variant="danger"
+                        onClick={obrisiOdabranoPutovanje}
+                        disabled={brisanje}
+                    >
+                        {brisanje ? "Brisanje..." : "Obriši"}
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal
+                show={putovanjeZaUredivanje !== null}
+                onHide={zatvoriUredivanje}
+                size="lg"
+                centered
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Uredi putovanje</Modal.Title>
+                </Modal.Header>
+
+                <Modal.Body>
+                    {putovanjeZaUredivanje && (
+                        <PutovanjePromjena
+                            key={putovanjeZaUredivanje.sifra}
+                            pocetnaSifra={putovanjeZaUredivanje.sifra}
+                            onSpremi={promjenePutovanjaSpremljene}
+                            onOdustani={zatvoriUredivanje}
+                        />
+                    )}
+                </Modal.Body>
+            </Modal>
 
         </section>
     )

@@ -7,10 +7,14 @@ import { FaArrowLeft, FaPen, FaSave, FaTimes } from "react-icons/fa";
 import { useObavijesti } from "../../components/Obavijesti";
 import PutovanjaService from "../../services/putovanja/PutovanjaService";
 
-export default function ItinerarPromjena() {
+export default function ItinerarPromjena({
+    pocetnaSifra,
+    onSpremi,
+    onOdustani
+}) {
 
     const navigate = useNavigate()
-    const { sifra } = useParams()
+    const params = useParams()
     const [searchParams] = useSearchParams()
     const obavijesti = useObavijesti()
 

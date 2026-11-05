@@ -8,16 +8,21 @@ import PretragaDrzava from "../../components/PretragaDrzava"
 import { FaPen, FaSave, FaTimes, FaArrowLeft } from "react-icons/fa"
 import { useObavijesti } from "../../components/Obavijesti"
 
-export default function PutovanjePromjena() {
+export default function PutovanjePromjena({
+    pocetnaSifra,
+    onSpremi,
+    onOdustani
+}) {
 
     const navigate = useNavigate()
     const obavijesti = useObavijesti()
     const params = useParams()
+    const sifra = pocetnaSifra ?? params.sifra
     const [putovanje, setPutovanje] = useState([])
     const [drzave, setDrzave] = useState([])
 
     async function ucitajPutovanje() {
-        await PutovanjaService.getBySifra(params.sifra).then((odgovor) => {
+        await PutovanjaService.getBySifra(sifra).then((odgovor) => {
             const p = odgovor.data
             p.datumPolaska = p.datumPolaska.substring(0, 10)
             p.datumPovratka = p.datumPovratka.substring(0, 10)
@@ -33,14 +38,28 @@ export default function PutovanjePromjena() {
     useEffect(() => {
         ucitajPutovanje()
         ucitajDrzave()
-    }, [])
+    }, [sifra])
+
+    function odustani() {
+        if (onOdustani) {
+            onOdustani()
+        } else {
+            navigate(RouteNames.PUTOVANJA)
+        }
+    }
 
     async function promijeni(putovanje) {
         try {
-            await PutovanjaService.promijeni(params.sifra, putovanje)
+            await PutovanjaService.promijeni(sifra, putovanje)
 
             obavijesti("Promjene putovanja su spremljene.")
-            navigate(RouteNames.PUTOVANJA)
+
+            if (onSpremi) {
+                await onSpremi()
+            } else {
+                navigate(RouteNames.PUTOVANJA)
+            }
+
         } catch (error) {
             console.error(error)
             obavijesti("Spremanje promjena nije uspjelo.", "danger")
@@ -69,13 +88,15 @@ export default function PutovanjePromjena() {
     return (
         <section className="promjena-putovanja">
 
-            <Link
-                to={RouteNames.PUTOVANJA}
-                className="natrag-na-pregled"
-            >
-                <FaArrowLeft />
-                Natrag na pregled putovanja
-            </Link>
+            {!onOdustani && (
+                <Link
+                    to={RouteNames.PUTOVANJA}
+                    className="natrag-na-pregled"
+                >
+                    <FaArrowLeft />
+                    Natrag na pregled putovanja
+                </Link>
+            )}
 
             <h2 className="promjena-putovanja-naslov">
                 <FaPen />
@@ -167,13 +188,14 @@ export default function PutovanjePromjena() {
                 </Row>
 
                 <div className="putovanje-obrazac-akcije">
-                    <Link
-                        to={RouteNames.PUTOVANJA}
-                        className="btn btn-outline-secondary"
+                    <Button
+                        type="button"
+                        variant="outline-secondary"
+                        onClick={odustani}
                     >
                         <FaTimes />
                         Odustani
-                    </Link>
+                    </Button>
 
                     <Button type="submit" variant="primary">
                         <FaSave />

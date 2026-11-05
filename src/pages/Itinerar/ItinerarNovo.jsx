@@ -10,13 +10,17 @@ import "timepicker-ui/main.css"
 import { useObavijesti } from "../../components/Obavijesti"
 
 
-export default function ItinerarNovo() {
+export default function ItinerarNovo({
+    pocetnoPutovanjeSifra,
+    onSpremi,
+    onOdustani
+}) {
 
     const navigate = useNavigate()
     const obavijesti = useObavijesti()
 
     const [searchParams] = useSearchParams()
-    const putovanjeSifra = searchParams.get("putovanjeSifra")
+    const putovanjeSifra = pocetnoPutovanjeSifra ?? searchParams.get("putovanjeSifra")
 
     const [putovanja, setPutovanja] = useState([])
     const [aktivnosti, setAktivnosti] = useState([])
@@ -84,6 +88,19 @@ export default function ItinerarNovo() {
             aktivno = false
         }
     }, [putovanjeSifra])
+
+    function odustani() {
+        if (onOdustani) {
+            onOdustani()
+            return
+        }
+
+        navigate(
+            putovanjeSifra
+                ? `${RouteNames.ITINERAR}?putovanjeSifra=${putovanjeSifra}`
+                : RouteNames.ITINERAR
+        )
+    }
 
     function brojDanaPutovanja(putovanje) {
         if (!putovanje) {
@@ -246,9 +263,13 @@ export default function ItinerarNovo() {
 
         obavijesti("Aktivnost je dodana.")
 
-        navigate(
-            `${RouteNames.ITINERAR}?putovanjeSifra=${novaStavka.putovanjeSifra}`
-        )
+        if (onSpremi) {
+            await onSpremi()
+        } else {
+            navigate(
+                `${RouteNames.ITINERAR}?putovanjeSifra=${novaStavka.putovanjeSifra}`
+            )
+        }
     }
 
     const odabranoPutovanje = putovanja.find(
@@ -261,17 +282,19 @@ export default function ItinerarNovo() {
     return (
         <section className="novi-itinerar">
 
-            <Link
-                to={
-                    stavka.putovanjeSifra
-                        ? `${RouteNames.ITINERAR}?putovanjeSifra=${stavka.putovanjeSifra}`
-                        : RouteNames.ITINERAR
-                }
-                className="natrag-na-pregled"
-            >
-                <FaArrowLeft />
-                {" "}Natrag na pregled itinerara
-            </Link>
+            {!onOdustani && (
+                <Link
+                    to={
+                        stavka.putovanjeSifra
+                            ? `${RouteNames.ITINERAR}?putovanjeSifra=${stavka.putovanjeSifra}`
+                            : RouteNames.ITINERAR
+                    }
+                    className="natrag-na-pregled"
+                >
+                    <FaArrowLeft />
+                    {" "}Natrag na pregled itinerara
+                </Link>
+            )}
 
             <h2 className="novi-itinerar-naslov">
                 <FaPlus />
@@ -406,17 +429,15 @@ export default function ItinerarNovo() {
                 </Row>
 
                 <div className="itinerar-obrazac-akcije">
-                    <Link
-                        to={
-                            stavka.putovanjeSifra
-                                ? `${RouteNames.ITINERAR}?putovanjeSifra=${stavka.putovanjeSifra}`
-                                : RouteNames.ITINERAR
-                        }
-                        className="btn btn-outline-secondary"
+                    <Button
+                        type="button"
+                        variant="outline-secondary"
+                        onClick={odustani}
+                        disabled={spremanje}
                     >
                         <FaTimes />
                         {" "}Odustani
-                    </Link>
+                    </Button>
 
                     <Button
                         type="submit"

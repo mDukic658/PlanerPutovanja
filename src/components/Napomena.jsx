@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button, Form } from "react-bootstrap";
-import { FaPen, FaCheck, FaTimes } from "react-icons/fa";
+import { FaPen, FaTimes } from "react-icons/fa";
 import PakiranjaService from "../services/lista_pakiranja/PakiranjaService";
 import { useObavijesti } from "./Obavijesti";
 
@@ -83,12 +83,21 @@ export default function Napomena({
                 className="napomena-prikaz"
             >
                 <Form.Control
-                    as="textarea"
-                    rows={2}
+                    type="text"
                     autoFocus
                     value={napomena}
                     onChange={(e) => setNapomena(e.target.value)}
                     onKeyDown={(e) => {
+                        if (e.nativeEvent.isComposing) return
+
+                        if (e.key === "Enter") {
+                            e.preventDefault()
+
+                            if (!spremanje) {
+                                spremi(e)
+                            }
+                        }
+
                         if (e.key === "Escape" && !spremanje) {
                             e.preventDefault()
                             odustani()
@@ -98,15 +107,6 @@ export default function Napomena({
                     placeholder="Unesi napomenu"
                     style={{ flex: "1 1 180px", minWidth: 0 }}
                 />
-
-                <Button
-                    type="submit"
-                    size="sm"
-                    disabled={spremanje}
-                    title="Spremi napomenu"
-                >
-                    <FaCheck />
-                </Button>
 
                 <Button
                     type="button"
@@ -123,7 +123,7 @@ export default function Napomena({
     }
 
     return (
-         <div className="napomena-prikaz">
+        <div className="napomena-prikaz">
             <span
                 onDoubleClick={zapocniUredivanje}
                 className="small"
