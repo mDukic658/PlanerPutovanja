@@ -221,6 +221,56 @@ export default function GeneriranjePodataka() {
         }
     }
 
+    const handleGenerirajSve = async () => {
+        if (loading) return
+
+        if (generiranjeZabranjeno) {
+            setPoruka({
+                tip: 'warning',
+                tekst: 'Generiranje podataka nije dopušteno dok je izvor podataka memorija.'
+            })
+            return
+        }
+
+        const neispravanUnos = kartaGeneriranja.find((k) =>
+            !Number.isInteger(k.broj) ||
+            k.broj < 1 ||
+            k.broj > k.max
+        )
+
+        if (neispravanUnos) {
+            setPoruka({
+                tip: 'warning',
+                tekst: `${neispravanUnos.naziv}: unesite cijeli broj između 1 i ${neispravanUnos.max}.`
+            })
+            return
+        }
+
+        setLoading(true)
+        setPoruka(null)
+
+        try {
+            await generirajDrzave(brojDrzava)
+            await generirajPredmete(brojPredmeta)
+            await generirajPutovanja(brojPutovanja)
+            await generirajItinerar(brojItinerara)
+            await generirajPakiranja(brojPakiranja)
+
+            setPoruka({
+                tip: 'success',
+                tekst: `Uspješno generirano: ${brojDrzava} država, ${brojPredmeta} predmeta, ${brojPutovanja} putovanja, ${brojItinerara} stavki itinerara i ${brojPakiranja} pakiranja!`
+            })
+        } catch (error) {
+            setPoruka({
+                tip: 'danger',
+                tekst: 'Generiranje je prekinuto: ' + error.message +
+                    ' Podaci dodani prije greške ostaju spremljeni.'
+            })
+        } finally {
+            setLoading(false)
+        }
+    }
+
     const kartaGeneriranja = [
         {
             naziv: 'Države',
@@ -290,6 +340,17 @@ export default function GeneriranjePodataka() {
                     {poruka.tekst}
                 </Alert>
             )}
+
+            <div className="d-flex justify-content-end mb-4">
+                <Button
+                    variant="success"
+                    type="button"
+                    onClick={handleGenerirajSve}
+                    disabled={loading || generiranjeZabranjeno}
+                >
+                    {loading ? 'Generiranje...' : 'Generiraj sve'}
+                </Button>
+            </div>
 
             <Row>
                 {kartaGeneriranja.map((k) => (
