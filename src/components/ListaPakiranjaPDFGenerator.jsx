@@ -306,3 +306,8 @@ Font.register({
     family: "OpenSans",
     src: `${import.meta.env.BASE_URL}fonts/OpenSans-VariableFont_wdth,wght.ttf`
 })
+
+Font.registerEmojiSource({
+    format: "png",
+    url: `${import.meta.env.BASE_URL}emojis/72x72/`
+})

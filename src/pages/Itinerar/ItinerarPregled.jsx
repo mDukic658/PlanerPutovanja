@@ -4,8 +4,9 @@ import { Button, Badge, Card, Form, Row, Col } from "react-bootstrap"
 import { RouteNames } from "../../constants";
 import PutovanjaService from '../../services/putovanja/PutovanjaService'
 import ItinerarService from '../../services/itinerar/ItinerarService'
-import { FaRoute, FaPlus, FaPen, FaTrash, FaClock, FaCalendarDay } from "react-icons/fa";
+import { FaRoute, FaPlus, FaPen, FaTrash, FaClock, FaCalendarDay, FaFileWord } from "react-icons/fa";
 import { useObavijesti } from "../../components/Obavijesti";
+import { generirajItinerarWord } from "../../components/WordGenerator";
 
 
 export default function ItinerarPregled() {
@@ -17,8 +18,9 @@ export default function ItinerarPregled() {
     const [pretragaPutovanje, setPretragaPutovanje] = useState('')
     const [prikaziAutocomplete, setPrikaziAutocomplete] = useState(false)
     const [odabraniIndex, setOdabraniIndex] = useState(-1)
-    const obavijesti = useObavijesti()
+    const [generiranjeWorda, setGeneriranjeWorda] = useState(false)
 
+    const obavijesti = useObavijesti()
     const navigate = useNavigate()
 
     const [searchParams] = useSearchParams()
@@ -78,15 +80,37 @@ export default function ItinerarPregled() {
         obavijesti("Aktivnost je obrisana")
     }
 
+    async function generirajWord() {
+        if (!odabranoPutovanje.sifra || generiranjeWorda) return
+
+        setGeneriranjeWorda(true)
+
+        try {
+            const odgovor = await ItinerarService.getByPutovanje(
+                odabranoPutovanje.sifra
+            )
+
+            await generirajItinerarWord(
+                odabranoPutovanje,
+                odgovor.data
+            )
+        } catch (greska) {
+            console.error("Generiranje Worda nije uspjelo:", greska)
+
+            obavijesti(
+                "Generiranje Word dokumenta nije uspjelo.",
+                "danger"
+            )
+        } finally {
+            setGeneriranjeWorda(false)
+        }
+    }
 
     const poDanima = stavke.reduce((acc, s) => {
         acc[s.dan] = acc[s.dan] || []
         acc[s.dan].push(s)
         return acc
     }, {})
-
-
-
 
     function filtrirajPutovanje() {
         //if (!pretragaPutovanje) return []
@@ -154,13 +178,24 @@ export default function ItinerarPregled() {
                 </h2>
 
                 {odabranoPutovanje.sifra > 0 && (
-                    <Link
-                        to={`${RouteNames.ITINERAR_DODAJ}?putovanjeSifra=${odabranaSifra}`}
-                        className="btn btn-primary"
-                    >
-                        <FaPlus />
-                        Dodaj aktivnost
-                    </Link>
+                    <div className="d-flex flex-wrap gap-2">
+                        <Button
+                            variant="primary"
+                            disabled={generiranjeWorda}
+                            onClick={generirajWord}
+                        >
+                            <FaFileWord className="me-2" />
+                            {generiranjeWorda ? "Generiranje..." : "Preuzmi Word"}
+                        </Button>
+
+                        <Link
+                            to={`${RouteNames.ITINERAR_DODAJ}?putovanjeSifra=${odabranaSifra}`}
+                            className="btn btn-primary"
+                        >
+                            <FaPlus />
+                            Dodaj aktivnost
+                        </Link>
+                    </div>
                 )}
             </div>
 
