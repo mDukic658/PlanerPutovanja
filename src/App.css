@@ -1,3 +1,57 @@
+/* APP.CSS — SADRŽAJ
+ * Za brzo pronalaženje koristi Ctrl + F i broj ili naziv cjeline.
+ * Redoslijed pravila je zadržan jer kasnija pravila mogu nadjačati prethodna.
+ * Ponavljanje selektora u media upitima nije duplikat: odnosi se na drugi ekran.
+ *
+ * 01. BOJE APLIKACIJE
+ * 02. OSNOVNI RASPORED
+ * 03. NAVIGACIJA
+ * 04. POČETNA STRANICA
+ * 05. ZAJEDNIČKI NASLOVI
+ * 06. ZAJEDNIČKE KARTICE
+ * 07. PODNOŽJE
+ * 08. DODATNI NASLOVI
+ * 09. ZAJEDNIČKI PRIMARNI GUMBI
+ * 10. PUTOVANJA — PREGLED
+ * 11. PUTOVANJA — UREĐIVANJE I OBRAZAC
+ * 12. PUTOVANJA — DODAVANJE
+ * 13. DRŽAVE — PREGLED
+ * 14. DRŽAVE — UREĐIVANJE
+ * 15. DRŽAVE — DODAVANJE
+ * 16. ITINERAR — PREGLED
+ * 17. ITINERAR — DODAVANJE
+ * 18. ITINERAR — ZAJEDNIČKI OBRAZAC
+ * 19. ITINERAR — UREĐIVANJE
+ * 20. PREDMETI — PREGLED I DODAVANJE
+ * 21. PREDMETI — UREĐIVANJE
+ * 22. PAKIRANJE — PREGLED
+ * 23. PAKIRANJE — REDOVI PREDMETA
+ * 24. PAKIRANJE — UREĐIVANJE
+ * 25. POVRATAK NA PREGLED
+ * 26. PAKIRANJE — NAPOMENE
+ * 27. KALENDAR — GODIŠNJI PREGLED
+ * 28. KALENDAR — STRANICA
+ * 29. KALENDAR — IZBOR KALENDAR / GODINA
+ * 30. KALENDAR — UPUTE ZA ODABIR
+ * 31. KALENDAR — PROMJENA GODINE
+ * 32. KALENDAR — OKVIR
+ * 33. KALENDAR — ALATNA TRAKA
+ * 34. KALENDAR — MREŽA I DATUMI
+ * 35. KALENDAR — DOGAĐAJI I POPIS
+ * 36. KALENDAR — DORADE GODIŠNJEG PREGLEDA
+ * 37. KALENDAR — MODALNI PROZORI
+ * 38. KALENDAR — OBRASCI U MODALIMA
+ * 39. KALENDAR — MOBITELI
+ * 40. KALENDAR — ODABRANI DATUMI
+ * 41. KALENDAR — KONAČNI RASPORED ALATNE TRAKE
+ * 42. KALENDAR — GUMBI BEZ POMAKANJA
+ */
+
+/* ==========================================================================
+   01. BOJE APLIKACIJE
+   Varijable boja koje koriste sve stranice.
+   ========================================================================== */
+
 :root {
   --wheat: #faf5e8;
   --charcoal: #1f2937;
@@ -6,6 +60,11 @@
   --sage-green: #556b2f;
   --terracotta: #c8553d;
 }
+
+/* ==========================================================================
+   02. OSNOVNI RASPORED
+   Pozadina, visina aplikacije i pomoćno poravnanje.
+   ========================================================================== */
 
 body {
   background-color: var(--wheat);
@@ -19,8 +78,10 @@ body {
   text-align: right;
 }
 
-
-/*Početna stranica*/
+/* ==========================================================================
+   03. NAVIGACIJA
+   Navigacijska traka, naziv aplikacije, poveznice i padajući izbornik.
+   ========================================================================== */
 
 .navbar {
   background-color: var(--charcoal) !important;
@@ -57,6 +118,10 @@ body {
   color: white !important;
 }
 
+/* ==========================================================================
+   04. POČETNA STRANICA
+   Glavni naslov, uvodni tekst i poziv na radnju.
+   ========================================================================== */
 
 .mb-5 h1 {
   color: var(--charcoal);
@@ -79,12 +144,21 @@ body {
   border-color: var(--mango-orange);
 }
 
+/* ==========================================================================
+   05. ZAJEDNIČKI NASLOVI
+   Pravila za sve h2 naslove, osim gdje ih stranica kasnije nadjača.
+   ========================================================================== */
+
 h2 {
   color: var(--charcoal);
   font-weight: 600;
   padding-bottom: 1rem;
 }
 
+/* ==========================================================================
+   06. ZAJEDNIČKE KARTICE
+   Podloga, naslovi, tekst, ikone i gumbi Bootstrap kartica.
+   ========================================================================== */
 
 .card {
   background-color: white;
@@ -118,6 +192,10 @@ h2 {
   color: white;
 }
 
+/* ==========================================================================
+   07. PODNOŽJE
+   Razdjelnik i tekst pri dnu stranice.
+   ========================================================================== */
 
 .footer-hr {
   margin-top: 3rem;
@@ -130,6 +208,10 @@ h2 {
   padding-bottom: 1.5rem;
 }
 
+/* ==========================================================================
+   08. DODATNI NASLOVI
+   Naslov liste pakiranja i opći h4 naslovi.
+   ========================================================================== */
 
 h3.LP {
   color: var(--charcoal);
@@ -142,7 +224,11 @@ h4 {
   margin-top: 1rem;
 }
 
-/* Dugme "Uredi listu pakiranja" */
+/* ==========================================================================
+   09. ZAJEDNIČKI PRIMARNI GUMBI
+   Vrijedi za sve .btn-primary gumbe, ne samo za pakiranje.
+   ========================================================================== */
+
 .btn-primary {
   background-color: var(--pacific-blue);
   border-color: var(--pacific-blue);
@@ -154,10 +240,10 @@ h4 {
   border-color: var(--mango-orange);
 }
 
-
-
-
-/*Pregled putovanja*/
+/* ==========================================================================
+   10. PUTOVANJA — PREGLED
+   Zaglavlje, gumbi, tablica, akcije i broj putovanja.
+   ========================================================================== */
 
 .pregled-putovanja {
   padding-top: 1rem;
@@ -276,6 +362,8 @@ h4 {
   background-color: var(--pacific-blue) !important;
 }
 
+/* PUTOVANJA — PREGLED: prilagodba za (max-width: 575px). */
+
 @media (max-width: 575px) {
   .putovanja-zaglavlje {
     flex-direction: column;
@@ -305,7 +393,10 @@ h4 {
   font-size: 0.875rem;
 }
 
-/* Promjena putovanja*/
+/* ==========================================================================
+   11. PUTOVANJA — UREĐIVANJE I OBRAZAC
+   Naslov uređivanja te zajednički obrazac i njegovi gumbi.
+   ========================================================================== */
 
 .promjena-putovanja {
   max-width: 850px;
@@ -390,6 +481,8 @@ h4 {
   color: white;
 }
 
+/* PUTOVANJA — UREĐIVANJE I OBRAZAC: prilagodba za (max-width: 575px). */
+
 @media (max-width: 575px) {
   .putovanje-obrazac {
     padding: 1.25rem;
@@ -404,7 +497,10 @@ h4 {
   }
 }
 
-/* Novo putovanje*/
+/* ==========================================================================
+   12. PUTOVANJA — DODAVANJE
+   Raspored i naslov novog putovanja.
+   ========================================================================== */
 
 .novo-putovanje {
   max-width: 850px;
@@ -422,10 +518,10 @@ h4 {
   font-weight: 700;
 }
 
-
-
-
-/*Pregled država*/
+/* ==========================================================================
+   13. DRŽAVE — PREGLED
+   Naslov, gumbi, tablica i broj država.
+   ========================================================================== */
 
 .pregled-drzava {
   padding-top: 1rem;
@@ -550,6 +646,8 @@ h4 {
   font-weight: 600;
 }
 
+/* DRŽAVE — PREGLED: prilagodba za (max-width: 575px). */
+
 @media (max-width: 575px) {
   .drzave-zaglavlje {
     flex-direction: column;
@@ -570,7 +668,11 @@ h4 {
   }
 }
 
-/*Promjena država*/
+/* ==========================================================================
+   14. DRŽAVE — UREĐIVANJE
+   Obrazac, polja i gumbi za spremanje i odustajanje.
+   ========================================================================== */
+
 .promjena-drzave {
   max-width: 700px;
   margin: 0 auto;
@@ -654,6 +756,8 @@ h4 {
   color: white;
 }
 
+/* DRŽAVE — UREĐIVANJE: prilagodba za (max-width: 575px). */
+
 @media (max-width: 575px) {
   .promjena-drzave-obrazac {
     padding: 1.25rem;
@@ -668,7 +772,11 @@ h4 {
   }
 }
 
-/*Nova država*/
+/* ==========================================================================
+   15. DRŽAVE — DODAVANJE
+   Obrazac nove države i pripadajući gumbi.
+   ========================================================================== */
+
 .nova-drzava {
   max-width: 700px;
   margin: 0 auto;
@@ -752,6 +860,8 @@ h4 {
   color: white;
 }
 
+/* DRŽAVE — DODAVANJE: prilagodba za (max-width: 575px). */
+
 @media (max-width: 575px) {
   .nova-drzava-obrazac {
     padding: 1.25rem;
@@ -766,8 +876,11 @@ h4 {
   }
 }
 
+/* ==========================================================================
+   16. ITINERAR — PREGLED
+   Odabir putovanja, prijedlozi, dani, kartice aktivnosti i ukupan broj.
+   ========================================================================== */
 
-/*Pregled itinerara*/
 .pregled-itinerara {
   padding-top: 1rem;
   color: var(--charcoal);
@@ -945,6 +1058,8 @@ h4 {
   background-color: var(--pacific-blue) !important;
 }
 
+/* ITINERAR — PREGLED: prilagodba za (max-width: 575px). */
+
 @media (max-width: 575px) {
   .itinerar-zaglavlje {
     flex-direction: column;
@@ -960,7 +1075,11 @@ h4 {
   }
 }
 
-/*Novo itinerar*/
+/* ==========================================================================
+   17. ITINERAR — DODAVANJE
+   Raspored i naslov nove aktivnosti.
+   ========================================================================== */
+
 .novi-itinerar {
   max-width: 850px;
   margin: 0 auto;
@@ -981,7 +1100,10 @@ h4 {
   color: var(--pacific-blue);
 }
 
-/*Zajednički obrazac za novu i promjenu stavke itinerara*/
+/* ==========================================================================
+   18. ITINERAR — ZAJEDNIČKI OBRAZAC
+   Polja, bilješke i akcije za dodavanje i uređivanje aktivnosti.
+   ========================================================================== */
 
 .itinerar-obrazac {
   padding: 2rem;
@@ -1052,6 +1174,8 @@ h4 {
   color: white;
 }
 
+/* ITINERAR — ZAJEDNIČKI OBRAZAC: prilagodba za (max-width: 575px). */
+
 @media (max-width: 575px) {
   .itinerar-obrazac {
     padding: 1.25rem;
@@ -1066,7 +1190,11 @@ h4 {
   }
 }
 
-/*Promjena itinerar*/
+/* ==========================================================================
+   19. ITINERAR — UREĐIVANJE
+   Raspored i naslov promjene aktivnosti.
+   ========================================================================== */
+
 .promjena-itinerara {
   max-width: 850px;
   margin: 0 auto;
@@ -1087,9 +1215,11 @@ h4 {
   color: var(--pacific-blue);
 }
 
+/* ==========================================================================
+   20. PREDMETI — PREGLED I DODAVANJE
+   Tablica predmeta, akcije, broj predmeta i obrazac dodavanja.
+   ========================================================================== */
 
-
-/*Pregled predmeta*/
 .pregled-predmeta {
   padding-top: 1rem;
   color: var(--charcoal);
@@ -1241,6 +1371,8 @@ h4 {
   box-shadow: 0 0 0 0.2rem rgb(28 169 201 / 15%);
 }
 
+/* PREDMETI — PREGLED I DODAVANJE: prilagodba za (max-width: 575px). */
+
 @media (max-width: 575px) {
   .predmeti-akcije {
     flex-direction: column;
@@ -1260,7 +1392,11 @@ h4 {
   }
 }
 
-/*Predmeti promjena*/
+/* ==========================================================================
+   21. PREDMETI — UREĐIVANJE
+   Obrazac promjene predmeta i njegovi gumbi.
+   ========================================================================== */
+
 .promjena-predmeta {
   max-width: 700px;
   margin: 0 auto;
@@ -1344,6 +1480,8 @@ h4 {
   color: white;
 }
 
+/* PREDMETI — UREĐIVANJE: prilagodba za (max-width: 575px). */
+
 @media (max-width: 575px) {
   .promjena-predmeta-obrazac {
     padding: 1.25rem;
@@ -1358,9 +1496,11 @@ h4 {
   }
 }
 
+/* ==========================================================================
+   22. PAKIRANJE — PREGLED
+   Kartice putovanja, navigacijske kartice, lokacija i gumbi izvoza.
+   ========================================================================== */
 
-
-/*Pregled listi pakiranja*/
 .pregled-pakiranja {
   padding-top: 1rem;
   color: var(--charcoal);
@@ -1462,7 +1602,10 @@ h4 {
   border-radius: 6px;
 }
 
-/*Zajednički prikaz predmeta na pregledu i uređivanju*/
+/* ==========================================================================
+   23. PAKIRANJE — REDOVI PREDMETA
+   Zajednički redovi i kućice za označavanje spakiranosti.
+   ========================================================================== */
 
 .pakiranja-stavke {
   overflow: hidden;
@@ -1509,6 +1652,8 @@ h4 {
   cursor: pointer;
 }
 
+/* PAKIRANJE — REDOVI PREDMETA: prilagodba za (max-width: 575px). */
+
 @media (max-width: 575px) {
   .pakiranja-pregled-kartica {
     padding: 1rem;
@@ -1525,7 +1670,11 @@ h4 {
   }
 }
 
-/*Uređivanje liste pakiranja*/
+/* ==========================================================================
+   24. PAKIRANJE — UREĐIVANJE
+   Podaci putovanja, brisanje predmeta i obrazac za dodavanje.
+   ========================================================================== */
+
 .uredivanje-pakiranja {
   max-width: 850px;
   margin: 0 auto;
@@ -1629,6 +1778,8 @@ h4 {
   border-color: var(--mango-orange);
 }
 
+/* PAKIRANJE — UREĐIVANJE: prilagodba za (max-width: 575px). */
+
 @media (max-width: 575px) {
   .uredivanje-pakiranja-kartica {
     padding: 1.25rem;
@@ -1644,9 +1795,10 @@ h4 {
   }
 }
 
-
-
-/* Gumb Povratak na pregled */
+/* ==========================================================================
+   25. POVRATAK NA PREGLED
+   Zajednička poveznica za povratak.
+   ========================================================================== */
 
 .natrag-na-pregled {
   display: inline-flex;
@@ -1664,7 +1816,10 @@ h4 {
   text-decoration: underline;
 }
 
-/*Poravnanje predmeta i napomena*/
+/* ==========================================================================
+   26. PAKIRANJE — NAPOMENE
+   Poravnanje predmeta i napomene te gumb za uređivanje napomene.
+   ========================================================================== */
 
 .pakiranje-sadrzaj {
   display: grid;
@@ -1692,7 +1847,6 @@ h4 {
   display: none;
 }
 
-/* Vrijedi i preko Bootstrapovih stilova za link */
 .napomena-gumb.btn {
   display: inline-flex;
   align-items: center;
@@ -1721,6 +1875,8 @@ h4 {
   box-shadow: none;
 }
 
+/* PAKIRANJE — NAPOMENE: prilagodba za (max-width: 575px). */
+
 @media (max-width: 575px) {
   .pakiranje-sadrzaj {
     grid-template-columns: minmax(0, 1fr);
@@ -1732,6 +1888,10 @@ h4 {
   }
 }
 
+/* ==========================================================================
+   27. KALENDAR — GODIŠNJI PREGLED
+   Mreža mjeseci, dani, današnji datum i oznake događaja.
+   ========================================================================== */
 
 .godisnji-pregled {
   display: grid;
@@ -1822,17 +1982,26 @@ h4 {
   font-size: 0.8rem;
 }
 
+/* KALENDAR — GODIŠNJI PREGLED: prilagodba za (max-width: 991px). */
+
 @media (max-width: 991px) {
   .godisnji-pregled {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
+/* KALENDAR — GODIŠNJI PREGLED: prilagodba za (max-width: 575px). */
+
 @media (max-width: 575px) {
   .godisnji-pregled {
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================================================
+   28. KALENDAR — STRANICA
+   Osnovni raspored stranice i glavni naslov.
+   ========================================================================== */
 
 .kalendar-stranica {
   padding: 24px 0;
@@ -1846,7 +2015,10 @@ h4 {
   letter-spacing: -0.03em;
 }
 
-/* GUMBI ZA ODABIR PRIKAZA */
+/* ==========================================================================
+   29. KALENDAR — IZBOR KALENDAR / GODINA
+   Osnovni izgled prekidača prikaza; završna dorada je u cjelini 42.
+   ========================================================================== */
 
 .kalendar-prikazi {
   width: fit-content;
@@ -1878,7 +2050,10 @@ h4 {
   background: var(--wheat);
 }
 
-/* UPUTE I ODABIR DATUMA */
+/* ==========================================================================
+   30. KALENDAR — UPUTE ZA ODABIR
+   Poruka o odabiru polaska i povratka te gumb Odustani.
+   ========================================================================== */
 
 .kalendar-uputa {
   margin-bottom: 20px;
@@ -1901,7 +2076,10 @@ h4 {
   border-radius: 8px;
 }
 
-/* GODIŠNJE KONTROLE */
+/* ==========================================================================
+   31. KALENDAR — PROMJENA GODINE
+   Prethodna/sljedeća godina i prikaz broja godine.
+   ========================================================================== */
 
 .kalendar-godina-kontrole {
   padding: 14px 18px;
@@ -1919,7 +2097,10 @@ h4 {
   border-radius: 8px;
 }
 
-/* OKVIR KALENDARA */
+/* ==========================================================================
+   32. KALENDAR — OKVIR
+   Bijela podloga, obrub, razmaci i font kalendara.
+   ========================================================================== */
 
 .kalendar-okvir {
   padding: 22px;
@@ -1934,18 +2115,19 @@ h4 {
   font-family: inherit;
 }
 
-/* ALATNA TRAKA KALENDARA */
+/* ==========================================================================
+   33. KALENDAR — ALATNA TRAKA
+   Osnovni izgled naslova i gumba; konačni raspored je u cjelini 41.
+   ========================================================================== */
 
 .kalendar-stranica .rbc-toolbar {
   gap: 14px;
-  margin-bottom: 22px;
 }
 
 .kalendar-stranica .rbc-toolbar-label {
   padding: 0 12px;
   color: var(--charcoal);
   font-size: 1.3rem;
-  font-weight: 700;
   text-transform: capitalize;
 }
 
@@ -1971,7 +2153,10 @@ h4 {
   box-shadow: none;
 }
 
-/* MREŽA I DANI */
+/* ==========================================================================
+   34. KALENDAR — MREŽA I DATUMI
+   Zaglavlja dana, obrubi, današnji datum i odabir područja.
+   ========================================================================== */
 
 .kalendar-stranica .rbc-month-view,
 .kalendar-stranica .rbc-time-view,
@@ -2028,7 +2213,10 @@ h4 {
   color: var(--charcoal);
 }
 
-/* PUTOVANJA I AKTIVNOSTI */
+/* ==========================================================================
+   35. KALENDAR — DOGAĐAJI I POPIS
+   Putovanja, aktivnosti, više događaja, popis i oznaka trenutnog vremena.
+   ========================================================================== */
 
 .kalendar-stranica .rbc-event {
   padding: 4px 7px;
@@ -2072,7 +2260,10 @@ h4 {
   background: var(--terracotta);
 }
 
-/* DORADA GODIŠNJEG PREGLEDA */
+/* ==========================================================================
+   36. KALENDAR — DORADE GODIŠNJEG PREGLEDA
+   Sjene i sažetak kartica mjeseci unutar stranice kalendara.
+   ========================================================================== */
 
 .kalendar-stranica .godisnji-mjesec {
   box-shadow: 0 4px 16px rgb(31 41 55 / 3%);
@@ -2087,7 +2278,10 @@ h4 {
   border-top: 1px solid #edf0f2;
 }
 
-/* MODALI KALENDARA */
+/* ==========================================================================
+   37. KALENDAR — MODALNI PROZORI
+   Zaglavlje, sadržaj, podnožje i gumbi prozora kalendara.
+   ========================================================================== */
 
 .kalendar-modal .modal-content {
   overflow: hidden;
@@ -2166,7 +2360,10 @@ h4 {
   background: #a6402c;
 }
 
-/* OBRASCI UNUTAR MODALA */
+/* ==========================================================================
+   38. KALENDAR — OBRASCI U MODALIMA
+   Prilagodbe obrazaca putovanja i aktivnosti kada su otvoreni u prozoru.
+   ========================================================================== */
 
 .kalendar-modal .modal-body>section {
   margin: 0;
@@ -2247,7 +2444,12 @@ h4 {
   margin-bottom: 0;
 }
 
-/* MANJI EKRANI */
+/* ==========================================================================
+   39. KALENDAR — MOBITELI
+   Manji razmaci, tekst, gumbi i modalni prozori na uskim ekranima.
+   ========================================================================== */
+
+/* KALENDAR — MOBITELI: prilagodba za (max-width: 767px). */
 
 @media (max-width: 767px) {
   .kalendar-stranica {
@@ -2313,14 +2515,15 @@ h4 {
   }
 }
 
-/* Prvi odabrani datum */
+/* ==========================================================================
+   40. KALENDAR — ODABRANI DATUMI
+   Boja prvog datuma, traka razdoblja te početak i kraj putovanja.
+   ========================================================================== */
 
 .kalendar-stranica .rbc-day-bg.kalendar-odabrani-polazak {
   background: #bceaf4;
   box-shadow: inset 0 0 0 2px var(--pacific-blue);
 }
-
-/* Odabrano razdoblje: obojena podloga i traka preko datuma */
 
 .kalendar-stranica .rbc-day-bg.kalendar-odabrano-razdoblje {
   background-color: #e5f6fb;
@@ -2330,8 +2533,6 @@ h4 {
       var(--pacific-blue) 46px,
       transparent 46px);
 }
-
-/* Početak i kraj razdoblja */
 
 .kalendar-stranica .rbc-day-bg.kalendar-odabrano-razdoblje.kalendar-odabrani-polazak {
   background-color: #bceaf4;
@@ -2343,8 +2544,297 @@ h4 {
   box-shadow: inset -3px 0 0 var(--pacific-blue);
 }
 
-/* Jednodnevno putovanje */
-
 .kalendar-stranica .rbc-day-bg.kalendar-odabrani-polazak.kalendar-odabrani-povratak {
   box-shadow: inset 0 0 0 2px var(--pacific-blue);
+}
+
+/* ==========================================================================
+   41. KALENDAR — KONAČNI RASPORED ALATNE TRAKE
+   Kasnija pravila nadjačavaju osnovni raspored iz cjeline 33. Ostaju na ovom mjestu radi CSS prioriteta.
+   ========================================================================== */
+
+.kalendar-stranica .rbc-toolbar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.kalendar-stranica .rbc-toolbar-label {
+  min-width: 0;
+  padding: 0;
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.kalendar-stranica .rbc-toolbar .rbc-btn-group {
+  display: inline-flex;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.kalendar-stranica .rbc-toolbar button {
+  min-height: 42px;
+  padding: 9px 12px;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.kalendar-stranica .rbc-toolbar button:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 2px solid var(--pacific-blue);
+  outline-offset: 2px;
+}
+
+/* KALENDAR — KONAČNI RASPORED ALATNE TRAKE: prilagodba za (max-width: 1100px). */
+
+@media (max-width: 1100px) {
+  .kalendar-stranica .rbc-toolbar {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .kalendar-stranica .rbc-toolbar-label {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    order: initial;
+  }
+
+  .kalendar-stranica .rbc-toolbar .rbc-btn-group {
+    width: 100%;
+  }
+
+  .kalendar-stranica .rbc-toolbar button {
+    flex: 1;
+  }
+}
+
+/* KALENDAR — KONAČNI RASPORED ALATNE TRAKE: prilagodba za (max-width: 575px). */
+
+@media (max-width: 575px) {
+  .kalendar-stranica .rbc-toolbar {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .kalendar-stranica .rbc-toolbar-label {
+    font-size: 1.15rem;
+  }
+
+  .kalendar-stranica .rbc-toolbar button {
+    padding: 9px 6px;
+    font-size: 0.8rem;
+  }
+}
+
+/* ==========================================================================
+   42. KALENDAR — GUMBI BEZ POMAKANJA
+   Konačna dorada: jednaka visina i uklanjanje pomaka pri odabiru ili prelasku mišem.
+   ========================================================================== */
+
+.kalendar-prikazi {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kalendar-prikazi .btn,
+.kalendar-prikazi .btn:hover,
+.kalendar-prikazi .btn:focus,
+.kalendar-prikazi .btn:active {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  margin: 0;
+  padding: 0 18px;
+  transform: none;
+  box-shadow: none;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+/* ==========================================================================
+   43. KALENDAR — DESNI PANEL PUTOVANJA
+   Detalji, odbrojavanje, itinerar, pakiranje i dokumenti.
+   ========================================================================== */
+
+.kalendar-panel.offcanvas-end {
+  --bs-offcanvas-width: 540px;
+  max-width: 100vw;
+  color: var(--charcoal);
+  background: white;
+}
+
+.kalendar-panel .offcanvas-header {
+  gap: 16px;
+  padding: 24px;
+  border-bottom: 1px solid #e2e7ec;
+  background: var(--wheat);
+}
+
+.kalendar-panel .offcanvas-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.kalendar-panel .offcanvas-body {
+  padding: 24px;
+}
+
+.kalendar-panel-detalji p {
+  margin-bottom: 10px;
+}
+
+.kalendar-panel-lokacija {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.kalendar-panel-odbrojavanje {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 14px;
+  border: 1px solid #bceaf4;
+  border-radius: 10px;
+  background: #edf9fc;
+  font-weight: 600;
+}
+
+.kalendar-panel-sekcija {
+  margin-top: 26px;
+  padding-top: 22px;
+  border-top: 1px solid #e2e7ec;
+}
+
+.kalendar-panel-sekcija h3 {
+  margin: 0 0 16px;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.kalendar-panel-dan {
+  margin-bottom: 20px;
+}
+
+.kalendar-panel-dan h4 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin: 0 0 10px;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.kalendar-panel-dan h4 span {
+  color: #64748b;
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+.kalendar-panel-aktivnost {
+  display: grid;
+  grid-template-columns: 55px minmax(0, 1fr);
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid #edf0f2;
+}
+
+.kalendar-panel-vrijeme {
+  color: #08788f;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.kalendar-panel-aktivnost strong {
+  overflow-wrap: anywhere;
+}
+
+.kalendar-panel-aktivnost p {
+  margin: 6px 0 0;
+  color: #64748b;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.kalendar-panel-poveznica {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #08788f;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.kalendar-panel-poveznica:hover {
+  color: var(--charcoal);
+  text-decoration: underline;
+}
+
+.kalendar-panel-gumbi,
+.kalendar-panel-akcije {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.kalendar-panel-akcije {
+  margin-top: 26px;
+  padding-top: 22px;
+  border-top: 1px solid #e2e7ec;
+}
+
+.kalendar-panel .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  transform: none;
+}
+
+.kalendar-panel .btn:hover,
+.kalendar-panel .btn:active {
+  transform: none;
+}
+
+.kalendar-panel .btn-outline-primary {
+  color: #08788f;
+  border-color: #08788f;
+}
+
+.kalendar-panel .btn-outline-primary:hover {
+  color: white;
+  background: #08788f;
+}
+
+.kalendar-panel .btn-danger {
+  background: var(--terracotta);
+  border-color: var(--terracotta);
+}
+
+/* Desni panel na mobitelima */
+
+@media (max-width: 575px) {
+  .kalendar-panel.offcanvas-end {
+    --bs-offcanvas-width: 100vw;
+  }
+
+  .kalendar-panel .offcanvas-header,
+  .kalendar-panel .offcanvas-body {
+    padding: 18px;
+  }
+
+  .kalendar-panel-gumbi .btn,
+  .kalendar-panel-akcije .btn {
+    width: 100%;
+  }
 }
