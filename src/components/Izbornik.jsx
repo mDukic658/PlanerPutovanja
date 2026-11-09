@@ -46,6 +46,10 @@ export default function Izbornik() {
                             </NavDropdown.Item>
                         </NavDropdown>
 
+                        <Nav.Link as={Link} to={RouteNames.KARTA_POSJETA} >
+                            Karta posjeta
+                        </Nav.Link>
+
                         <NavDropdown title="Programi" id="basic-nav-dropdown">
                             <NavDropdown.Item
                                 onClick={() => { navigate(RouteNames.DRZAVE) }}

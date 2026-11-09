@@ -28,7 +28,11 @@ export const RouteNames = {
 
     BUDZET: '/budzet',
     BUDZET_PROMJENA: '/budzet/:sifra',
-    BUDZET_NOVO: '/budzet/novo'
+    BUDZET_NOVO: '/budzet/novo',
+
+    KARTA_POSJETA: '/karta-posjeta',
+    KARTA_POSJETA_NOVO: '/karta-posjeta/novo',
+    KARTA_POSJETA_PROMJENA: '/karta-posjeta/promjena/:sifra'
 }
 
 // memorija, localStorage, firebase

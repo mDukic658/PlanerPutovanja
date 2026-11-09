@@ -23,6 +23,9 @@ import Kalendar from './pages/Kalendar'
 import BudzetPregled from './pages/budzet/BudzetPregled'
 import BudzetPromjena from './pages/budzet/BudzetPromjena'
 import BudzetNovo from './pages/budzet/BudzetNovo'
+import KartaPregled from './pages/karta/KartaPregled'
+import KartaPromjena from './pages/karta/KartaPromjena'
+import KartaNovo from './pages/karta/KartaNovo'
 
 function App() {
 
@@ -51,6 +54,9 @@ function App() {
             <Route path={RouteNames.BUDZET} element={<BudzetPregled />} />
             <Route path={RouteNames.BUDZET_PROMJENA} element={<BudzetPromjena />} />
             <Route path={RouteNames.BUDZET_NOVO} element={<BudzetNovo />} />
+            <Route path={RouteNames.KARTA_POSJETA} element={ <KartaPregled/> } /> 
+            <Route path={RouteNames.KARTA_POSJETA_PROMJENA} element={ <KartaPromjena /> } /> 
+            <Route path={RouteNames.KARTA_POSJETA_NOVO} element={ <KartaNovo /> } />
           </Routes>
         </Container>
         <hr className="footer-hr" />
