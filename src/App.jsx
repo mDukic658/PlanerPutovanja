@@ -20,6 +20,9 @@ import ItinerarPregled from './pages/Itinerar/ItinerarPregled'
 import ItinerarPromjena from './pages/Itinerar/ItinerarPromjena'
 import ItinerarNovo from './pages/Itinerar/ItinerarNovo'
 import Kalendar from './pages/Kalendar'
+import BudzetPregled from './pages/budzet/BudzetPregled'
+import BudzetPromjena from './pages/budzet/BudzetPromjena'
+import BudzetNovo from './pages/budzet/BudzetNovo'
 
 function App() {
 
@@ -41,10 +44,13 @@ function App() {
             <Route path={RouteNames.DRZAVE_DODAJ} element={<NovaDrzava />} />
             <Route path={RouteNames.DRZAVE_PROMJENA} element={<DrzavaPromjena />} />
             <Route path={RouteNames.GENERIRANJE_PODATAKA} element={<GeneriranjePodataka />} />
-            <Route path= {RouteNames.ITINERAR} element={<ItinerarPregled />} />
-            <Route  path={RouteNames.ITINERAR_PROMJENA} element={ <ItinerarPromjena /> } />
-            <Route  path={RouteNames.ITINERAR_DODAJ} element={ <ItinerarNovo /> } />
+            <Route path={RouteNames.ITINERAR} element={<ItinerarPregled />} />
+            <Route path={RouteNames.ITINERAR_PROMJENA} element={<ItinerarPromjena />} />
+            <Route path={RouteNames.ITINERAR_DODAJ} element={<ItinerarNovo />} />
             <Route path={RouteNames.KALENDAR} element={<Kalendar />} />
+            <Route path={RouteNames.BUDZET} element={<BudzetPregled />} />
+            <Route path={RouteNames.BUDZET_PROMJENA} element={<BudzetPromjena />} />
+            <Route path={RouteNames.BUDZET_NOVO} element={<BudzetNovo />} />
           </Routes>
         </Container>
         <hr className="footer-hr" />

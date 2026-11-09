@@ -22,6 +22,19 @@ export default function Izbornik() {
                         <Nav.Link as={Link} to={RouteNames.KALENDAR} >
                             Kalendar
                         </Nav.Link>
+
+                        <NavDropdown title="Putovanja" id='basic-nav-dropdown' >
+                            <NavDropdown.Item
+                                onClick={() => { navigate(RouteNames.PUTOVANJA) }}>
+                                Pregled putovanja</NavDropdown.Item>
+                            <NavDropdown.Item
+                                onClick={() => { navigate(RouteNames.ITINERAR) }}>
+                                Itinerar</NavDropdown.Item>
+                            <NavDropdown.Item
+                            onClick={() => {navigate(RouteNames.BUDZET)}}>
+                                Evidencija troškova</NavDropdown.Item>
+                        </NavDropdown>
+
                         <NavDropdown title="Evidencija pakiranja" id="basic-nav-dropdown">
                             <NavDropdown.Item
                                 onClick={() => { navigate(RouteNames.LISTA_PAKIRANJA) }}>
@@ -35,14 +48,8 @@ export default function Izbornik() {
 
                         <NavDropdown title="Programi" id="basic-nav-dropdown">
                             <NavDropdown.Item
-                                onClick={() => { navigate(RouteNames.PUTOVANJA) }}
-                            >Putovanja</NavDropdown.Item>
-                            <NavDropdown.Item
                                 onClick={() => { navigate(RouteNames.DRZAVE) }}
                             >Države</NavDropdown.Item>
-                            <NavDropdown.Item
-                                onClick={() => { navigate(RouteNames.ITINERAR) }} >
-                                Itinerar</NavDropdown.Item>
                             <NavDropdown.Item
                                 onClick={() => { navigate(RouteNames.GENERIRANJE_PODATAKA) }}
                             >Generiranje podataka</NavDropdown.Item>
