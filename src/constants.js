@@ -12,6 +12,7 @@ export const RouteNames = {
     PREDMET_PROMJENA: '/predmet/promjena/:sifra',
 
     LISTA_PAKIRANJA: '/lista/pakiranja',
+    LISTA_PAKIRANJA_ODABRANO: '/lista/pakiranja/odabrano/:sifra',
     LISTA_PAKIRANJA_UREDI: '/lista/pakiranja/:sifra',
 
     DRZAVE: '/drzave',

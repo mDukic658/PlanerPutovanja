@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import PakiranjaService from "../../services/lista_pakiranja/PakiranjaService"
 import PredmetiService from "../../services/predmeti/PredmetiService"
 import { Button, Tab, Tabs, ProgressBar } from "react-bootstrap"
 import Pakiranje from "./Pakiranje"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { FaSuitcaseRolling, FaPen, FaMapMarkerAlt, FaFilePdf } from "react-icons/fa"
 import { useObavijesti } from "../../components/Obavijesti"
 import ListaPakiranjaPDFGenerator from "../../components/ListaPakiranjaPDFGenerator"
@@ -14,6 +14,8 @@ export default function ListaPakiranja() {
 
     const navigate = useNavigate()
     const obavijesti = useObavijesti()
+    const params = useParams()
+    const [odabranoPutovanje, setOdabranoPutovanje] = useState(0)
 
     const [generiranjePDFa, setGeneriranjePDFa] = useState(false)
 
@@ -26,10 +28,11 @@ export default function ListaPakiranja() {
         ucitajPakiranja()
         ucitajPredmete()
     }, [])
-
+    
     async function ucitajPutovanja() {
         await PutovanjaService.get().then((odgovor) => {
             setPutovanja(odgovor.data)
+            setOdabranoPutovanje(params.sifra ? parseInt(params.sifra) : odgovor.data[0].sifra)
         })
     }
 
@@ -148,7 +151,7 @@ export default function ListaPakiranja() {
             ) : (
                 <Tabs
                     key={putovanja[0].sifra}
-                    defaultActiveKey={putovanja[0].sifra}
+                    defaultActiveKey={odabranoPutovanje}
                     variant="pills"
                     className="lista-pakiranja-tabs"
                 >

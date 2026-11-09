@@ -77,7 +77,7 @@ export default function UrediListuPakiranja() {
         <section className="uredivanje-pakiranja">
 
             <Link
-                to={RouteNames.LISTA_PAKIRANJA}
+                to={`/lista/pakiranja/odabrano/${params.sifra}`}
                 className="natrag-na-pregled"
             >
                 <FaArrowLeft />

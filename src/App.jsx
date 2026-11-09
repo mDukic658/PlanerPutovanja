@@ -39,6 +39,7 @@ function App() {
             <Route path={RouteNames.PUTOVANJA} element={<PutovanjePregled />} />
             <Route path={RouteNames.PUTOVANJA_DODAJ} element={<NovoPutovanje />} />
             <Route path={RouteNames.LISTA_PAKIRANJA} element={<ListaPakiranja />} />
+            <Route path={RouteNames.LISTA_PAKIRANJA_ODABRANO} element={<ListaPakiranja />} />
             <Route path={RouteNames.PUTOVANJA_PROMIJENA} element={<PutovanjePromjena />} />
             <Route path={RouteNames.PREDMETI} element={<Predmeti />} />
             <Route path={RouteNames.PREDMET_PROMJENA} element={<PredmetPromjena />} />
