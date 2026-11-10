@@ -20,10 +20,14 @@ switch (DATA_SOURCE) {
 
 const PrazanServis = {
     get: async () => ({ data: [] }),
-    getBySifra: async (sifra) => ({ data: {} }),
-    dodaj: async (pakiranje) => { console.error('Servis nije implementiran') },
-    promijeni: async (sifra, pakiranje) => { console.error('Servis nije implementiran') },
-    obrisi: async (predmetSifra, putovanjeSifra) => {
+    getBySifra: async () => ({ data: {} }),
+    dodaj: async () => {
+        console.error('Servis nije implementiran')
+    },
+    promijeni: async () => {
+        console.error('Servis nije implementiran')
+    },
+    obrisi: async () => {
         console.error('Servis nije implementiran')
     }
 }

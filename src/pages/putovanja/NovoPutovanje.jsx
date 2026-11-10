@@ -18,9 +18,6 @@ export default function NovoPutovanje({
     const obavijesti = useObavijesti()
     const [drzave, setDrzave] = useState([])
     const [odabranaDrzava, setOdabranaDrzava] = useState("")
-    const [odabraniGrad, setOdabraniGrad] = useState(null)
-    const [countryid, setCountryid] = useState(0)
-    const [stateid, setStateid] = useState(0)
 
     function odustani() {
         if (onOdustani) {

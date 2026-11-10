@@ -18,16 +18,35 @@ export default function PutovanjePromjena({
     const obavijesti = useObavijesti()
     const params = useParams()
     const sifra = pocetnaSifra ?? params.sifra
-    const [putovanje, setPutovanje] = useState([])
+    const [putovanje, setPutovanje] = useState(null)
+    const [ucitavanje, setUcitavanje] = useState(true)
+    const [greska, setGreska] = useState('')
     const [drzave, setDrzave] = useState([])
 
     async function ucitajPutovanje() {
-        await PutovanjaService.getBySifra(sifra).then((odgovor) => {
-            const p = odgovor.data
-            p.datumPolaska = p.datumPolaska.substring(0, 10)
-            p.datumPovratka = p.datumPovratka.substring(0, 10)
-            setPutovanje(p)
-        })
+        setUcitavanje(true)
+        setGreska('')
+
+        try {
+            const odgovor = await PutovanjaService.getBySifra(sifra)
+            const podaci = odgovor.data
+
+            if (!podaci) {
+                setPutovanje(null)
+                return
+            }
+
+            setPutovanje({
+                ...podaci,
+                datumPolaska: podaci.datumPolaska.slice(0, 10),
+                datumPovratka: podaci.datumPovratka.slice(0, 10)
+            })
+        } catch (error) {
+            console.error(error)
+            setGreska("Učitavanje putovanja nije uspjelo.")
+        } finally {
+            setUcitavanje(false)
+        }
     }
 
     async function ucitajDrzave() {
@@ -68,21 +87,110 @@ export default function PutovanjePromjena({
 
     function obradiSubmit(e) {
         e.preventDefault()
-        const podaci = new FormData(e.target)
 
-        if (!podaci.get("drzava")) {
+        const podaci = new FormData(e.currentTarget)
+
+        const naziv = String(podaci.get('naziv') || '').trim()
+        const destinacija = String(podaci.get('destinacija') || '').trim()
+        const drzava = String(podaci.get('drzava') || '').trim()
+        const datumPolaska = String(podaci.get('datumPolaska') || '')
+        const datumPovratka = String(podaci.get('datumPovratka') || '')
+        const unosBudzeta = String(podaci.get('budzet') || '').trim()
+
+        if (naziv.length < 3 || naziv.length > 50) {
+            obavijesti(
+                "Naziv mora imati između 3 i 50 znakova.",
+                "danger"
+            )
+            return
+        }
+
+        if (destinacija.length < 2 || destinacija.length > 50) {
+            obavijesti(
+                "Destinacija mora imati između 2 i 50 znakova.",
+                "danger"
+            )
+            return
+        }
+
+        if (!drzava) {
             obavijesti("Morate odabrati državu!", "danger")
             return
         }
 
+        if (!datumPolaska || !datumPovratka) {
+            obavijesti(
+                "Morate odabrati datum polaska i povratka.",
+                "danger"
+            )
+            return
+        }
+
+        const polazak = new Date(datumPolaska)
+        const povratak = new Date(datumPovratka)
+
+        if (
+            Number.isNaN(polazak.getTime()) ||
+            Number.isNaN(povratak.getTime())
+        ) {
+            obavijesti("Datumi nisu ispravni.", "danger")
+            return
+        }
+
+        if (povratak < polazak) {
+            obavijesti(
+                "Datum povratka ne može biti prije datuma polaska.",
+                "danger"
+            )
+            return
+        }
+
+        if (unosBudzeta === '') {
+            obavijesti("Budžet je obavezan.", "danger")
+            return
+        }
+
+        const budzet = Number(unosBudzeta)
+
+        if (!Number.isFinite(budzet) || budzet < 0 || budzet > 100000) {
+            obavijesti(
+                "Budžet mora biti broj između 0 i 100000 €.",
+                "danger"
+            )
+            return
+        }
+
         promijeni({
-            naziv: podaci.get('naziv'),
-            destinacija: podaci.get('destinacija'),
-            drzava: podaci.get('drzava'),
-            datumPolaska: new Date(podaci.get('datumPolaska')).toISOString(),
-            datumPovratka: new Date(podaci.get('datumPovratka')).toISOString(),
-            budzet: parseFloat(podaci.get('budzet'))
+            naziv,
+            destinacija,
+            drzava,
+            datumPolaska: polazak.toISOString(),
+            datumPovratka: povratak.toISOString(),
+            budzet
         })
+    }
+
+    if (ucitavanje) {
+        return <p>Učitavanje...</p>
+    }
+
+    if (greska || !putovanje) {
+        return (
+            <section className="promjena-putovanja">
+                <Button
+                    variant="link"
+                    className="natrag-na-pregled"
+                    onClick={odustani}
+                >
+                    <FaArrowLeft />
+                    {" "}Natrag
+                </Button>
+
+                <p role="alert">
+                    {greska || "Putovanje nije pronađeno. Možda je obrisano."}
+                </p>
+            </section>
+        )
     }
 
     return (

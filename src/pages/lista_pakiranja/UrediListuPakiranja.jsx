@@ -6,7 +6,6 @@ import PredmetiService from "../../services/predmeti/PredmetiService"
 import Pakiranje from "./Pakiranje"
 import NovoPakiranje from "./NovoPakiranje"
 import { Button } from "react-bootstrap"
-import { RouteNames } from "../../constants"
 import { FaArrowLeft, FaPen, FaTrash, FaPlus, FaMapMarkerAlt } from "react-icons/fa"
 
 export default function UrediListuPakiranja() {

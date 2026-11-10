@@ -1,6 +1,7 @@
 import { DATA_SOURCE } from "../../constants"
 import PredmetiServiceLocalStorage from "./PredmetiServiceLocalStorage"
 import PredmetiServiceMemorija from "./PredmetiServiceMemorija"
+import PakiranjaService from "../lista_pakiranja/PakiranjaService"
 
 let Servis = null
 
@@ -17,10 +18,16 @@ switch (DATA_SOURCE) {
 
 const PrazanServis = {
     get: async () => ({ data: [] }),
-    getBySifra: async (sifra) => ({ data: {} }),
-    dodaj: async (predmet) => { console.error('Servis nije implementiran') },
-    promijeni: async (sifra, predmet) => { console.error('Servis nije implementiran') },
-    obrisi: async (sifra) => { console.error('Servis nije implementiran') },
+    getBySifra: async () => ({ data: {} }),
+    dodaj: async () => {
+        console.error('Servis nije implementiran')
+    },
+    promijeni: async () => {
+        console.error('Servis nije implementiran')
+    },
+    obrisi: async () => {
+        console.error('Servis nije implementiran')
+    },
     dohvatiStranicu: async () => ({
         data: [],
         ukupnoStranica: 0,
@@ -30,12 +37,30 @@ const PrazanServis = {
 
 const AktivniServis = Servis || PrazanServis
 
+async function obrisi(sifra) {
+    const sifraPredmeta = Number(sifra)
+
+    const odgovor = await PakiranjaService.get()
+    const povezanaPakiranja = odgovor.data.filter(
+        pakiranje => Number(pakiranje.predmetSifra) === sifraPredmeta
+    )
+
+    for (const pakiranje of povezanaPakiranja) {
+        await PakiranjaService.obrisi(
+            pakiranje.predmetSifra,
+            pakiranje.putovanjeSifra
+        )
+    }
+
+    await AktivniServis.obrisi(sifraPredmeta)
+}
+
 export default {
     get: () => AktivniServis.get(),
     getBySifra: (sifra) => AktivniServis.getBySifra(sifra),
     dodaj: (predmet) => AktivniServis.dodaj(predmet),
     promijeni: (sifra, predmet) => AktivniServis.promijeni(sifra, predmet),
-    obrisi: (sifra) => AktivniServis.obrisi(sifra),
+    obrisi,
     dohvatiStranicu: (stranica, velicinaStranice, uvjetPretrazivaja) =>
         AktivniServis.dohvatiStranicu(stranica, velicinaStranice, uvjetPretrazivaja)
 }

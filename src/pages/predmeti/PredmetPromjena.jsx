@@ -11,17 +11,29 @@ export default function PredmetPromjena() {
     const params = useParams()
 
     const [predmet, setPredmet] = useState(null)
+    const [ucitavanje, setUcitavanje] = useState(true)
+    const [greska, setGreska] = useState('')
 
     useEffect(() => {
         ucitajPredmet()
     }, [])
 
     async function ucitajPredmet() {
-        await PredmetiService.getBySifra(
-            parseInt(params.sifra)
-        ).then((odgovor) => {
-            setPredmet(odgovor.data)
-        })
+        setUcitavanje(true)
+        setGreska('')
+
+        try {
+            const odgovor = await PredmetiService.getBySifra(
+                Number(params.sifra)
+            )
+
+            setPredmet(odgovor.data || null)
+        } catch (error) {
+            console.error(error)
+            setGreska("Učitavanje predmeta nije uspjelo.")
+        } finally {
+            setUcitavanje(false)
+        }
     }
 
     async function obradiSubmit(e) {
@@ -29,18 +41,43 @@ export default function PredmetPromjena() {
 
         const podaci = new FormData(e.target)
 
+        const naziv = String(podaci.get('naziv') || '').trim()
+
+        if (!naziv) {
+            alert("Unesi naziv predmeta.")
+            return
+        }
+
         await PredmetiService.promijeni(
             parseInt(params.sifra),
             {
-                naziv: podaci.get('naziv')
+                naziv
             }
         )
 
         navigate(RouteNames.PREDMETI)
     }
 
-    if (predmet == null) {
+    if (ucitavanje) {
         return <p>Učitavanje...</p>
+    }
+
+    if (greska || !predmet) {
+        return (
+            <section className="promjena-predmeta">
+                <Link
+                    to={RouteNames.PREDMETI}
+                    className="natrag-na-pregled"
+                >
+                    <FaArrowLeft />
+                    {" "}Natrag na pregled predmeta
+                </Link>
+
+                <p role="alert">
+                    {greska || "Predmet nije pronađen. Možda je obrisan."}
+                </p>
+            </section>
+        )
     }
 
     return (

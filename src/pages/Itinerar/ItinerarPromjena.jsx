@@ -89,10 +89,52 @@ export default function ItinerarPromjena({
     async function spremi(e) {
         e.preventDefault()
 
+        let putovanje
+
+        try {
+            const odgovor = await PutovanjaService.getBySifra(
+                stavka.putovanjeSifra
+            )
+
+            putovanje = odgovor.data
+        } catch (error) {
+            console.error(error)
+            obavijesti("Učitavanje putovanja nije uspjelo.", "danger")
+            return
+        }
+
+        if (!putovanje) {
+            obavijesti("Putovanje nije pronađeno.", "danger")
+            return
+        }
+
+        const polazak = Date.parse(putovanje.datumPolaska.slice(0, 10))
+        const povratak = Date.parse(putovanje.datumPovratka.slice(0, 10))
+
+        if (
+            !Number.isFinite(polazak) ||
+            !Number.isFinite(povratak) ||
+            povratak < polazak
+        ) {
+            obavijesti("Datumi putovanja nisu ispravni.", "danger")
+            return
+        }
+
+        const maksimalniDan = Math.round(
+            (povratak - polazak) / 86400000
+        ) + 1
+
         const dan = Number(stavka.dan)
 
-        if (!Number.isInteger(dan) || dan < 1) {
-            obavijesti("Dan mora biti pozitivan cijeli broj.", "danger")
+        if (
+            !Number.isInteger(dan) ||
+            dan < 1 ||
+            dan > maksimalniDan
+        ) {
+            obavijesti(
+                `Dan mora biti između 1 i ${maksimalniDan}.`,
+                "danger"
+            )
             return
         }
 

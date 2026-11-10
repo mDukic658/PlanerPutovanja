@@ -85,24 +85,54 @@ export default function GeneriranjePodataka() {
     }
 
     const generirajPakiranja = async (broj) => {
+        const odgovorPredmeti = await PredmetiService.get()
+        const predmeti = odgovorPredmeti.data
 
-        const rezultatiPredmeti = await PredmetiService.get()
-        const predmeti = rezultatiPredmeti.data
+        const odgovorPutovanja = await PutovanjaService.get()
+        const putovanja = odgovorPutovanja.data
 
-        const rezultatiPutovanja = await PutovanjaService.get()
-        const putovanja = rezultatiPutovanja.data
+        const odgovorPakiranja = await PakiranjaService.get()
+        const postojecaPakiranja = odgovorPakiranja.data
 
         if (predmeti.length === 0 || putovanja.length === 0) {
-            throw new Error('Nema dostupnih predmeta ili putovanja. Prvo ih generirajte.');
+            throw new Error(
+                'Nema dostupnih predmeta ili putovanja. Prvo ih generirajte.'
+            )
         }
 
-        for (let i = 0; i < broj; i++) {
-            const randomPredmet = predmeti[faker.number.int({ min: 0, max: predmeti.length - 1 })]
-            const randomPutovanje = putovanja[faker.number.int({ min: 0, max: putovanja.length - 1 })]
+        const slobodneKombinacije = []
 
+        for (const putovanje of putovanja) {
+            for (const predmet of predmeti) {
+                const postoji = postojecaPakiranja.some(pakiranje =>
+                    Number(pakiranje.predmetSifra) === Number(predmet.sifra) &&
+                    Number(pakiranje.putovanjeSifra) === Number(putovanje.sifra)
+                )
+
+                if (!postoji) {
+                    slobodneKombinacije.push({
+                        predmetSifra: predmet.sifra,
+                        putovanjeSifra: putovanje.sifra
+                    })
+                }
+            }
+        }
+
+        if (broj > slobodneKombinacije.length) {
+            throw new Error(
+                `Moguće je dodati još ${slobodneKombinacije.length} ` +
+                'pakiranja bez ponavljanja. Smanjite broj ili dodajte ' +
+                'nove predmete i putovanja.'
+            )
+        }
+
+        const odabraneKombinacije = faker.helpers
+            .shuffle(slobodneKombinacije)
+            .slice(0, broj)
+
+        for (const kombinacija of odabraneKombinacije) {
             await PakiranjaService.dodaj({
-                predmetSifra: randomPredmet.sifra,
-                putovanjeSifra: randomPutovanje.sifra,
+                ...kombinacija,
                 spakirano: faker.datatype.boolean()
             })
         }
@@ -148,12 +178,33 @@ export default function GeneriranjePodataka() {
         for (let i = 0; i < broj; i++) {
             const putovanje = faker.helpers.arrayElement(putovanja)
 
+            const polazak = Date.parse(
+                putovanje.datumPolaska.slice(0, 10)
+            )
+            const povratak = Date.parse(
+                putovanje.datumPovratka.slice(0, 10)
+            )
+
+            if (
+                !Number.isFinite(polazak) ||
+                !Number.isFinite(povratak) ||
+                povratak < polazak
+            ) {
+                throw new Error(
+                    `Putovanje "${putovanje.naziv}" nema ispravne datume.`
+                )
+            }
+
+            const brojDana = Math.round(
+                (povratak - polazak) / 86400000
+            ) + 1
+
             const sat = faker.number.int({ min: 8, max: 20 })
             const minute = faker.helpers.arrayElement(['00', '30'])
 
             await ItinerarService.dodaj({
                 putovanjeSifra: putovanje.sifra,
-                dan: faker.number.int({ min: 1, max: 5 }),
+                dan: faker.number.int({ min: 1, max: brojDana }),
                 vrijeme: `${String(sat).padStart(2, '0')}:${minute}`,
                 naziv: faker.helpers.arrayElement(aktivnosti),
                 biljeska: faker.helpers.arrayElement(biljeske)
@@ -174,7 +225,14 @@ export default function GeneriranjePodataka() {
             const podaci = rezultat.data
 
             for (const item of podaci) {
-                await servis.obrisi(item.sifra)
+                if (servis === PakiranjaService) {
+                    await servis.obrisi(
+                        item.predmetSifra,
+                        item.putovanjeSifra
+                    )
+                } else {
+                    await servis.obrisi(item.sifra)
+                }
             }
 
             setPoruka({
@@ -285,7 +343,6 @@ export default function GeneriranjePodataka() {
         setPoruka(null)
 
         try {
-            // Prvo brišemo podatke koji su povezani s putovanjima i predmetima.
             const servisi = [
                 PakiranjaService,
                 ItinerarService,
@@ -299,11 +356,18 @@ export default function GeneriranjePodataka() {
             for (const servis of servisi) {
                 const odgovor = await servis.get()
 
-                // Kopija niza omogućuje sigurno brisanje i u memoriji.
                 const podaci = [...odgovor.data]
 
                 for (const podatak of podaci) {
-                    await servis.obrisi(podatak.sifra)
+                    if (servis === PakiranjaService) {
+                        await servis.obrisi(
+                            podatak.predmetSifra,
+                            podatak.putovanjeSifra
+                        )
+                    } else {
+                        await servis.obrisi(podatak.sifra)
+                    }
+
                     ukupnoObrisano++
                 }
             }
@@ -394,24 +458,24 @@ export default function GeneriranjePodataka() {
             )}
 
             <div className="d-flex justify-content-end flex-wrap gap-2 mb-4">
-    <Button
-        variant="success"
-        type="button"
-        onClick={handleGenerirajSve}
-        disabled={loading || generiranjeZabranjeno}
-    >
-        {loading ? 'Obrada...' : 'Generiraj sve'}
-    </Button>
+                <Button
+                    variant="success"
+                    type="button"
+                    onClick={handleGenerirajSve}
+                    disabled={loading || generiranjeZabranjeno}
+                >
+                    {loading ? 'Obrada...' : 'Generiraj sve'}
+                </Button>
 
-    <Button
-        variant="danger"
-        type="button"
-        onClick={handleObrisiSve}
-        disabled={loading}
-    >
-        {loading ? 'Obrada...' : 'Obriši sve podatke'}
-    </Button>
-</div>
+                <Button
+                    variant="danger"
+                    type="button"
+                    onClick={handleObrisiSve}
+                    disabled={loading}
+                >
+                    {loading ? 'Obrada...' : 'Obriši sve podatke'}
+                </Button>
+            </div>
 
             <Row>
                 {kartaGeneriranja.map((k) => (
