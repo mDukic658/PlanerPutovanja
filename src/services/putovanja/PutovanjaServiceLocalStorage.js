@@ -1,4 +1,5 @@
-
+import ItinerarService from "../itinerar/ItinerarServiceLocalStorage"
+import { provjeriTrajanjePutovanja } from "../../utils/provjeriTrajanjePutovanja"
 
 const STORAGE_KEY = 'marta_putovanja'
 
@@ -42,9 +43,25 @@ async function dodaj(putovanje) {
 
 async function promijeni(sifra, putovanje) {
     const putovanja = dohvatiSveIzStorage()
-    const index = putovanja.findIndex(p => p.sifra === parseInt(sifra))
 
-    putovanja[index] = { ...putovanja[index], ...putovanje }
+    const index = putovanja.findIndex(
+        p => p.sifra === parseInt(sifra)
+    )
+
+    if (index === -1) {
+        throw new Error("Putovanje nije pronađeno.")
+    }
+
+    const promjena = {
+        ...putovanja[index],
+        ...putovanje
+    }
+
+    const odgovor = await ItinerarService.get()
+
+    provjeriTrajanjePutovanja(promjena, odgovor.data)
+
+    putovanja[index] = promjena
 
     spremiUStorage(putovanja)
 }

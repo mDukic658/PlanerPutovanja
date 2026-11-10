@@ -1,10 +1,10 @@
 
 const STORAGE_KEY = 'marta_pakiranja'
 
-function dohvatiSveIzStorage(){
+function dohvatiSveIzStorage() {
     const podaci = localStorage.getItem(STORAGE_KEY)
 
-    if(podaci){
+    if (podaci) {
         return JSON.parse(podaci)
     }
 
@@ -32,6 +32,17 @@ async function getByPutovanje(sifraPutovanja) {
 
 async function dodaj(pakiranje) {
     const pakiranja = dohvatiSveIzStorage()
+
+    const postoji = pakiranja.some(stavka =>
+        Number(stavka.predmetSifra) === Number(pakiranje.predmetSifra) &&
+        Number(stavka.putovanjeSifra) === Number(pakiranje.putovanjeSifra)
+    )
+
+    if (postoji) {
+        throw new Error(
+            "Ovaj predmet već postoji na listi pakiranja ovog putovanja."
+        )
+    }
 
     pakiranja.push(pakiranje)
 

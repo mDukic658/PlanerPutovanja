@@ -2,8 +2,11 @@ import { useEffect, useState } from "react"
 import { Button, Form } from "react-bootstrap"
 import PredmetiService from "../../services/predmeti/PredmetiService"
 import PakiranjaService from "../../services/lista_pakiranja/PakiranjaService"
+import { useObavijesti } from "../../components/Obavijesti"
 
 export default function NovoPakiranje({ putovanjeSifra, ucitajPakiranja }) {
+
+    const obavijesti = useObavijesti()
 
     const [predmeti, setPredmeti] = useState([])
     const [odabraniPredmet, setOdabraniPredmet] = useState(null)
@@ -78,18 +81,26 @@ export default function NovoPakiranje({ putovanjeSifra, ucitajPakiranja }) {
             podaci.get('predmetSifra')
         )
 
-        await PakiranjaService.dodaj({
-            predmetSifra: predmetSifra,
-            putovanjeSifra: putovanjeSifra,
-            spakirano: false,
-            napomena: String(podaci.get("napomena") ?? "").trim()
-        })
+        const obrazac = e.currentTarget
 
-        e.target.reset()
+        try {
+            await PakiranjaService.dodaj({
+                predmetSifra,
+                putovanjeSifra,
+                spakirano: false,
+                napomena: String(podaci.get("napomena") ?? "").trim()
+            })
 
-        setOdabraniPredmet(null)
+            obrazac.reset()
+            setOdabraniPredmet(null)
 
-        ucitajPakiranja()
+            await ucitajPakiranja()
+        } catch (error) {
+            obavijesti(
+                error.message || "Dodavanje predmeta nije uspjelo.",
+                "danger"
+            )
+        }
     }
 
     return (
@@ -166,11 +177,11 @@ export default function NovoPakiranje({ putovanjeSifra, ucitajPakiranja }) {
             <Form.Group>
                 <Form.Label>Napomena</Form.Label>
 
-                <Form.Control 
-                as="textarea"
-                rows={3}
-                name="napomena"
-                placeholder="Npr. Ponijeti dva komada"
+                <Form.Control
+                    as="textarea"
+                    rows={3}
+                    name="napomena"
+                    placeholder="Npr. Ponijeti dva komada"
                 />
             </Form.Group>
 

@@ -11,6 +11,17 @@ async function getByPutovanje(sifraPutovanja) {
 }
 
 async function dodaj(pakiranje) {
+    const postoji = pakiranja.some(stavka =>
+        Number(stavka.predmetSifra) === Number(pakiranje.predmetSifra) &&
+        Number(stavka.putovanjeSifra) === Number(pakiranje.putovanjeSifra)
+    )
+
+    if (postoji) {
+        throw new Error(
+            "Ovaj predmet već postoji na listi pakiranja ovog putovanja."
+        )
+    }
+
     pakiranja.push(pakiranje)
 }
 

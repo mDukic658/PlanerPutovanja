@@ -81,7 +81,10 @@ export default function PutovanjePromjena({
 
         } catch (error) {
             console.error(error)
-            obavijesti("Spremanje promjena nije uspjelo.", "danger")
+            obavijesti(
+                error.message || "Spremanje promjena nije uspjelo.",
+                "danger"
+            )
         }
     }
 

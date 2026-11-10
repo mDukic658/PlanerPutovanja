@@ -1,4 +1,6 @@
 import { putovanja } from "./PutovanjaPodaci";
+import ItinerarService from "../itinerar/ItinerarServiceMemorija"
+import { provjeriTrajanjePutovanja } from "../../utils/provjeriTrajanjePutovanja";
 
 async function get() {
     return { data: [...putovanja] }
@@ -26,7 +28,21 @@ async function dodaj(putovanje) {
 
 async function promijeni(sifra, putovanje) {
     const index = nadiIndex(sifra)
-    putovanja[index] = { ...putovanja[index], ...putovanje }
+
+    if (index === -1) {
+        throw new Error("Putovanje nije pronađeno.")
+    }
+
+    const promjena = {
+        ...putovanja[index],
+        ...putovanje
+    }
+
+    const odgovor = await ItinerarService.get()
+
+    provjeriTrajanjePutovanja(promjena, odgovor.data)
+
+    putovanja[index] = promjena
 }
 
 function nadiIndex(sifra) {
