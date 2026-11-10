@@ -56,20 +56,31 @@ async function obrisi(sifra) {
     spremiUStorage(predmeti)
 }
 
-async function dohvatiStranicu(stranica = 1, velicinaStranice = 10) {
+async function dohvatiStranicu(
+    stranica = 1,
+    velicinaStranice = 10,
+    uvjetPretrazivanja = ''
+) {
+    let filtriraniPredmeti = dohvatiSveIzStorage()
 
-    const predmeti = dohvatiSveIzStorage()
+    if (uvjetPretrazivanja.trim() !== '') {
+        const uvjet = uvjetPretrazivanja.toLowerCase().trim()
+
+        filtriraniPredmeti = filtriraniPredmeti.filter(predmet =>
+            (predmet.naziv || '').toLowerCase().includes(uvjet)
+        )
+    }
 
     const pocetniIndeks = (stranica - 1) * velicinaStranice
     const zavrsniIndeks = pocetniIndeks + velicinaStranice
 
-    const ukupnoStavki = predmeti.length
+    const ukupnoStavki = filtriraniPredmeti.length
     const ukupnoStranica = Math.ceil(
         ukupnoStavki / velicinaStranice
     )
 
     return {
-        data: predmeti.slice(pocetniIndeks, zavrsniIndeks),
+        data: filtriraniPredmeti.slice(pocetniIndeks, zavrsniIndeks),
         ukupnoStranica,
         ukupnoStavki
     }

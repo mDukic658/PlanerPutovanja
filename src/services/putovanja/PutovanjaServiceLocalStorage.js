@@ -57,28 +57,40 @@ async function obrisi(sifra) {
     spremiUStorage(putovanja)
 }
 
-async function dohvatiStranicu(stranica = 1, velicinaStranice = 6) {
+async function dohvatiStranicu(
+    stranica = 1,
+    velicinaStranice = 6,
+    uvjetPretrazivanja = ''
+) {
+    let filtriranaPutovanja = dohvatiSveIzStorage()
 
-    const putovanja = dohvatiSveIzStorage()
+    if (uvjetPretrazivanja.trim() !== '') {
+        const uvjet = uvjetPretrazivanja.toLowerCase().trim()
+
+        filtriranaPutovanja = filtriranaPutovanja.filter(putovanje => {
+            const naziv = (putovanje.naziv || '').toLowerCase()
+            const destinacija = (putovanje.destinacija || '').toLowerCase()
+            const drzava = (putovanje.drzava || '').toLowerCase()
+
+            return naziv.includes(uvjet) ||
+                destinacija.includes(uvjet) ||
+                drzava.includes(uvjet)
+        })
+    }
+
     const pocetniIndeks = (stranica - 1) * velicinaStranice
     const zavrsniIndeks = pocetniIndeks + velicinaStranice
 
-    const podaciStranice = putovanja.slice(
-        pocetniIndeks,
-        zavrsniIndeks
-    )
-
-    const ukupnoStavki = putovanja.length
+    const ukupnoStavki = filtriranaPutovanja.length
     const ukupnoStranica = Math.ceil(
         ukupnoStavki / velicinaStranice
     )
 
     return {
-        data: podaciStranice,
+        data: filtriranaPutovanja.slice(pocetniIndeks, zavrsniIndeks),
         ukupnoStranica,
         ukupnoStavki
     }
-
 }
 
 export default {

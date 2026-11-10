@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react"
-import { Button, Form, Table, Pagination } from "react-bootstrap"
+import { Button, Form, Table, Pagination, InputGroup } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
 import PredmetiService from "../../services/predmeti/PredmetiService"
 import { RouteNames } from "../../constants"
-import { FaListUl, FaPlus, FaPen, FaTrash } from "react-icons/fa"
+import { FaListUl, FaPlus, FaPen, FaTrash, FaSearch } from "react-icons/fa"
 import { useObavijesti } from "../../components/Obavijesti"
 
 export default function Predmeti() {
@@ -15,6 +15,7 @@ export default function Predmeti() {
     const [trenutnaStranica, setTrenutnuStranicu] = useState(1)
     const [ukupnoStranica, setUkupnoStranica] = useState(0)
     const [ukupnoStavki, setUkupnoStavki] = useState(0)
+    const [uvjetPretrazivanja, setUvjetPretrazivanja] = useState('')
 
     const velicinaStranice = 10
 
@@ -24,12 +25,13 @@ export default function Predmeti() {
             console.error(error)
             obavijesti("Učitavanje predmeta nije uspjelo.", "danger")
         })
-    }, [trenutnaStranica])
+    }, [trenutnaStranica, uvjetPretrazivanja])
 
     async function ucitajPredmete(stranica) {
         const odgovor = await PredmetiService.dohvatiStranicu(
             stranica,
-            velicinaStranice
+            velicinaStranice,
+            uvjetPretrazivanja
         )
 
         setPredmeti(odgovor.data)
@@ -39,6 +41,11 @@ export default function Predmeti() {
 
     function promijeniStranicu(stranica) {
         setTrenutnuStranicu(stranica)
+    }
+
+    function promijeniUvjetPretrazivanja(e) {
+        setUvjetPretrazivanja(e.target.value)
+        setTrenutnuStranicu(1)
     }
 
     async function obradiSubmit(e) {
@@ -116,6 +123,21 @@ export default function Predmeti() {
                 {" "}  Predmeti
             </h2>
 
+            <InputGroup className="mb-3" >
+                <InputGroup.Text>
+                    <FaSearch />
+                </InputGroup.Text>
+
+                <Form.Control
+                    type="search"
+                    placeholder="Pretraži predmete po nazivu..."
+                    aria-label="Pretraži predmete"
+                    value={uvjetPretrazivanja}
+                    onChange={promijeniUvjetPretrazivanja}
+                />
+
+            </InputGroup>
+
             <div className="predmeti-tablica">
                 <Table hover responsive className="mb-0">
                     <thead>
@@ -126,6 +148,17 @@ export default function Predmeti() {
                     </thead>
 
                     <tbody>
+
+                        {predmeti.length === 0 && (
+                            <tr>
+                                <td colSpan={2} className="text-center text-muted py-4">
+                                    {uvjetPretrazivanja.trim()
+                                        ? "Nema predmeta koji odgovaraju pretrazi."
+                                        : "Trenutno nema predmeta."}
+                                </td>
+                            </tr>
+                        )}
+
                         {predmeti.map((predmet) => (
                             <tr key={predmet.sifra}>
                                 <td className="predmet-naziv">
@@ -160,14 +193,6 @@ export default function Predmeti() {
                                 </td>
                             </tr>
                         ))}
-
-                        {predmeti.length === 0 && (
-                            <tr>
-                                <td colSpan={2} className="predmeti-prazno">
-                                    Trenutno nema dodanih predmeta.
-                                </td>
-                            </tr>
-                        )}
                     </tbody>
                 </Table>
             </div>

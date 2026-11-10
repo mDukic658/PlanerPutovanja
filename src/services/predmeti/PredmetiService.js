@@ -36,6 +36,6 @@ export default {
     dodaj: (predmet) => AktivniServis.dodaj(predmet),
     promijeni: (sifra, predmet) => AktivniServis.promijeni(sifra, predmet),
     obrisi: (sifra) => AktivniServis.obrisi(sifra),
-    dohvatiStranicu: (stranica, velicinaStranice) =>
-        AktivniServis.dohvatiStranicu(stranica, velicinaStranice)
+    dohvatiStranicu: (stranica, velicinaStranice, uvjetPretrazivaja) =>
+        AktivniServis.dohvatiStranicu(stranica, velicinaStranice, uvjetPretrazivaja)
 }

@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
-import { Button, Badge, Card, Col, Row, Pagination } from "react-bootstrap"
+import { Button, Badge, Card, Col, Row, Pagination, InputGroup, Form } from "react-bootstrap"
 import FormatDatuma from "../../components/FormatDatuma"
 import { NumericFormat } from "react-number-format"
 import { Link, useNavigate } from "react-router-dom"
 import { RouteNames } from "../../constants"
 import { BsSuitcase2Fill } from "react-icons/bs"
-import { FaPlus, FaPen, FaTrash, FaCamera } from "react-icons/fa"
+import { FaPlus, FaPen, FaTrash, FaCamera, FaSearch } from "react-icons/fa"
 import { useObavijesti } from "../../components/Obavijesti"
 
 export default function PutovanjePregled() {
@@ -16,6 +16,7 @@ export default function PutovanjePregled() {
     const [trenutnaStranica, setTrenutnuStranicu] = useState(1)
     const [ukupnoStranica, setUkupnoStranica] = useState(0)
     const [ukupnoStavki, setUkupnoStavki] = useState(0)
+    const [uvjetPretrazivanja, setUvjetPretrazivanja] = useState('')
 
     const velicinaStranice = 6
 
@@ -27,12 +28,13 @@ export default function PutovanjePregled() {
             console.error(error)
             obavijesti("Učitavanje putovanja nije uspjelo.", "danger")
         })
-    }, [trenutnaStranica])
+    }, [trenutnaStranica, uvjetPretrazivanja])
 
     async function ucitajPutovanja(stranica) {
         const odgovor = await PutovanjaService.dohvatiStranicu(
             stranica,
-            velicinaStranice
+            velicinaStranice,
+            uvjetPretrazivanja
         )
 
         setPutovanja(odgovor.data)
@@ -42,6 +44,11 @@ export default function PutovanjePregled() {
 
     function promijeniStranicu(stranica) {
         setTrenutnuStranicu(stranica)
+    }
+
+    function promijeniUvjetPretrazivanja(e) {
+        setUvjetPretrazivanja(e.target.value)
+        setTrenutnuStranicu(1)
     }
 
     async function obrisi(sifra) {
@@ -98,9 +105,25 @@ export default function PutovanjePregled() {
                 </Link>
             </div>
 
+            <InputGroup className="mb-4">
+                <InputGroup.Text>
+                    <FaSearch aria-hidden="true" />
+                </InputGroup.Text>
+
+                <Form.Control
+                    type="search"
+                    placeholder="Pretraži putovanja po nazivu, destinaciji ili državi..."
+                    aria-label="Pretraži putovanja"
+                    value={uvjetPretrazivanja}
+                    onChange={promijeniUvjetPretrazivanja}
+                />
+            </InputGroup>
+
             {putovanja.length === 0 ? (
                 <p className="putovanja-prazno">
-                    Trenutno nemaš niti jedno putovanje.
+                    {uvjetPretrazivanja.trim()
+                        ? "Nema putovanja koja odgovaraju pretrazi."
+                        : "Trenutno nemaš niti jedno putovanje."}
                 </p>
             ) : (
                 <Row className="g-4">
@@ -195,7 +218,6 @@ export default function PutovanjePregled() {
 
             {ukupnoStranica > 1 && (
                 <nav
-                    aria-label="Stranice putovanja"
                     className="mt-4"
                 >
                     <Pagination className="justify-content-center flex-wrap">

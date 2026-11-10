@@ -24,41 +24,51 @@ async function dodaj(putovanje) {
     putovanja.push(putovanje)
 }
 
-async function promijeni(sifra, putovanje){
+async function promijeni(sifra, putovanje) {
     const index = nadiIndex(sifra)
-    putovanja[index] = {...putovanja[index], ...putovanje}
+    putovanja[index] = { ...putovanja[index], ...putovanje }
 }
 
-function nadiIndex(sifra){
+function nadiIndex(sifra) {
     return putovanja.findIndex(p => p.sifra === parseInt(sifra))
 }
 
-async function obrisi(sifra){
+async function obrisi(sifra) {
     const index = nadiIndex(sifra)
     putovanja.splice(index, 1)
 }
 
-async function dohvatiStranicu(stranica = 1, velicinaStranice = 6) {
+async function dohvatiStranicu(stranica = 1, velicinaStranice = 6, uvjetPretrazivanja = '') {
+
+    let filtriranaPutovanja = [...putovanja]
+
+    if (uvjetPretrazivanja.trim() !== '') {
+        const uvjet = uvjetPretrazivanja.toLowerCase().trim()
+
+        filtriranaPutovanja = filtriranaPutovanja.filter(putovanje => {
+            const naziv = (putovanje.naziv || '').toLowerCase()
+            const destinacija = (putovanje.destinacija || '').toLowerCase()
+            const drzava = (putovanje.drzava || '').toLowerCase()
+
+            return naziv.includes(uvjet) ||
+                destinacija.includes(uvjet) ||
+                drzava.includes(uvjet)
+        })
+    }
 
     const pocetniIndeks = (stranica - 1) * velicinaStranice
     const zavrsniIndeks = pocetniIndeks + velicinaStranice
 
-    const podaciStranice = putovanja.slice(
-        pocetniIndeks,
-        zavrsniIndeks
-    )
-
-    const ukupnoStavki = putovanja.length
+    const ukupnoStavki = filtriranaPutovanja.length
     const ukupnoStranica = Math.ceil(
         ukupnoStavki / velicinaStranice
     )
 
     return {
-        data: podaciStranice,
-        ukupnoStranica, 
+        data: filtriranaPutovanja.slice(pocetniIndeks, zavrsniIndeks),
+        ukupnoStranica,
         ukupnoStavki
     }
-
 }
 
 export default {
@@ -66,6 +76,6 @@ export default {
     getBySifra,
     dodaj,
     promijeni,
-    obrisi, 
+    obrisi,
     dohvatiStranicu
 }

@@ -271,6 +271,58 @@ export default function GeneriranjePodataka() {
         }
     }
 
+    const handleObrisiSve = async () => {
+        if (loading) return
+
+        const potvrda = window.confirm(
+            'Obrisati SVE države, predmete, putovanja, itinerare i pakiranja? ' +
+            'Obrisat će se i ručno uneseni podaci. Ovu akciju nije moguće poništiti.'
+        )
+
+        if (!potvrda) return
+
+        setLoading(true)
+        setPoruka(null)
+
+        try {
+            // Prvo brišemo podatke koji su povezani s putovanjima i predmetima.
+            const servisi = [
+                PakiranjaService,
+                ItinerarService,
+                PutovanjaService,
+                PredmetiService,
+                DrzaveService
+            ]
+
+            let ukupnoObrisano = 0
+
+            for (const servis of servisi) {
+                const odgovor = await servis.get()
+
+                // Kopija niza omogućuje sigurno brisanje i u memoriji.
+                const podaci = [...odgovor.data]
+
+                for (const podatak of podaci) {
+                    await servis.obrisi(podatak.sifra)
+                    ukupnoObrisano++
+                }
+            }
+
+            setPoruka({
+                tip: 'success',
+                tekst: `Obrisani su svi podaci iz generatora: ${ukupnoObrisano} zapisa.`
+            })
+        } catch (error) {
+            setPoruka({
+                tip: 'danger',
+                tekst: 'Brisanje je prekinuto: ' + error.message +
+                    ' Podaci obrisani prije greške ostaju obrisani.'
+            })
+        } finally {
+            setLoading(false)
+        }
+    }
+
     const kartaGeneriranja = [
         {
             naziv: 'Države',
@@ -341,16 +393,25 @@ export default function GeneriranjePodataka() {
                 </Alert>
             )}
 
-            <div className="d-flex justify-content-end mb-4">
-                <Button
-                    variant="success"
-                    type="button"
-                    onClick={handleGenerirajSve}
-                    disabled={loading || generiranjeZabranjeno}
-                >
-                    {loading ? 'Generiranje...' : 'Generiraj sve'}
-                </Button>
-            </div>
+            <div className="d-flex justify-content-end flex-wrap gap-2 mb-4">
+    <Button
+        variant="success"
+        type="button"
+        onClick={handleGenerirajSve}
+        disabled={loading || generiranjeZabranjeno}
+    >
+        {loading ? 'Obrada...' : 'Generiraj sve'}
+    </Button>
+
+    <Button
+        variant="danger"
+        type="button"
+        onClick={handleObrisiSve}
+        disabled={loading}
+    >
+        {loading ? 'Obrada...' : 'Obriši sve podatke'}
+    </Button>
+</div>
 
             <Row>
                 {kartaGeneriranja.map((k) => (

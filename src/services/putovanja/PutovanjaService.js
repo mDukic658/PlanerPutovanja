@@ -46,6 +46,6 @@ export default {
     promijeni: (sifra, putovanje) =>
         AktivniServis.promijeni(sifra, putovanje),
     obrisi: (sifra) => AktivniServis.obrisi(sifra),
-    dohvatiStranicu: (stranica, velicinaStranice) =>
-        AktivniServis.dohvatiStranicu(stranica, velicinaStranice)
+    dohvatiStranicu: (stranica, velicinaStranice, uvjetPretrazivanja) =>
+        AktivniServis.dohvatiStranicu(stranica, velicinaStranice, uvjetPretrazivanja)
 }
