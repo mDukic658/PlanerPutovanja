@@ -7,6 +7,7 @@ export const RouteNames = {
     PUTOVANJA: '/putovanja',
     PUTOVANJA_DODAJ: '/novo/putovanje',
     PUTOVANJA_PROMIJENA: '/putovanja/:sifra',
+    PUTOVANJA_DETALJI: '/putovanja/detalji/:sifra',
 
     PREDMETI: '/predmeti',
     PREDMET_PROMJENA: '/predmet/promjena/:sifra',

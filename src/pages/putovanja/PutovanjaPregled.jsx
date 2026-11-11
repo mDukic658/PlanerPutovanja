@@ -172,35 +172,15 @@ export default function PutovanjePregled() {
                                         {p.destinacija}, {p.drzava}
                                     </p>
 
-                                    <div className="mb-2">
-                                        <strong>Polazak: </strong>
-                                        <FormatDatuma
-                                            datum={p.datumPolaska}
-                                        />
-                                    </div>
-
-                                    <div className="mb-2">
-                                        <strong>Povratak: </strong>
-                                        <FormatDatuma
-                                            datum={p.datumPovratka}
-                                        />
-                                    </div>
-
-                                    <div className="mb-4">
-                                        <strong>Budžet: </strong>
-
-                                        <NumericFormat
-                                            value={p.budzet}
-                                            displayType="text"
-                                            decimalSeparator=","
-                                            decimalScale={2}
-                                            fixedDecimalScale
-                                            thousandSeparator="."
-                                            suffix=" €"
-                                        />
-                                    </div>
-
                                     <div className="d-flex flex-wrap gap-2 mt-auto">
+
+                                        <Link
+                                            to={RouteNames.PUTOVANJA_DETALJI.replace(":sifra", p.sifra)}
+                                            className="btn btn-outline-primary"
+                                        >
+                                            Pogledaj putovanje
+                                        </Link>
+
                                         <Button
                                             onClick={() =>
                                                 navigate(

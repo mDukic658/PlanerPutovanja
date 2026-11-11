@@ -26,6 +26,7 @@ import BudzetNovo from './pages/budzet/BudzetNovo'
 import KartaPregled from './pages/karta/KartaPregled'
 import KartaPromjena from './pages/karta/KartaPromjena'
 import KartaNovo from './pages/karta/KartaNovo'
+import PutovanjaDetalji from './pages/putovanja/PutovanjaDetalji'
 
 function App() {
 
@@ -41,6 +42,7 @@ function App() {
             <Route path={RouteNames.LISTA_PAKIRANJA} element={<ListaPakiranja />} />
             <Route path={RouteNames.LISTA_PAKIRANJA_ODABRANO} element={<ListaPakiranja />} />
             <Route path={RouteNames.PUTOVANJA_PROMIJENA} element={<PutovanjePromjena />} />
+            <Route path={RouteNames.PUTOVANJA_DETALJI} element={<PutovanjaDetalji />} /> 
             <Route path={RouteNames.PREDMETI} element={<Predmeti />} />
             <Route path={RouteNames.PREDMET_PROMJENA} element={<PredmetPromjena />} />
             <Route path={RouteNames.LISTA_PAKIRANJA_UREDI} element={<UrediListuPakiranja />} />
