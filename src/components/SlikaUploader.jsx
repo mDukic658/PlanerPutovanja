@@ -153,6 +153,7 @@ export default function SlikaUploader({ value, onChange }) {
             )}
 
             <Modal
+                className="slika-uploader-modal"
                 show={Boolean(slikaZaCrop)}
                 onHide={() => {
                     if (!obrada) {

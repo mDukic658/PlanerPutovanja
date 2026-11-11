@@ -5,6 +5,7 @@ import PutovanjaServiceMemorija from "./PutovanjaServiceMemorija";
 import PakiranjaService from "../lista_pakiranja/PakiranjaService";
 import ItinerarService from "../itinerar/ItinerarService";
 import BudzetServis from "../budzet/BudzetServis"
+import FotografijeService from "../fotografije/FotografijeService";
 
 
 let Servis = null
@@ -73,6 +74,14 @@ async function obrisi(sifra) {
 
     for (const trosak of troskoviPutovanja) {
         await BudzetServis.obrisi(trosak.sifra)
+    }
+
+    const odgovorFotografija = await FotografijeService.getByPutovanje(
+        sifraPutovanja
+    )
+
+    for (const fotografija of odgovorFotografija.data) {
+        await FotografijeService.obrisi(fotografija.sifra)
     }
 
     await AktivniServis.obrisi(sifraPutovanja)

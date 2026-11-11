@@ -19,9 +19,14 @@ export default function Izbornik() {
                         <Nav.Link
                             onClick={() => { navigate(RouteNames.HOME) }}
                         >Početna</Nav.Link>
+
                         <Nav.Link as={Link} to={RouteNames.KALENDAR} >
                             Kalendar
                         </Nav.Link>
+
+                        <Nav.Link 
+                        onClick={() => { navigate(RouteNames.FOTOGRAFIJE)}}>
+                            Galerija slika</Nav.Link>
 
                         <NavDropdown title="Putovanja" id='basic-nav-dropdown' >
                             <NavDropdown.Item

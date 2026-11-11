@@ -45,6 +45,7 @@
  * 40. KALENDAR — ODABRANI DATUMI
  * 41. KALENDAR — KONAČNI RASPORED ALATNE TRAKE
  * 42. KALENDAR — GUMBI BEZ POMAKANJA
+ * 43. GALERIJA SLIKA 
  */
 
 /* ==========================================================================
@@ -2848,4 +2849,350 @@ h4 {
 .putovanje-obrazac .form-label+input[type="file"]+.btn {
   display: block;
   margin-top: 0.5rem;
+}
+
+/* Prozor za uređivanje slike */
+
+.slika-uploader-modal .modal-content {
+  overflow: hidden;
+  border: 0;
+  border-radius: 18px;
+  background-color: var(--wheat);
+  color: var(--charcoal);
+  box-shadow: 0 20px 60px rgb(0 0 0 / 25%);
+}
+
+.slika-uploader-modal .modal-header,
+.slika-uploader-modal .modal-footer {
+  padding: 1rem 1.5rem;
+  border-color: rgb(31 41 55 / 12%);
+}
+
+.slika-uploader-modal .modal-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.slika-uploader-modal .modal-body {
+  padding: 1.25rem;
+}
+
+.slika-uploader-modal .reactEasyCrop_Container {
+  border-radius: 12px;
+}
+
+.slika-uploader-modal .form-label {
+  display: block;
+  font-weight: 600;
+}
+
+.slika-uploader-modal .form-range::-webkit-slider-thumb {
+  background-color: var(--pacific-blue);
+}
+
+.slika-uploader-modal .form-range::-moz-range-thumb {
+  background-color: var(--pacific-blue);
+}
+
+.slika-uploader-modal .form-range:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 4px rgb(28 169 201 / 20%);
+}
+
+.slika-uploader-modal .form-range:focus::-moz-range-thumb {
+  box-shadow: 0 0 0 4px rgb(28 169 201 / 20%);
+}
+
+.slika-uploader-modal .modal-footer {
+  gap: 0.5rem;
+}
+
+.slika-uploader-modal .modal-footer .btn {
+  min-height: 44px;
+  padding-inline: 1.25rem;
+}
+
+@media (max-width: 575.98px) {
+
+  .slika-uploader-modal .modal-header,
+  .slika-uploader-modal .modal-body,
+  .slika-uploader-modal .modal-footer {
+    padding: 0.85rem;
+  }
+}
+
+/* ==========================================================================
+   43. GALERIJA SLIKA
+   ========================================================================== */
+
+.fotografije-pregled,
+.fotografija-novo,
+.fotografija-promjena {
+  padding: clamp(1rem, 3vw, 2rem);
+  color: var(--charcoal);
+}
+
+.fotografije-pregled h2,
+.fotografija-novo h2,
+.fotografija-promjena h2 {
+  font-weight: 700;
+}
+
+.fotografije-pregled .form-label,
+.fotografija-novo .form-label,
+.fotografija-promjena .form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+/* Odabir putovanja */
+
+.fotografije-pregled .form-select {
+  max-width: 480px;
+}
+
+.fotografije-pregled .form-select,
+.fotografija-novo .form-select,
+.fotografija-novo .form-control,
+.fotografija-promjena .form-control {
+  min-height: 48px;
+  border: 1px solid #d7dee5;
+  border-radius: 10px;
+  color: var(--charcoal);
+}
+
+.fotografije-pregled .form-select:focus,
+.fotografija-novo .form-select:focus,
+.fotografija-novo .form-control:focus,
+.fotografija-promjena .form-control:focus {
+  border-color: var(--pacific-blue);
+  box-shadow: 0 0 0 3px rgb(28 169 201 / 15%);
+}
+
+/* Kartice fotografija */
+
+.fotografije-pregled .card {
+  overflow: hidden;
+  border-radius: 16px;
+  background-color: #fff;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fotografije-pregled .card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgb(31 41 55 / 12%) !important;
+}
+
+.fotografije-pregled .card>button {
+  display: block;
+  overflow: hidden;
+  cursor: zoom-in;
+}
+
+.fotografije-pregled .card>button:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 3px solid var(--pacific-blue);
+  outline-offset: -3px;
+}
+
+.fotografije-pregled .card-img-top {
+  transition: transform 0.3s ease;
+}
+
+.fotografije-pregled .card>button:hover .card-img-top {
+  transform: scale(1.04);
+}
+
+.fotografije-pregled .card-body {
+  padding: 1.25rem;
+  text-align: left;
+}
+
+.fotografije-pregled .card-title {
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.fotografije-pregled .card-text {
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.fotografije-pregled .card-body>.text-muted {
+  font-size: 0.9rem;
+}
+
+.fotografije-pregled .card-body>.d-flex {
+  padding-top: 1rem;
+}
+
+/* Obrasci */
+
+.fotografija-novo h2,
+.fotografija-promjena h2 {
+  margin: 1.5rem 0;
+}
+
+.fotografija-novo form,
+.fotografija-promjena form {
+  max-width: 800px;
+  margin-inline: auto;
+  padding: clamp(1.25rem, 4vw, 2rem);
+  border: 1px solid #e1e5e9;
+  border-radius: 18px;
+  background-color: #fff;
+  box-shadow: 0 8px 24px rgb(31 41 55 / 5%);
+  text-align: left;
+}
+
+.fotografija-novo fieldset,
+.fotografija-promjena fieldset {
+  min-width: 0;
+}
+
+.fotografija-novo textarea.form-control,
+.fotografija-promjena textarea.form-control {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.fotografija-novo form img,
+.fotografija-promjena form img {
+  background-color: var(--wheat);
+  border: 1px solid #e1e5e9;
+}
+
+.fotografija-novo fieldset>button[type="submit"],
+.fotografija-promjena fieldset>button[type="submit"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 48px;
+  margin-top: 0.5rem;
+  padding-inline: 1.5rem;
+}
+
+/* Mobiteli */
+
+@media (max-width: 575.98px) {
+
+  .fotografije-pregled,
+  .fotografija-novo,
+  .fotografija-promjena {
+    padding-inline: 0;
+  }
+
+  .fotografije-pregled .form-select {
+    max-width: none;
+  }
+
+  .fotografija-novo fieldset>button[type="submit"],
+  .fotografija-promjena fieldset>button[type="submit"] {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .fotografije-pregled .card,
+  .fotografije-pregled .card-img-top {
+    transition: none;
+  }
+
+  .fotografije-pregled .card:hover,
+  .fotografije-pregled .card>button:hover .card-img-top {
+    transform: none;
+  }
+}
+
+/* Pregled velike fotografije */
+
+.galerija-modal .modal-content {
+  overflow: hidden;
+  border: 0;
+  border-radius: 18px;
+  background-color: var(--charcoal);
+  color: var(--wheat);
+  box-shadow: 0 20px 60px rgb(0 0 0 / 30%);
+}
+
+.galerija-modal .modal-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgb(255 255 255 / 12%);
+}
+
+.galerija-modal .modal-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.galerija-modal .btn-close {
+  filter: invert(1) grayscale(1) brightness(2);
+}
+
+.galerija-modal .modal-body {
+  padding: 1rem;
+  background-color: #141b25;
+}
+
+.galerija-modal .modal-body img {
+  display: block;
+  margin-inline: auto;
+  border-radius: 8px;
+}
+
+.galerija-modal .modal-body p {
+  padding-inline: 0.5rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.galerija-modal .modal-footer {
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid rgb(255 255 255 / 12%);
+}
+
+.galerija-modal .modal-footer .btn {
+  --bs-btn-color: var(--wheat);
+  --bs-btn-border-color: rgb(255 255 255 / 35%);
+  --bs-btn-hover-color: var(--charcoal);
+  --bs-btn-hover-bg: var(--wheat);
+  --bs-btn-hover-border-color: var(--wheat);
+  --bs-btn-active-color: var(--charcoal);
+  --bs-btn-active-bg: var(--wheat);
+  --bs-btn-active-border-color: var(--wheat);
+  --bs-btn-disabled-color: var(--wheat);
+  --bs-btn-disabled-border-color: rgb(255 255 255 / 20%);
+
+  min-height: 44px;
+}
+
+.galerija-modal .modal-footer>span {
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 575.98px) {
+
+  .galerija-modal .modal-header,
+  .galerija-modal .modal-footer {
+    padding: 0.85rem;
+  }
+
+  .galerija-modal .modal-body {
+    padding: 0.5rem;
+  }
+
+  .galerija-modal .modal-footer .btn {
+    padding-inline: 0.65rem;
+    font-size: 0.85rem;
+  }
 }

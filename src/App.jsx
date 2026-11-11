@@ -27,6 +27,9 @@ import KartaPregled from './pages/karta/KartaPregled'
 import KartaPromjena from './pages/karta/KartaPromjena'
 import KartaNovo from './pages/karta/KartaNovo'
 import PutovanjaDetalji from './pages/putovanja/PutovanjaDetalji'
+import FotografijePregled from './pages/fotografije/FotografijePregled'
+import FotografijaNovo from './pages/fotografije/FotografijaNovo'
+import FotografijaPromjena from './pages/fotografije/FotografijaPromjena'
 
 function App() {
 
@@ -60,6 +63,9 @@ function App() {
             <Route path={RouteNames.KARTA_POSJETA} element={ <KartaPregled/> } /> 
             <Route path={RouteNames.KARTA_POSJETA_PROMJENA} element={ <KartaPromjena /> } /> 
             <Route path={RouteNames.KARTA_POSJETA_NOVO} element={ <KartaNovo /> } />
+            <Route path={RouteNames.FOTOGRAFIJE} element={ <FotografijePregled /> } />
+            <Route path={RouteNames.FOTOGRAFIJE_NOVO} element={ <FotografijaNovo /> } />
+            <Route path={RouteNames.FOTOGRAFIJE_PROMJENA} element={ <FotografijaPromjena /> } />
           </Routes>
         </Container>
         <hr className="footer-hr" />

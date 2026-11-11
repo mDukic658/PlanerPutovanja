@@ -34,7 +34,11 @@ export const RouteNames = {
 
     KARTA_POSJETA: '/karta-posjeta',
     KARTA_POSJETA_NOVO: '/karta-posjeta/novo',
-    KARTA_POSJETA_PROMJENA: '/karta-posjeta/promjena/:sifra'
+    KARTA_POSJETA_PROMJENA: '/karta-posjeta/promjena/:sifra',
+
+    FOTOGRAFIJE: '/fotografije',
+    FOTOGRAFIJE_NOVO: '/fotografije/novo',
+    FOTOGRAFIJE_PROMJENA: '/fotografije/promjena/:sifra'
 }
 
 // memorija, localStorage, firebase
