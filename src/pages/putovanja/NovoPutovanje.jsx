@@ -7,6 +7,7 @@ import { useEffect, useState } from "react"
 import PretragaDrzava from "../../components/PretragaDrzava"
 import { FaArrowLeft, FaPlaneDeparture, FaPlus, FaTimes } from "react-icons/fa"
 import { useObavijesti } from "../../components/Obavijesti"
+import SlikaUploader from "../../components/SlikaUploader"
 
 
 export default function NovoPutovanje({
@@ -18,6 +19,7 @@ export default function NovoPutovanje({
     const obavijesti = useObavijesti()
     const [drzave, setDrzave] = useState([])
     const [odabranaDrzava, setOdabranaDrzava] = useState("")
+    const [slika, setSlika] = useState(null)
 
     function odustani() {
         if (onOdustani) {
@@ -139,7 +141,8 @@ export default function NovoPutovanje({
             drzava: podaci.get('drzava'),
             datumPolaska: new Date(podaci.get('datumPolaska')).toISOString(),
             datumPovratka: new Date(podaci.get('datumPovratka')).toISOString(),
-            budzet: parseFloat(podaci.get('budzet'))
+            budzet: parseFloat(podaci.get('budzet')),
+            slika
         })
     }
 
@@ -234,6 +237,17 @@ export default function NovoPutovanje({
                                 name="budzet"
                                 step={0.01}
                                 placeholder="Npr. 800"
+                            />
+                        </Form.Group>
+                    </Col>
+
+                    <Col xs={12}>
+                        <Form.Group>
+                            <Form.Label>Naslovna slika putovanja</Form.Label>
+
+                            <SlikaUploader
+                                value={slika}
+                                onChange={setSlika}
                             />
                         </Form.Group>
                     </Col>

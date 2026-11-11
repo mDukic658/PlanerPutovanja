@@ -136,19 +136,31 @@ export default function PutovanjePregled() {
                         >
                             <Card className="h-100 border-0 shadow-sm">
 
-                                <div
-                                    className="d-flex flex-column align-items-center justify-content-center bg-body-secondary text-secondary rounded-top"
-                                    style={{ height: "180px" }}
-                                >
-                                    <FaCamera
-                                        size={32}
-                                        aria-hidden="true"
+                                {p.slika ? (
+                                    <Card.Img
+                                        variant="top"
+                                        src={p.slika}
+                                        alt={`Naslovna slika putovanja ${p.naziv}`}
+                                        style={{
+                                            height: "180px",
+                                            objectFit: "cover"
+                                        }}
                                     />
+                                ) : (
+                                    <div
+                                        className="d-flex flex-column align-items-center justify-content-center bg-body-secondary text-secondary rounded-top"
+                                        style={{ height: "180px" }}
+                                    >
+                                        <FaCamera
+                                            size={32}
+                                            aria-hidden="true"
+                                        />
 
-                                    <span className="mt-2">
-                                        Fotografija putovanja
-                                    </span>
-                                </div>
+                                        <span className="mt-2">
+                                            Fotografija putovanja
+                                        </span>
+                                    </div>
+                                )}
 
                                 <Card.Body className="d-flex flex-column">
 

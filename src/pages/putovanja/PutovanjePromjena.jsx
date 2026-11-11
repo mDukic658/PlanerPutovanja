@@ -7,6 +7,7 @@ import { useState, useEffect } from "react"
 import PretragaDrzava from "../../components/PretragaDrzava"
 import { FaPen, FaSave, FaTimes, FaArrowLeft } from "react-icons/fa"
 import { useObavijesti } from "../../components/Obavijesti"
+import SlikaUploader from "../../components/SlikaUploader"
 
 export default function PutovanjePromjena({
     pocetnaSifra,
@@ -169,7 +170,8 @@ export default function PutovanjePromjena({
             drzava,
             datumPolaska: polazak.toISOString(),
             datumPovratka: povratak.toISOString(),
-            budzet
+            budzet,
+            slika: putovanje.slika ?? null
         })
     }
 
@@ -292,6 +294,22 @@ export default function PutovanjePromjena({
                                 name="budzet"
                                 step={0.01}
                                 defaultValue={putovanje.budzet}
+                            />
+                        </Form.Group>
+                    </Col>
+
+                    <Col xs={12}>
+                        <Form.Group>
+                            <Form.Label>Naslovna slika putovanja</Form.Label>
+
+                            <SlikaUploader
+                                value={putovanje.slika}
+                                onChange={(slika) =>
+                                    setPutovanje(prethodno => ({
+                                        ...prethodno,
+                                        slika
+                                    }))
+                                }
                             />
                         </Form.Group>
                     </Col>

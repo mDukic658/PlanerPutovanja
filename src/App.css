@@ -2838,3 +2838,14 @@ h4 {
     width: 100%;
   }
 }
+
+
+/* Gumb za odabir slike ispod naslova polja */
+.putovanje-obrazac .form-label {
+  display: block;
+}
+
+.putovanje-obrazac .form-label+input[type="file"]+.btn {
+  display: block;
+  margin-top: 0.5rem;
+}
