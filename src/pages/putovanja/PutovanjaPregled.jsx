@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import { Button, Badge, Card, Col, Row, Pagination, InputGroup, Form } from "react-bootstrap"
-import FormatDatuma from "../../components/FormatDatuma"
-import { NumericFormat } from "react-number-format"
 import { Link, useNavigate } from "react-router-dom"
 import { RouteNames } from "../../constants"
 import { BsSuitcase2Fill } from "react-icons/bs"
@@ -176,7 +174,7 @@ export default function PutovanjePregled() {
 
                                         <Link
                                             to={RouteNames.PUTOVANJA_DETALJI.replace(":sifra", p.sifra)}
-                                            className="btn btn-outline-primary"
+                                            className="btn btn-primary"
                                         >
                                             Pogledaj putovanje
                                         </Link>

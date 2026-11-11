@@ -1,13 +1,33 @@
 import { useRef, useState } from "react";
-import { Button, Modal } from "react-bootstrap";
-import { Cropper } from "react-cropper";
-import "cropperjs/dist/cropper.css"
+import { Button, Modal, ButtonGroup, Form } from "react-bootstrap";
+import Cropper from "react-easy-crop";
+import { izreziSliku } from "../utils/cropSlika";
+
+const OMJERI = [
+    { naziv: "16:9", vrijednost: 16 / 9 },
+    { naziv: "4:3", vrijednost: 4 / 3 },
+    { naziv: "1:1", vrijednost: 1 },
+    { naziv: "3:4", vrijednost: 3 / 4 }
+]
 
 export default function SlikaUploader({ value, onChange }) {
+    const inputRef = useRef(null)
 
     const [slikaZaCrop, setSlikaZaCrop] = useState(null)
-    const cropperRef = useRef(null)
-    const inputRef = useRef(null)
+    const [crop, setCrop] = useState({ x: 0, y: 0 })
+    const [zoom, setZoom] = useState(1)
+    const [rotacija, setRotacija] = useState(0)
+    const [omjer, setOmjer] = useState(16 / 9)
+    const [odabraniDio, setOdabraniDio] = useState(null)
+    const [obrada, setObrada] = useState(false)
+
+    function otvoriUredivanje(slika) {
+        setCrop({ x: 0, y: 0 })
+        setZoom(1)
+        setRotacija(0)
+        setOdabraniDio(null)
+        setSlikaZaCrop(slika)
+    }
 
     function odaberiSliku(e) {
         const datoteka = e.target.files?.[0]
@@ -36,7 +56,7 @@ export default function SlikaUploader({ value, onChange }) {
         const reader = new FileReader()
 
         reader.onload = () => {
-            setSlikaZaCrop(reader.result)
+            otvoriUredivanje(reader.result)
         }
 
         reader.onerror = () => {
@@ -46,34 +66,34 @@ export default function SlikaUploader({ value, onChange }) {
         reader.readAsDataURL(datoteka)
     }
 
-    function primijeniSliku() {
-        const cropper = cropperRef.current?.cropper
-
-        if (!cropper) {
+    async function primijeniSliku() {
+        if (!slikaZaCrop || !odabraniDio || obrada) {
             return
         }
 
         try {
-            const canvas = cropper.getCroppedCanvas({
-                maxWidth: 1200,
-                maxHeight: 1200,
-                fillColor: "#fff",
-                imageSmoothingEnabled: true,
-                imageSmoothingQuality: "high"
-            })
+            setObrada(true)
 
-            if (!canvas || !canvas.width || !canvas.height) {
-                throw new Error("Slika nije spremna za obradu.")
-            }
-
-            const slika = canvas.toDataURL("image/jpeg", 0.85)
+            const slika = await izreziSliku(
+                slikaZaCrop,
+                odabraniDio,
+                rotacija
+            )
 
             onChange(slika)
             setSlikaZaCrop(null)
         } catch (error) {
             console.error(error)
             alert("Obrada slike nije uspjela. Pokušajte ponovno.")
+        } finally {
+            setObrada(false)
         }
+    }
+
+    function resetiraj() {
+        setCrop({ x: 0, y: 0 })
+        setZoom(1)
+        setRotacija(0)
     }
 
     return (
@@ -89,6 +109,7 @@ export default function SlikaUploader({ value, onChange }) {
             <Button
                 type="button"
                 variant="outline-primary"
+                className="d-block"
                 onClick={() => inputRef.current?.click()}
             >
                 {value ? "Odaberi drugu sliku" : "Odaberi sliku"}
@@ -103,50 +124,147 @@ export default function SlikaUploader({ value, onChange }) {
                         style={{
                             width: "100%",
                             maxHeight: 250,
-                            objectFit: "cover"
+                            objectFit: "contain"
                         }}
                     />
 
-                    <Button
-                        type="button"
-                        variant="outline-danger"
-                        size="sm"
-                        className="mt-2"
-                        onClick={() => onChange(null)}
-                    >
-                        Ukloni sliku
-                    </Button>
+                    <div className="d-flex flex-wrap gap-2 mt-2">
+                        {value.startsWith("data:image/") && (
+                            <Button
+                                type="button"
+                                variant="outline-secondary"
+                                size="sm"
+                                onClick={() => otvoriUredivanje(value)}
+                            >
+                                Uredi sliku
+                            </Button>
+                        )}
+
+                        <Button
+                            type="button"
+                            variant="outline-danger"
+                            size="sm"
+                            onClick={() => onChange(null)}
+                        >
+                            Ukloni sliku
+                        </Button>
+                    </div>
                 </div>
             )}
 
             <Modal
                 show={Boolean(slikaZaCrop)}
-                onHide={() => setSlikaZaCrop(null)}
+                onHide={() => {
+                    if (!obrada) {
+                        setSlikaZaCrop(null)
+                    }
+                }}
                 size="lg"
                 centered
+                backdrop="static"
             >
-                <Modal.Header closeButton>
+                <Modal.Header closeButton={!obrada}>
                     <Modal.Title>Uredi sliku</Modal.Title>
                 </Modal.Header>
 
                 <Modal.Body>
-                    {slikaZaCrop && (
-                        <Cropper
-                            src={slikaZaCrop}
-                            ref={cropperRef}
-                            style={{ height: 400, width: "100%" }}
-                            aspectRatio={16 / 9}
-                            viewMode={1}
-                            autoCropArea={1}
-                            background={false}
-                            responsive
-                        />
-                    )}
+                    <div
+                        style={{
+                            position: "relative",
+                            height: 400,
+                            width: "100%",
+                            background: "#222"
+                        }}
+                    >
+                        {slikaZaCrop && (
+                            <Cropper
+                                image={slikaZaCrop}
+                                crop={crop}
+                                zoom={zoom}
+                                rotation={rotacija}
+                                aspect={omjer}
+                                onCropChange={setCrop}
+                                onZoomChange={setZoom}
+                                onRotationChange={setRotacija}
+                                onCropComplete={(_, pikseli) =>
+                                    setOdabraniDio(pikseli)
+                                }
+                            />
+                        )}
+                    </div>
+
+                    <fieldset disabled={obrada} className="mt-3">
+                        <Form.Group controlId="slika-zoom">
+                            <Form.Label>
+                                Povećanje: {zoom.toFixed(1)}×
+                            </Form.Label>
+
+                            <Form.Range
+                                min={1}
+                                max={3}
+                                step={0.05}
+                                value={zoom}
+                                onChange={(e) =>
+                                    setZoom(Number(e.target.value))
+                                }
+                            />
+                        </Form.Group>
+
+                        <Form.Group controlId="slika-rotacija">
+                            <Form.Label>
+                                Rotacija: {rotacija}°
+                            </Form.Label>
+
+                            <Form.Range
+                                min={-180}
+                                max={180}
+                                step={1}
+                                value={rotacija}
+                                onChange={(e) =>
+                                    setRotacija(Number(e.target.value))
+                                }
+                            />
+                        </Form.Group>
+
+                        <div className="d-flex flex-wrap align-items-center gap-3">
+                            <ButtonGroup aria-label="Omjer stranica slike">
+                                {OMJERI.map((opcija) => (
+                                    <Button
+                                        key={opcija.naziv}
+                                        type="button"
+                                        size="sm"
+                                        variant={
+                                            omjer === opcija.vrijednost
+                                                ? "primary"
+                                                : "outline-primary"
+                                        }
+                                        onClick={() => {
+                                            setOdabraniDio(null)
+                                            setOmjer(opcija.vrijednost)
+                                        }}
+                                    >
+                                        {opcija.naziv}
+                                    </Button>
+                                ))}
+                            </ButtonGroup>
+
+                            <Button
+                                type="button"
+                                size="sm"
+                                variant="outline-secondary"
+                                onClick={resetiraj}
+                            >
+                                Resetiraj položaj
+                            </Button>
+                        </div>
+                    </fieldset>
                 </Modal.Body>
 
                 <Modal.Footer>
                     <Button
+                        type="button"
                         variant="outline-secondary"
+                        disabled={obrada}
                         onClick={() => setSlikaZaCrop(null)}
                     >
                         Odustani
@@ -155,13 +273,13 @@ export default function SlikaUploader({ value, onChange }) {
                     <Button
                         type="button"
                         variant="success"
+                        disabled={obrada || !odabraniDio}
                         onClick={primijeniSliku}
                     >
-                        Primijeni
+                        {obrada ? "Obrađujem..." : "Primijeni"}
                     </Button>
                 </Modal.Footer>
             </Modal>
         </>
     )
-
 }
