@@ -9,6 +9,7 @@ import PredmetiService from "../../services/predmeti/PredmetiService"
 import { useObavijesti } from "../Obavijesti"
 import { generirajItinerarWord } from "../WordGenerator"
 import ListaPakiranjaPDFGenerator from "../ListaPakiranjaPDFGenerator"
+import { RouteNames } from "../../constants";
 
 export default function PutovanjePanel({
     odabranoPutovanje,
@@ -297,6 +298,27 @@ export default function PutovanjePanel({
                         </section>
 
                         <div className="kalendar-panel-akcije">
+
+                            <Button
+                                as={Link}
+                                to={RouteNames.PUTOVANJA_DETALJI.replace(
+                                    ":sifra",
+                                    odabranoPutovanje.sifra
+                                )}
+                                variant="outline-primary"
+                                disabled={panelZauzet}
+                                onClick={e => {
+                                    if (panelZauzet) {
+                                        e.preventDefault()
+                                        return
+                                    }
+
+                                    onZatvori()
+                                }}
+                            >
+                                Detalji putovanja
+                            </Button>
+
                             <Button
                                 type="button"
                                 variant="outline-primary"

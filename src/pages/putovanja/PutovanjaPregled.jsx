@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import { Button, Badge, Card, Col, Row, Pagination, InputGroup, Form } from "react-bootstrap"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate, useSearchParams } from "react-router-dom"
 import { RouteNames } from "../../constants"
 import { BsSuitcase2Fill } from "react-icons/bs"
 import { FaPlus, FaPen, FaTrash, FaCamera, FaSearch } from "react-icons/fa"
@@ -11,10 +11,23 @@ export default function PutovanjePregled() {
 
     const [putovanja, setPutovanja] = useState([])
 
-    const [trenutnaStranica, setTrenutnuStranicu] = useState(1)
     const [ukupnoStranica, setUkupnoStranica] = useState(0)
     const [ukupnoStavki, setUkupnoStavki] = useState(0)
-    const [uvjetPretrazivanja, setUvjetPretrazivanja] = useState('')
+
+    const [searchParams, setSearchParams] = useSearchParams()
+
+    const stranicaIzUrla = Number(searchParams.get("stranica"))
+
+    const trenutnaStranica =
+        Number.isSafeInteger(stranicaIzUrla) && stranicaIzUrla > 0
+            ? stranicaIzUrla
+            : 1
+
+    const uvjetPretrazivanja = searchParams.get("pretraga") || ""
+
+    const povratakNaPregled = searchParams.toString()
+        ? `${RouteNames.PUTOVANJA}?${searchParams.toString()}`
+        : RouteNames.PUTOVANJA
 
     const velicinaStranice = 6
 
@@ -41,12 +54,31 @@ export default function PutovanjePregled() {
     }
 
     function promijeniStranicu(stranica) {
-        setTrenutnuStranicu(stranica)
+        setSearchParams(prethodni => {
+            const novi = new URLSearchParams(prethodni)
+
+            novi.set("stranica", String(stranica))
+
+            return novi
+        })
     }
 
     function promijeniUvjetPretrazivanja(e) {
-        setUvjetPretrazivanja(e.target.value)
-        setTrenutnuStranicu(1)
+        const vrijednost = e.target.value
+
+        setSearchParams(prethodni => {
+            const novi = new URLSearchParams(prethodni)
+
+            novi.set("stranica", "1")
+
+            if (vrijednost) {
+                novi.set("pretraga", vrijednost)
+            } else {
+                novi.delete("pretraga")
+            }
+
+            return novi
+        }, { replace: true })
     }
 
     async function obrisi(sifra) {
@@ -72,7 +104,7 @@ export default function PutovanjePregled() {
         )
 
         if (trenutnaStranica > noveUkupneStranice) {
-            setTrenutnuStranicu(noveUkupneStranice)
+            promijeniStranicu(noveUkupneStranice)
         } else {
             try {
                 await ucitajPutovanja(trenutnaStranica)
@@ -174,6 +206,7 @@ export default function PutovanjePregled() {
 
                                         <Link
                                             to={RouteNames.PUTOVANJA_DETALJI.replace(":sifra", p.sifra)}
+                                            state={{povratakNaPregled}}
                                             className="btn btn-primary"
                                         >
                                             Pogledaj putovanje

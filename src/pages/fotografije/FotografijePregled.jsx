@@ -16,6 +16,9 @@ export default function FotografijePregled() {
     const [ucitavanje, setUcitavanje] = useState(true)
     const [greska, setGreska] = useState("")
     const [otvorenaSifra, setOtvorenaSifra] = useState(null)
+    const [pretragaPutovanje, setPretragaPutovanje] = useState("")
+    const [prikaziAutocomplete, setPrikaziAutocomplete] = useState(false)
+    const [odabraniIndex, setOdabraniIndex] = useState(-1)
 
     const obavijesti = useObavijesti()
 
@@ -72,39 +75,6 @@ export default function FotografijePregled() {
 
     function promijeniSliku(pomak) {
         if (trenutniIndeks === -1 || prikazaneFotografije.length === 0) {
-
-            useEffect(() => {
-                if (!otvorenaFotografija) {
-                    return
-                }
-
-                function obradiTipku(e) {
-                    let pomak
-
-                    if (e.key === "ArrowLeft") {
-                        pomak = -1
-                    } else if (e.key === "ArrowRight") {
-                        pomak = 1
-                    } else {
-                        return
-                    }
-
-                    e.preventDefault()
-
-                    const noviIndeks = (
-                        trenutniIndeks + pomak + prikazaneFotografije.length
-                    ) % prikazaneFotografije.length
-
-                    setOtvorenaSifra(prikazaneFotografije[noviIndeks].sifra)
-                }
-
-                document.addEventListener("keydown", obradiTipku)
-
-                return () => {
-                    document.removeEventListener("keydown", obradiTipku)
-                }
-            }, [otvorenaFotografija, trenutniIndeks, prikazaneFotografije])
-
             return
         }
 
@@ -119,12 +89,83 @@ export default function FotografijePregled() {
         ? `${RouteNames.FOTOGRAFIJE_NOVO}?putovanjeSifra=${putovanjeSifra}`
         : RouteNames.FOTOGRAFIJE_NOVO
 
-    function promijeniPutovanje(e) {
-        const novaSifra = e.target.value
+    const odabranoPutovanje = putovanja.find(
+        putovanje => Number(putovanje.sifra) === Number(putovanjeSifra)
+    )
 
-        setSearchParams(
-            novaSifra ? { putovanjeSifra: novaSifra } : {}
+    const filtriranaPutovanja = [...putovanja]
+        .sort(
+            (a, b) =>
+                new Date(b.datumPolaska) - new Date(a.datumPolaska)
         )
+        .filter(putovanje =>
+            putovanje.naziv
+                .toLowerCase()
+                .includes(pretragaPutovanje.trim().toLowerCase())
+        )
+
+    function odaberiPutovanje(sifra) {
+        setSearchParams(prethodni => {
+            const novi = new URLSearchParams(prethodni)
+
+            if (sifra) {
+                novi.set("putovanjeSifra", String(sifra))
+            } else {
+                novi.delete("putovanjeSifra")
+            }
+
+            return novi
+        })
+
+        setOtvorenaSifra(null)
+        setPretragaPutovanje("")
+        setPrikaziAutocomplete(false)
+        setOdabraniIndex(-1)
+    }
+
+    function obradiTipkuPutovanja(e) {
+        if (e.key === "Escape") {
+            setPrikaziAutocomplete(false)
+            setOdabraniIndex(-1)
+            return
+        }
+
+        if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+            e.preventDefault()
+            setPrikaziAutocomplete(true)
+
+            if (filtriranaPutovanja.length === 0) {
+                return
+            }
+
+            const pomak = e.key === "ArrowDown" ? 1 : -1
+
+            setOdabraniIndex(prethodni => {
+                if (prethodni === -1) {
+                    return pomak === 1
+                        ? 0
+                        : filtriranaPutovanja.length - 1
+                }
+
+                return (
+                    prethodni + pomak + filtriranaPutovanja.length
+                ) % filtriranaPutovanja.length
+            })
+
+            return
+        }
+
+        if (
+            e.key === "Enter" &&
+            prikaziAutocomplete &&
+            filtriranaPutovanja[odabraniIndex]
+        ) {
+            e.preventDefault()
+
+            odaberiPutovanje(
+                filtriranaPutovanja[odabraniIndex].sifra
+            )
+        }
     }
 
     async function obrisi(fotografija) {
@@ -148,6 +189,38 @@ export default function FotografijePregled() {
         }
     }
 
+    useEffect(() => {
+        if (!otvorenaFotografija) {
+            return
+        }
+
+        function obradiTipku(e) {
+            let pomak
+
+            if (e.key === "ArrowLeft") {
+                pomak = -1
+            } else if (e.key === "ArrowRight") {
+                pomak = 1
+            } else {
+                return
+            }
+
+            e.preventDefault()
+
+            const noviIndeks = (
+                trenutniIndeks + pomak + prikazaneFotografije.length
+            ) % prikazaneFotografije.length
+
+            setOtvorenaSifra(prikazaneFotografije[noviIndeks].sifra)
+        }
+
+        document.addEventListener("keydown", obradiTipku)
+
+        return () => {
+            document.removeEventListener("keydown", obradiTipku)
+        }
+    }, [otvorenaFotografija, trenutniIndeks, prikazaneFotografije])
+
     return (
         <section className="fotografije-pregled">
             <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
@@ -168,28 +241,100 @@ export default function FotografijePregled() {
                 <p role="alert">{greska}</p>
             ) : (
                 <>
-                    <Form.Group
-                        controlId="galerija-putovanje"
-                        className="mb-4"
-                    >
-                        <Form.Label>Putovanje</Form.Label>
-
-                        <Form.Select
-                            value={putovanjeSifra}
-                            onChange={promijeniPutovanje}
+                    <div className="itinerar-odabir mb-4">
+                        <Form.Group
+                            controlId="galerija-putovanje"
+                            className="position-relative"
                         >
-                            <option value="">Sva putovanja</option>
+                            <Form.Label>Odaberi putovanje</Form.Label>
 
-                            {putovanja.map(putovanje => (
-                                <option
-                                    key={putovanje.sifra}
-                                    value={putovanje.sifra}
+                            <Form.Control
+                                type="text"
+                                placeholder="Pretraži putovanja..."
+                                value={pretragaPutovanje}
+                                onChange={e => {
+                                    setPretragaPutovanje(e.target.value)
+                                    setOdabraniIndex(-1)
+                                    setPrikaziAutocomplete(true)
+                                }}
+                                onFocus={() => setPrikaziAutocomplete(true)}
+                                onBlur={() => {
+                                    setPrikaziAutocomplete(false)
+                                    setOdabraniIndex(-1)
+                                }}
+                                onKeyDown={obradiTipkuPutovanja}
+                                autoComplete="off"
+                                role="combobox"
+                                aria-autocomplete="list"
+                                aria-expanded={prikaziAutocomplete}
+                                aria-controls="galerija-prijedlozi"
+                                aria-activedescendant={
+                                    prikaziAutocomplete &&
+                                        filtriranaPutovanja[odabraniIndex]
+                                        ? `galerija-prijedlog-${odabraniIndex}`
+                                        : undefined
+                                }
+                            />
+
+                            {prikaziAutocomplete && (
+                                <div
+                                    id="galerija-prijedlozi"
+                                    className="itinerar-prijedlozi"
+                                    role="listbox"
+                                    aria-label="Putovanja"
                                 >
-                                    {putovanje.naziv}
-                                </option>
-                            ))}
-                        </Form.Select>
-                    </Form.Group>
+                                    {filtriranaPutovanja.map((putovanje, index) => (
+                                        <div
+                                            id={`galerija-prijedlog-${index}`}
+                                            key={putovanje.sifra}
+                                            role="option"
+                                            aria-selected={index === odabraniIndex}
+                                            className={
+                                                index === odabraniIndex
+                                                    ? "itinerar-prijedlog aktivan"
+                                                    : "itinerar-prijedlog"
+                                            }
+                                            onMouseDown={e => e.preventDefault()}
+                                            onMouseEnter={() => setOdabraniIndex(index)}
+                                            onClick={() =>
+                                                odaberiPutovanje(putovanje.sifra)
+                                            }
+                                        >
+                                            {putovanje.naziv}
+                                        </div>
+                                    ))}
+
+                                    {filtriranaPutovanja.length === 0 && (
+                                        <div className="p-3">
+                                            Nema pronađenih putovanja.
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </Form.Group>
+
+                        {odabranoPutovanje && (
+                            <div className="itinerar-odabrano">
+                                <strong>{odabranoPutovanje.naziv}</strong>
+
+                                <span>
+                                    {odabranoPutovanje.destinacija},
+                                    {" "}{odabranoPutovanje.drzava}
+                                </span>
+                            </div>
+                        )}
+
+                        {putovanjeSifra && (
+                            <Button
+                                type="button"
+                                variant="outline-primary"
+                                className="mt-3"
+                                onClick={() => odaberiPutovanje("")}
+                            >
+                                Prikaži sva putovanja
+                            </Button>
+                        )}
+                    </div>
 
                     {prikazaneFotografije.length === 0 ? (
                         <p>

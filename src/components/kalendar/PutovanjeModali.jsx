@@ -44,7 +44,6 @@ export default function PutovanjeModali({
 
     return (
         <>
-            {/* Dodavanje putovanja */}
 
             <Modal
                 className="kalendar-modal"
@@ -67,8 +66,6 @@ export default function PutovanjeModali({
                     )}
                 </Modal.Body>
             </Modal>
-
-            {/* Uređivanje putovanja */}
 
             <Modal
                 className="kalendar-modal"

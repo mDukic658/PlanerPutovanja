@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react"
-import { Link, useParams } from "react-router-dom"
+import { Link, useParams, useLocation } from "react-router-dom"
 import { FaArrowLeft, FaPen, FaImages, FaSuitcaseRolling, FaList } from "react-icons/fa"
 import { RouteNames } from "../../constants"
-import { Card, Row, Col } from "react-bootstrap"
+import { Card, Row, Col, Button, Modal } from "react-bootstrap"
 import { NumericFormat } from "react-number-format"
 import FormatDatuma from "../../components/FormatDatuma"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
@@ -13,6 +13,9 @@ import FotografijeService from "../../services/fotografije/FotografijeService"
 
 export default function PutovanjaDetalji() {
     const { sifra } = useParams()
+    const location = useLocation()
+
+    const povratakNaPregled = location.state?.povratakNaPregled || RouteNames.PUTOVANJA
 
     const [putovanje, setPutovanje] = useState(null)
     const [aktivnosti, setAktivnosti] = useState([])
@@ -20,6 +23,7 @@ export default function PutovanjaDetalji() {
     const [fotografije, setFotografije] = useState([])
     const [ucitavanje, setUcitavanje] = useState(true)
     const [greska, setGreska] = useState("")
+    const [otvorenaSifra, setOtvorenaSifra] = useState(null)
 
     useEffect(() => {
         let aktivno = true
@@ -31,6 +35,7 @@ export default function PutovanjaDetalji() {
             setAktivnosti([])
             setPakiranja([])
             setFotografije([])
+            setOtvorenaSifra(null)
 
             try {
                 const odgovorPutovanja =
@@ -109,6 +114,56 @@ export default function PutovanjaDetalji() {
         }
     }, [sifra])
 
+    const trenutniIndeks = fotografije.findIndex(
+        fotografija => fotografija.sifra === otvorenaSifra
+    )
+
+    const otvorenaFotografija = fotografije[trenutniIndeks]
+
+    function promijeniSliku(pomak) {
+        if (trenutniIndeks === -1 || fotografije.length < 2) {
+            return
+        }
+
+        const noviIndeks = (
+            trenutniIndeks + pomak + fotografije.length
+        ) % fotografije.length
+
+        setOtvorenaSifra(fotografije[noviIndeks].sifra)
+    }
+
+    useEffect(() => {
+        if (!otvorenaFotografija || fotografije.length < 2) {
+            return
+        }
+
+        function obradiTipku(e) {
+            let pomak
+
+            if (e.key === "ArrowLeft") {
+                pomak = -1
+            } else if (e.key === "ArrowRight") {
+                pomak = 1
+            } else {
+                return
+            }
+
+            e.preventDefault()
+
+            const noviIndeks = (
+                trenutniIndeks + pomak + fotografije.length
+            ) % fotografije.length
+
+            setOtvorenaSifra(fotografije[noviIndeks].sifra)
+        }
+
+        document.addEventListener("keydown", obradiTipku)
+
+        return () => {
+            document.removeEventListener("keydown", obradiTipku)
+        }
+    }, [otvorenaFotografija, trenutniIndeks, fotografije])
+
     const aktivnostiPoDanima = aktivnosti.reduce(
         (dani, aktivnost) => {
             const dan = aktivnost.dan
@@ -145,7 +200,7 @@ export default function PutovanjaDetalji() {
     return (
         <section className="putovanje-detalji">
             <Link
-                to={RouteNames.PUTOVANJA}
+                to={povratakNaPregled}
                 className="natrag-na-pregled"
             >
                 <FaArrowLeft />
@@ -387,9 +442,12 @@ export default function PutovanjaDetalji() {
                                             lg={3}
                                             key={fotografija.sifra}
                                         >
-                                            <Link
-                                                to={galerijaPutanja}
-                                                className="d-block text-decoration-none text-reset"
+                                            <Button
+                                                type="button"
+                                                variant="link"
+                                                className="d-block w-100 border-0 p-0 text-start text-decoration-none text-reset"
+                                                aria-label={`Otvori fotografiju ${fotografija.naziv}`}
+                                                onClick={() => setOtvorenaSifra(fotografija.sifra)}
                                             >
                                                 <img
                                                     src={fotografija.slika}
@@ -405,7 +463,7 @@ export default function PutovanjaDetalji() {
                                                 <p className="mt-2 mb-0">
                                                     {fotografija.naziv}
                                                 </p>
-                                            </Link>
+                                            </Button>
                                         </Col>
                                     )
                                 )}
@@ -414,6 +472,68 @@ export default function PutovanjaDetalji() {
                     </section>
                 </>
             )}
+
+            <Modal
+                show={Boolean(otvorenaFotografija)}
+                onHide={() => setOtvorenaSifra(null)}
+                size="xl"
+                centered
+                className="galerija-modal"
+                aria-labelledby="detalji-fotografija-naslov"
+            >
+                <Modal.Header closeButton closeLabel="Zatvori">
+                    <Modal.Title id="detalji-fotografija-naslov">
+                        {otvorenaFotografija?.naziv}
+                    </Modal.Title>
+                </Modal.Header>
+
+                <Modal.Body className="text-center">
+                    {otvorenaFotografija && (
+                        <>
+                            <img
+                                src={otvorenaFotografija.slika}
+                                alt={otvorenaFotografija.naziv}
+                                style={{
+                                    width: "100%",
+                                    maxHeight: "70vh",
+                                    objectFit: "contain"
+                                }}
+                            />
+
+                            {otvorenaFotografija.opis && (
+                                <p className="mt-3 mb-0">
+                                    {otvorenaFotografija.opis}
+                                </p>
+                            )}
+                        </>
+                    )}
+                </Modal.Body>
+
+                <Modal.Footer className="justify-content-between">
+                    <Button
+                        type="button"
+                        variant="outline-primary"
+                        disabled={fotografije.length < 2}
+                        onClick={() => promijeniSliku(-1)}
+                    >
+                        ← Prethodna
+                    </Button>
+
+                    <span aria-live="polite" aria-atomic="true">
+                        {trenutniIndeks + 1} / {fotografije.length}
+                    </span>
+
+                    <Button
+                        type="button"
+                        variant="outline-primary"
+                        disabled={fotografije.length < 2}
+                        onClick={() => promijeniSliku(1)}
+                    >
+                        Sljedeća →
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
         </section>
     )
 }
