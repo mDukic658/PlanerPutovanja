@@ -8,6 +8,7 @@ import PretragaDrzava from "../../components/obrasci/PretragaDrzava"
 import { FaPen, FaSave, FaTimes, FaArrowLeft } from "react-icons/fa"
 import { useObavijesti } from "../../components/zajednicko/Obavijesti"
 import SlikaUploader from "../../components/obrasci/SlikaUploader"
+import { ShemaPutovanje } from "../../schemas/ShemaPutovanje"
 
 export default function PutovanjePromjena({
     pocetnaSifra,
@@ -23,6 +24,7 @@ export default function PutovanjePromjena({
     const [ucitavanje, setUcitavanje] = useState(true)
     const [greska, setGreska] = useState('')
     const [drzave, setDrzave] = useState([])
+    const [greske, setGreske] = useState({})
 
     async function ucitajPutovanje() {
         setUcitavanje(true)
@@ -89,88 +91,44 @@ export default function PutovanjePromjena({
         }
     }
 
+    function ocistiGresku(polje) {
+        setGreske(prethodne => {
+            const nove = { ...prethodne }
+            delete nove[polje]
+            return nove
+        })
+    }
+
     function obradiSubmit(e) {
         e.preventDefault()
+        setGreske({})
 
         const podaci = new FormData(e.currentTarget)
+        const rezultat = ShemaPutovanje.safeParse(
+            Object.fromEntries(podaci)
+        )
 
-        const naziv = String(podaci.get('naziv') || '').trim()
-        const destinacija = String(podaci.get('destinacija') || '').trim()
-        const drzava = String(podaci.get('drzava') || '').trim()
-        const datumPolaska = String(podaci.get('datumPolaska') || '')
-        const datumPovratka = String(podaci.get('datumPovratka') || '')
-        const unosBudzeta = String(podaci.get('budzet') || '').trim()
+        if (!rezultat.success) {
+            const noveGreske = {}
 
-        if (naziv.length < 3 || naziv.length > 50) {
-            obavijesti(
-                "Naziv mora imati između 3 i 50 znakova.",
-                "danger"
-            )
+            rezultat.error.issues.forEach((issue) => {
+                const polje = issue.path[0]
+
+                if (!noveGreske[polje]) {
+                    noveGreske[polje] = issue.message
+                }
+            })
+
+            setGreske(noveGreske)
             return
         }
 
-        if (destinacija.length < 2 || destinacija.length > 50) {
-            obavijesti(
-                "Destinacija mora imati između 2 i 50 znakova.",
-                "danger"
-            )
-            return
-        }
-
-        if (!drzava) {
-            obavijesti("Morate odabrati državu!", "danger")
-            return
-        }
-
-        if (!datumPolaska || !datumPovratka) {
-            obavijesti(
-                "Morate odabrati datum polaska i povratka.",
-                "danger"
-            )
-            return
-        }
-
-        const polazak = new Date(datumPolaska)
-        const povratak = new Date(datumPovratka)
-
-        if (
-            Number.isNaN(polazak.getTime()) ||
-            Number.isNaN(povratak.getTime())
-        ) {
-            obavijesti("Datumi nisu ispravni.", "danger")
-            return
-        }
-
-        if (povratak < polazak) {
-            obavijesti(
-                "Datum povratka ne može biti prije datuma polaska.",
-                "danger"
-            )
-            return
-        }
-
-        if (unosBudzeta === '') {
-            obavijesti("Budžet je obavezan.", "danger")
-            return
-        }
-
-        const budzet = Number(unosBudzeta)
-
-        if (!Number.isFinite(budzet) || budzet < 0 || budzet > 100000) {
-            obavijesti(
-                "Budžet mora biti broj između 0 i 100000 €.",
-                "danger"
-            )
-            return
-        }
+        const vrijednosti = rezultat.data
 
         promijeni({
-            naziv,
-            destinacija,
-            drzava,
-            datumPolaska: polazak.toISOString(),
-            datumPovratka: povratak.toISOString(),
-            budzet,
+            ...vrijednosti,
+            datumPolaska: new Date(vrijednosti.datumPolaska).toISOString(),
+            datumPovratka: new Date(vrijednosti.datumPovratka).toISOString(),
             slika: putovanje.slika ?? null
         })
     }
@@ -217,6 +175,7 @@ export default function PutovanjePromjena({
             </h2>
 
             <Form
+                noValidate
                 onSubmit={obradiSubmit}
                 className="putovanje-obrazac"
             >
@@ -228,9 +187,13 @@ export default function PutovanjePromjena({
                             <Form.Control
                                 type="text"
                                 name="naziv"
-                                required
+                                isInvalid={!!greske.naziv}
+                                onChange={() => ocistiGresku('naziv')}
                                 defaultValue={putovanje.naziv}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                {greske.naziv}
+                            </Form.Control.Feedback>
                         </Form.Group>
                     </Col>
 
@@ -241,7 +204,12 @@ export default function PutovanjePromjena({
                                 type="text"
                                 name="destinacija"
                                 defaultValue={putovanje.destinacija}
+                                isInvalid={!!greske.destinacija}
+                                onChange={() => ocistiGresku('destinacija')}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                {greske.destinacija}
+                            </Form.Control.Feedback>
                         </Form.Group>
                     </Col>
 
@@ -250,13 +218,20 @@ export default function PutovanjePromjena({
                             <PretragaDrzava
                                 drzave={drzave}
                                 odabranaDrzava={putovanje.drzava}
-                                onOdaberi={(drzava) =>
-                                    setPutovanje({
-                                        ...putovanje,
-                                        drzava: drzava
-                                    })
-                                }
+                                onOdaberi={(drzava) => {
+                                    setPutovanje(prethodno => ({
+                                        ...prethodno,
+                                        drzava
+                                    }))
+                                    ocistiGresku('drzava')
+                                }}
                             />
+
+                            {greske.drzava && (
+                                <div className="text-danger small mt-1" role="alert">
+                                    {greske.drzava}
+                                </div>
+                            )}
                         </Form.Group>
                     </Col>
 
@@ -269,7 +244,12 @@ export default function PutovanjePromjena({
                                 onFocus={(e) => e.target.showPicker()}
                                 name="datumPolaska"
                                 defaultValue={putovanje.datumPolaska}
+                                isInvalid={!!greske.datumPolaska}
+                                onChange={() => ocistiGresku('datumPolaska')}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                {greske.datumPolaska}
+                            </Form.Control.Feedback>
                         </Form.Group>
                     </Col>
 
@@ -282,7 +262,12 @@ export default function PutovanjePromjena({
                                 onFocus={(e) => e.target.showPicker()}
                                 name="datumPovratka"
                                 defaultValue={putovanje.datumPovratka}
+                                isInvalid={!!greske.datumPovratka}
+                                onChange={() => ocistiGresku('datumPovratka')}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                {greske.datumPovratka}
+                            </Form.Control.Feedback>
                         </Form.Group>
                     </Col>
 
@@ -294,7 +279,12 @@ export default function PutovanjePromjena({
                                 name="budzet"
                                 step={0.01}
                                 defaultValue={putovanje.budzet}
+                                isInvalid={!!greske.budzet}
+                                onChange={() => ocistiGresku('budzet')}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                {greske.budzet}
+                            </Form.Control.Feedback>
                         </Form.Group>
                     </Col>
 

@@ -7,12 +7,13 @@ import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import FotografijeService from "../../services/fotografije/FotografijeService"
 import SlikaUploader from "../../components/obrasci/SlikaUploader"
 import { useObavijesti } from "../../components/zajednicko/Obavijesti"
+import { ShemaNovaFotografija } from "../../schemas/ShemaFotografije"
 
 export default function FotografijaNovo() {
     const navigate = useNavigate()
     const obavijesti = useObavijesti()
     const [searchParams] = useSearchParams()
-
+    const [errors, setErrors] = useState({})
     const [putovanja, setPutovanja] = useState([])
     const [putovanjeSifra, setPutovanjeSifra] = useState(
         searchParams.get("putovanjeSifra") || ""
@@ -63,31 +64,38 @@ export default function FotografijaNovo() {
             return
         }
 
+        setErrors({})
+
         const podaci = new FormData(e.currentTarget)
-        const naziv = String(podaci.get("naziv") || "").trim()
-        const opis = String(podaci.get("opis") || "").trim()
-        const sifraPutovanja = Number(putovanjeSifra)
 
-        if (!putovanja.some(p => p.sifra === sifraPutovanja)) {
-            obavijesti("Odaberite putovanje.", "danger")
+        const rezultat = ShemaNovaFotografija.safeParse({
+            putovanjeSifra,
+            naziv: String(podaci.get("naziv") || ""),
+            opis: String(podaci.get("opis") || ""),
+            slika
+        })
+
+        if (!rezultat.success) {
+            const noveGreske = {}
+
+            rezultat.error.issues.forEach((issue) => {
+                const kljuc = issue.path[0]
+
+                if (!noveGreske[kljuc]) {
+                    noveGreske[kljuc] = issue.message
+                }
+            })
+
+            setErrors(noveGreske)
             return
         }
 
-        if (!naziv || naziv.length > 100) {
-            obavijesti(
-                "Naziv fotografije mora imati između 1 i 100 znakova.",
-                "danger"
-            )
-            return
-        }
+        const sifraPutovanja = rezultat.data.putovanjeSifra
 
-        if (opis.length > 1000) {
-            obavijesti("Opis smije imati najviše 1000 znakova.", "danger")
-            return
-        }
-
-        if (!slika) {
-            obavijesti("Odaberite sliku i kliknite Primijeni.", "danger")
+        if (!putovanja.some(p => Number(p.sifra) === sifraPutovanja)) {
+            setErrors({
+                putovanjeSifra: "Odaberite postojeće putovanje."
+            })
             return
         }
 
@@ -97,16 +105,13 @@ export default function FotografijaNovo() {
             const odgovor = await PutovanjaService.getBySifra(sifraPutovanja)
 
             if (!odgovor.data) {
-                obavijesti("Odabrano putovanje više ne postoji.", "danger")
+                setErrors({
+                    putovanjeSifra: "Odabrano putovanje više ne postoji."
+                })
                 return
             }
 
-            await FotografijeService.dodaj({
-                putovanjeSifra: sifraPutovanja,
-                naziv,
-                opis,
-                slika
-            })
+            await FotografijeService.dodaj(rezultat.data)
 
             obavijesti("Fotografija je dodana.")
             navigate(povratak)
@@ -134,7 +139,7 @@ export default function FotografijaNovo() {
             ) : putovanja.length === 0 ? (
                 <p>Prvo dodajte putovanje kojem pripada fotografija.</p>
             ) : (
-                <Form onSubmit={obradiSubmit}>
+                <Form onSubmit={obradiSubmit} noValidate >
                     <fieldset disabled={spremanje}>
                         <Form.Group controlId="fotografija-putovanje" className="mb-3">
                             <Form.Label>Putovanje</Form.Label>
@@ -143,6 +148,11 @@ export default function FotografijaNovo() {
                                 value={putovanjeSifra}
                                 onChange={e => setPutovanjeSifra(e.target.value)}
                                 required
+                                isInvalid={!!errors.putovanjeSifra}
+                                onFocus={() => setErrors(prethodne => ({
+                                    ...prethodne,
+                                    putovanjeSifra: ""
+                                }))}
                             >
                                 <option value="">Odaberite putovanje...</option>
 
@@ -155,6 +165,9 @@ export default function FotografijaNovo() {
                                     </option>
                                 ))}
                             </Form.Select>
+                            <Form.Control.Feedback type="invalid">
+                                {errors.putovanjeSifra}
+                            </Form.Control.Feedback>
                         </Form.Group>
 
                         <Form.Group controlId="fotografija-naziv" className="mb-3">
@@ -165,7 +178,16 @@ export default function FotografijaNovo() {
                                 name="naziv"
                                 maxLength={100}
                                 required
+                                isInvalid={!!errors.naziv}
+                                onFocus={() => setErrors(prethodne => ({
+                                    ...prethodne,
+                                    naziv: ""
+                                }))}
                             />
+
+                            <Form.Control.Feedback type="invalid">
+                                {errors.naziv}
+                            </Form.Control.Feedback>
                         </Form.Group>
 
                         <Form.Group controlId="fotografija-opis" className="mb-3">
@@ -176,12 +198,38 @@ export default function FotografijaNovo() {
                                 name="opis"
                                 rows={3}
                                 maxLength={1000}
+                                isInvalid={!!errors.opis}
+                                onFocus={() => setErrors(prethodne => ({
+                                    ...prethodne,
+                                    opis: ""
+                                }))}
                             />
+
+                            <Form.Control.Feedback type="invalid">
+                                {errors.opis}
+                            </Form.Control.Feedback>
                         </Form.Group>
 
                         <div className="mb-4">
                             <p className="form-label">Fotografija</p>
-                            <SlikaUploader value={slika} onChange={setSlika} />
+
+                            <SlikaUploader
+                                value={slika}
+                                onChange={novaSlika => {
+                                    setSlika(novaSlika)
+
+                                    setErrors(prethodne => ({
+                                        ...prethodne,
+                                        slika: ""
+                                    }))
+                                }}
+                            />
+
+                            {errors.slika && (
+                                <p className="text-danger mt-2 mb-0" role="alert">
+                                    {errors.slika}
+                                </p>
+                            )}
                         </div>
 
                         <Button type="submit">

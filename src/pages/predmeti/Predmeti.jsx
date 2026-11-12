@@ -5,6 +5,7 @@ import PredmetiService from "../../services/predmeti/PredmetiService"
 import { RouteNames } from "../../constants"
 import { FaListUl, FaPlus, FaPen, FaTrash, FaSearch } from "react-icons/fa"
 import { useObavijesti } from "../../components/zajednicko/Obavijesti"
+import { ShemaPredmet } from "../../schemas/ShemaPredmeti"
 
 export default function Predmeti() {
 
@@ -16,7 +17,7 @@ export default function Predmeti() {
     const [ukupnoStranica, setUkupnoStranica] = useState(0)
     const [ukupnoStavki, setUkupnoStavki] = useState(0)
     const [uvjetPretrazivanja, setUvjetPretrazivanja] = useState('')
-
+    const [errors, setErrors] = useState({})
     const velicinaStranice = 10
 
 
@@ -53,15 +54,30 @@ export default function Predmeti() {
 
         const obrazac = e.currentTarget
         const podaci = new FormData(obrazac)
-        const naziv = podaci.get("naziv").trim()
 
-        if (!naziv) {
-            obavijesti("Unesi naziv predmeta.", "danger")
+        setErrors({})
+
+        const rezultat = ShemaPredmet.safeParse(
+            Object.fromEntries(podaci)
+        )
+
+        if (!rezultat.success) {
+            const noveGreske = {}
+
+            rezultat.error.issues.forEach((issue) => {
+                const kljuc = issue.path[0]
+
+                if (!noveGreske[kljuc]) {
+                    noveGreske[kljuc] = issue.message
+                }
+            })
+
+            setErrors(noveGreske)
             return
         }
 
         try {
-            await PredmetiService.dodaj({ naziv })
+            await PredmetiService.dodaj(rezultat.data)
         } catch (error) {
             console.error(error)
             obavijesti("Dodavanje predmeta nije uspjelo.", "danger")
@@ -288,6 +304,7 @@ export default function Predmeti() {
             </p>
 
             <Form
+                noValidate
                 onSubmit={obradiSubmit}
                 className="dodavanje-predmeta"
             >
@@ -303,8 +320,13 @@ export default function Predmeti() {
                         type="text"
                         name="naziv"
                         placeholder="Npr. Putovnica"
-                        required
+                        isInvalid={!!errors.naziv}
+                        onFocus={() => setErrors({})}
                     />
+
+                    <Form.Control.Feedback type="invalid">
+                        {errors.naziv}
+                    </Form.Control.Feedback>
                 </Form.Group>
 
                 <Button

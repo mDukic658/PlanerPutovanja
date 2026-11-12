@@ -3,9 +3,12 @@ import { Link, useNavigate } from 'react-router-dom'
 import { RouteNames } from '../../constants'
 import DrzaveService from '../../services/drzave/DrzaveService'
 import { FaArrowLeft, FaGlobeEurope, FaPlus, FaTimes } from 'react-icons/fa'
+import { ShemaDrzava } from '../../schemas/ShemaDrzave'
+import { useState } from 'react'
 
 export default function NovaDrzava() {
     const navigate = useNavigate()
+    const [greske, setGreske] = useState({})
 
     async function dodaj(drzava) {
         await DrzaveService.dodaj(drzava).then(() => {
@@ -16,11 +19,20 @@ export default function NovaDrzava() {
     function obradiSubmit(e) {
         e.preventDefault()
 
-        const podaci = new FormData(e.target)
+        const podaci = new FormData(e.currentTarget)
+        const rezultat = ShemaDrzava.safeParse(
+            Object.fromEntries(podaci)
+        )
 
-        dodaj({
-            naziv: podaci.get('naziv').trim(),
-        })
+        if (!rezultat.success) {
+            setGreske({
+                naziv: rezultat.error.issues[0].message
+            })
+            return
+        }
+
+        setGreske({})
+        dodaj(rezultat.data)
     }
 
     return (
@@ -40,6 +52,7 @@ export default function NovaDrzava() {
             </h2>
 
             <Form
+                noValidate
                 onSubmit={obradiSubmit}
                 className="nova-drzava-obrazac"
             >
@@ -50,8 +63,13 @@ export default function NovaDrzava() {
                         type="text"
                         name="naziv"
                         placeholder="Npr. Hrvatska"
-                        required
+                        isInvalid={!!greske.naziv}
+                        onChange={() => setGreske({})}
                     />
+
+                    <Form.Control.Feedback type="invalid">
+                        {greske.naziv}
+                    </Form.Control.Feedback>
                 </Form.Group>
 
                 <div className="nova-drzava-akcije">

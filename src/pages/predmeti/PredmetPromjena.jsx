@@ -4,12 +4,13 @@ import { useEffect, useState } from "react"
 import PredmetiService from "../../services/predmeti/PredmetiService"
 import { RouteNames } from "../../constants"
 import { FaArrowLeft, FaPen, FaSave, FaTimes } from "react-icons/fa"
+import { ShemaPredmet } from "../../schemas/ShemaPredmeti"
 
 export default function PredmetPromjena() {
 
     const navigate = useNavigate()
     const params = useParams()
-
+    const [errors, setErrors] = useState({})
     const [predmet, setPredmet] = useState(null)
     const [ucitavanje, setUcitavanje] = useState(true)
     const [greska, setGreska] = useState('')
@@ -39,20 +40,32 @@ export default function PredmetPromjena() {
     async function obradiSubmit(e) {
         e.preventDefault()
 
-        const podaci = new FormData(e.target)
+        const podaci = new FormData(e.currentTarget)
 
-        const naziv = String(podaci.get('naziv') || '').trim()
+        setErrors({})
 
-        if (!naziv) {
-            alert("Unesi naziv predmeta.")
+        const rezultat = ShemaPredmet.safeParse(
+            Object.fromEntries(podaci)
+        )
+
+        if (!rezultat.success) {
+            const noveGreske = {}
+
+            rezultat.error.issues.forEach((issue) => {
+                const kljuc = issue.path[0]
+
+                if (!noveGreske[kljuc]) {
+                    noveGreske[kljuc] = issue.message
+                }
+            })
+
+            setErrors(noveGreske)
             return
         }
 
         await PredmetiService.promijeni(
-            parseInt(params.sifra),
-            {
-                naziv
-            }
+            Number(params.sifra),
+            rezultat.data
         )
 
         navigate(RouteNames.PREDMETI)
@@ -97,6 +110,7 @@ export default function PredmetPromjena() {
             </h2>
 
             <Form
+                noValidate
                 onSubmit={obradiSubmit}
                 className="promjena-predmeta-obrazac"
             >
@@ -107,8 +121,13 @@ export default function PredmetPromjena() {
                         type="text"
                         name="naziv"
                         defaultValue={predmet.naziv}
-                        required
+                        isInvalid={!!errors.naziv}
+                        onFocus={() => setErrors({})}
                     />
+
+                    <Form.Control.Feedback type="invalid">
+                        {errors.naziv}
+                    </Form.Control.Feedback>
                 </Form.Group>
 
                 <div className="promjena-predmeta-akcije">

@@ -24,8 +24,8 @@ export default function Izbornik() {
                             Kalendar
                         </Nav.Link>
 
-                        <Nav.Link 
-                        onClick={() => { navigate(RouteNames.FOTOGRAFIJE)}}>
+                        <Nav.Link
+                            onClick={() => { navigate(RouteNames.FOTOGRAFIJE) }}>
                             Galerija slika</Nav.Link>
 
                         <NavDropdown title="Putovanja" id='basic-nav-dropdown' >
@@ -36,7 +36,7 @@ export default function Izbornik() {
                                 onClick={() => { navigate(RouteNames.ITINERAR) }}>
                                 Itinerar</NavDropdown.Item>
                             <NavDropdown.Item
-                            onClick={() => {navigate(RouteNames.BUDZET)}}>
+                                onClick={() => { navigate(RouteNames.BUDZET) }}>
                                 Evidencija troškova</NavDropdown.Item>
                         </NavDropdown>
 
@@ -59,6 +59,9 @@ export default function Izbornik() {
                             <NavDropdown.Item
                                 onClick={() => { navigate(RouteNames.DRZAVE) }}
                             >Države</NavDropdown.Item>
+                            <NavDropdown.Item as={Link} to={RouteNames.OPERATERI}>
+                                Operateri
+                            </NavDropdown.Item>
                             <NavDropdown.Item
                                 onClick={() => { navigate(RouteNames.GENERIRANJE_PODATAKA) }}
                             >Generiranje podataka</NavDropdown.Item>

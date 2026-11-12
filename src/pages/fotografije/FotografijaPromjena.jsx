@@ -6,12 +6,13 @@ import { RouteNames } from "../../constants"
 import FotografijeService from "../../services/fotografije/FotografijeService"
 import SlikaUploader from "../../components/obrasci/SlikaUploader"
 import { useObavijesti } from "../../components/zajednicko/Obavijesti"
+import { ShemaFotografija } from "../../schemas/ShemaFotografije"
 
 export default function FotografijaPromjena() {
     const { sifra } = useParams()
     const navigate = useNavigate()
     const obavijesti = useObavijesti()
-
+    const [errors, setErrors] = useState({})
     const [fotografija, setFotografija] = useState(null)
     const [ucitavanje, setUcitavanje] = useState(true)
     const [greska, setGreska] = useState("")
@@ -64,41 +65,33 @@ export default function FotografijaPromjena() {
             return
         }
 
-        const naziv = String(fotografija.naziv || "").trim()
-        const opis = String(fotografija.opis || "").trim()
+        setErrors({})
 
-        if (!naziv || naziv.length > 100) {
-            obavijesti(
-                "Naziv fotografije mora imati između 1 i 100 znakova.",
-                "danger"
-            )
-            return
-        }
+        const rezultat = ShemaFotografija.safeParse({
+            naziv: fotografija.naziv ?? "",
+            opis: fotografija.opis ?? "",
+            slika: fotografija.slika
+        })
 
-        if (opis.length > 1000) {
-            obavijesti(
-                "Opis smije imati najviše 1000 znakova.",
-                "danger"
-            )
-            return
-        }
+        if (!rezultat.success) {
+            const noveGreske = {}
 
-        if (!fotografija.slika) {
-            obavijesti(
-                "Odaberite sliku i kliknite Primijeni.",
-                "danger"
-            )
+            rezultat.error.issues.forEach((issue) => {
+                const kljuc = issue.path[0]
+
+                if (!noveGreske[kljuc]) {
+                    noveGreske[kljuc] = issue.message
+                }
+            })
+
+            setErrors(noveGreske)
             return
         }
 
         setSpremanje(true)
 
         try {
-            await FotografijeService.promijeni(sifra, {
-                naziv,
-                opis,
-                slika: fotografija.slika
-            })
+            await FotografijeService.promijeni(sifra, rezultat.data)
 
             obavijesti("Promjene fotografije su spremljene.")
             navigate(povratak)
@@ -135,7 +128,7 @@ export default function FotografijaPromjena() {
                     Fotografija nije pronađena. Možda je obrisana.
                 </p>
             ) : (
-                <Form onSubmit={obradiSubmit}>
+                <Form onSubmit={obradiSubmit} noValidate >
                     <fieldset disabled={spremanje}>
                         <Form.Group
                             controlId="fotografija-naziv"
@@ -148,6 +141,11 @@ export default function FotografijaPromjena() {
                                 value={fotografija.naziv ?? ""}
                                 maxLength={100}
                                 required
+                                isInvalid={!!errors.naziv}
+                                onFocus={() => setErrors(prethodne => ({
+                                    ...prethodne,
+                                    naziv: ""
+                                }))}
                                 onChange={e => {
                                     const naziv = e.target.value
 
@@ -157,6 +155,10 @@ export default function FotografijaPromjena() {
                                     }))
                                 }}
                             />
+
+                            <Form.Control.Feedback type="invalid">
+                                {errors.naziv}
+                            </Form.Control.Feedback>
                         </Form.Group>
 
                         <Form.Group
@@ -170,6 +172,11 @@ export default function FotografijaPromjena() {
                                 rows={3}
                                 value={fotografija.opis ?? ""}
                                 maxLength={1000}
+                                isInvalid={!!errors.opis}
+                                onFocus={() => setErrors(prethodne => ({
+                                    ...prethodne,
+                                    opis: ""
+                                }))}
                                 onChange={e => {
                                     const opis = e.target.value
 
@@ -179,6 +186,10 @@ export default function FotografijaPromjena() {
                                     }))
                                 }}
                             />
+
+                            <Form.Control.Feedback type="invalid">
+                                {errors.opis}
+                            </Form.Control.Feedback>
                         </Form.Group>
 
                         <div className="mb-4">
@@ -186,13 +197,24 @@ export default function FotografijaPromjena() {
 
                             <SlikaUploader
                                 value={fotografija.slika}
-                                onChange={slika =>
+                                onChange={slika => {
                                     setFotografija(prethodna => ({
                                         ...prethodna,
                                         slika
                                     }))
-                                }
+
+                                    setErrors(prethodne => ({
+                                        ...prethodne,
+                                        slika: ""
+                                    }))
+                                }}
                             />
+
+                            {errors.slika && (
+                                <p className="text-danger mt-2 mb-0" role="alert">
+                                    {errors.slika}
+                                </p>
+                            )}
                         </div>
 
                         <Button type="submit">

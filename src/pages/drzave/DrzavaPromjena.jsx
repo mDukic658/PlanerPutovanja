@@ -4,11 +4,12 @@ import { RouteNames } from '../../constants'
 import DrzaveService from '../../services/drzave/DrzaveService'
 import { useState, useEffect } from 'react'
 import { FaArrowLeft, FaPen, FaSave, FaTimes } from 'react-icons/fa'
+import { ShemaDrzava } from '../../schemas/ShemaDrzave'
 
 export default function DrzavaPromjena() {
     const navigate = useNavigate()
     const { sifra } = useParams()
-
+    const [greske, setGreske] = useState({})
     const [drzava, setDrzava] = useState({
         naziv: '',
     })
@@ -30,15 +31,24 @@ export default function DrzavaPromjena() {
     function obradiSubmit(e) {
         e.preventDefault()
 
-        const podaci = new FormData(e.target)
+        const podaci = new FormData(e.currentTarget)
+        const rezultat = ShemaDrzava.safeParse(
+            Object.fromEntries(podaci)
+        )
 
-        promijeni({
-            naziv: podaci.get('naziv').trim(),
-        })
+        if (!rezultat.success) {
+            setGreske({
+                naziv: rezultat.error.issues[0].message
+            })
+            return
+        }
+
+        setGreske({})
+        promijeni(rezultat.data)
     }
 
     return (
-         <section className="promjena-drzave">
+        <section className="promjena-drzave">
 
             <Link
                 to={RouteNames.DRZAVE}
@@ -54,6 +64,7 @@ export default function DrzavaPromjena() {
             </h2>
 
             <Form
+                noValidate
                 onSubmit={obradiSubmit}
                 className="promjena-drzave-obrazac"
             >
@@ -63,15 +74,20 @@ export default function DrzavaPromjena() {
                     <Form.Control
                         type="text"
                         name="naziv"
-                        required
                         value={drzava.naziv || ''}
-                        onChange={(e) =>
-                            setDrzava({
-                                ...drzava,
-                                naziv: e.target.value,
-                            })
-                        }
+                        isInvalid={!!greske.naziv}
+                        onChange={(e) => {
+                            setDrzava(prethodna => ({
+                                ...prethodna,
+                                naziv: e.target.value
+                            }))
+                            setGreske({})
+                        }}
                     />
+
+                    <Form.Control.Feedback type="invalid">
+                        {greske.naziv}
+                    </Form.Control.Feedback>
                 </Form.Group>
 
                 <div className="promjena-drzave-akcije">

@@ -4,6 +4,7 @@ import OdabirLokacije from "./OdabirLokacije"
 import PretragaDrzava from "../obrasci/PretragaDrzava"
 import DrzaveService from "../../services/drzave/DrzaveService"
 import PretragaLokacije from "./PretragaLokacije"
+import { ShemaPosjet } from "../../schemas/ShemaKarte"
 
 export default function PosjetObrazac({
     pocetniPodaci = {},
@@ -102,66 +103,40 @@ export default function PosjetObrazac({
             return
         }
 
+        setGreske({})
+
         const podaci = {
-            drzava: drzava.trim(),
-            iso2: iso2.trim().toUpperCase(),
-            grad: grad.trim(),
+            drzava,
+            iso2,
+            grad,
             datumPosjeta,
-            napomena: napomena.trim(),
+            napomena,
             lat: lokacija?.lat,
             lng: lokacija?.lng
         }
 
-        const noveGreske = {}
+        const rezultat = ShemaPosjet.safeParse(podaci)
 
-        if (podaci.drzava.length < 2 || podaci.drzava.length > 100) {
-            noveGreske.drzava =
-                "Naziv države mora imati između 2 i 100 znakova."
-        }
+        if (!rezultat.success) {
+            const noveGreske = {}
 
-        if (!/^[A-Z]{2}$/.test(podaci.iso2)) {
-            noveGreske.iso2 =
-                "Odaberi državu koja ima valjanu dvoslovnu oznaku."
-        }
+            rezultat.error.issues.forEach((issue) => {
+                const polje = issue.path[0]
 
-        if (podaci.grad.length < 2 || podaci.grad.length > 100) {
-            noveGreske.grad =
-                "Naziv mjesta mora imati između 2 i 100 znakova."
-        }
+                const kljuc = polje === "lat" || polje === "lng"
+                    ? "lokacija"
+                    : polje
 
-        const datum = new Date(`${podaci.datumPosjeta}T00:00:00Z`)
+                if (!noveGreske[kljuc]) {
+                    noveGreske[kljuc] = issue.message
+                }
+            })
 
-        if (
-            !/^\d{4}-\d{2}-\d{2}$/.test(podaci.datumPosjeta) ||
-            !Number.isFinite(datum.getTime()) ||
-            datum.toISOString().substring(0, 10) !== podaci.datumPosjeta
-        ) {
-            noveGreske.datumPosjeta = "Unesi valjan datum posjeta."
-        }
-
-        if (
-            !Number.isFinite(podaci.lat) ||
-            !Number.isFinite(podaci.lng) ||
-            podaci.lat < -90 ||
-            podaci.lat > 90 ||
-            podaci.lng < -180 ||
-            podaci.lng > 180
-        ) {
-            noveGreske.lokacija = "Odaberi lokaciju na karti."
-        }
-
-        if (podaci.napomena.length > 1000) {
-            noveGreske.napomena =
-                "Napomena smije imati najviše 1000 znakova."
-        }
-
-        setGreske(noveGreske)
-
-        if (Object.keys(noveGreske).length > 0) {
+            setGreske(noveGreske)
             return
         }
 
-        onSpremi(podaci)
+        onSpremi(rezultat.data)
     }
 
     return (

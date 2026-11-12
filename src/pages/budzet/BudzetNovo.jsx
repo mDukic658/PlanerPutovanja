@@ -7,12 +7,13 @@ import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import BudzetServis from "../../services/budzet/BudzetServis"
 import { useObavijesti } from "../../components/zajednicko/Obavijesti"
 import { kategorije } from "../../services/budzet/BudzetKategorije"
+import { ShemaBudzet } from "../../schemas/ShemaBudzet"
 
 export default function BudzetNovo() {
 
     const [searchParams] = useSearchParams()
     const putovanjeSifra = searchParams.get("putovanjeSifra") || ""
-
+    const [errors, setErrors] = useState({})
     const [putovanje, setPutovanje] = useState(null)
     const [ucitavanje, setUcitavanje] = useState(true)
     const [greska, setGreska] = useState("")
@@ -73,6 +74,13 @@ export default function BudzetNovo() {
         }
     }, [putovanjeSifra])
 
+    function ocistiGresku(polje) {
+        setErrors(prethodne => ({
+            ...prethodne,
+            [polje]: ""
+        }))
+    }
+
     async function obradiSubmit(e) {
         e.preventDefault()
 
@@ -80,51 +88,26 @@ export default function BudzetNovo() {
             return
         }
 
+        setErrors({})
+
         const podaci = new FormData(e.currentTarget)
 
-        const naziv = String(podaci.get("naziv") || "").trim()
-        const iznosUnos = String(podaci.get("iznos") || "").trim()
-        const iznos = Number(iznosUnos.replace(",", "."))
-        const kategorija = String(podaci.get("kategorija") || "")
-        const datum = String(podaci.get("datum") || "")
-        const napomena = String(podaci.get("napomena") || "").trim()
+        const rezultat = ShemaBudzet.safeParse(
+            Object.fromEntries(podaci)
+        )
 
-        if (!naziv || naziv.length > 100) {
-            obavijesti(
-                "Naziv troška mora imati između 1 i 100 znakova.",
-                "danger"
-            )
-            return
-        }
+        if (!rezultat.success) {
+            const noveGreske = {}
 
-        if (
-            !/^\d+(?:[.,]\d{1,2})?$/.test(iznosUnos) ||
-            !Number.isFinite(iznos) ||
-            iznos <= 0 ||
-            !Number.isSafeInteger(Math.round(iznos * 100))
-        ) {
-            obavijesti(
-                "Unesi iznos veći od nule, s najviše dvije decimale.",
-                "danger"
-            )
-            return
-        }
+            rezultat.error.issues.forEach((issue) => {
+                const kljuc = issue.path[0]
 
-        if (!kategorije.includes(kategorija)) {
-            obavijesti("Odaberi kategoriju troška.", "danger")
-            return
-        }
+                if (!noveGreske[kljuc]) {
+                    noveGreske[kljuc] = issue.message
+                }
+            })
 
-        if (!datum) {
-            obavijesti("Unesi datum troška.", "danger")
-            return
-        }
-
-        if (napomena.length > 1000) {
-            obavijesti(
-                "Napomena smije imati najviše 1000 znakova.",
-                "danger"
-            )
+            setErrors(noveGreske)
             return
         }
 
@@ -142,12 +125,8 @@ export default function BudzetNovo() {
             }
 
             await BudzetServis.dodaj({
-                putovanjeSifra: Number(putovanje.sifra),
-                naziv,
-                iznos: Math.round(iznos * 100) / 100,
-                kategorija,
-                datum,
-                napomena
+                ...rezultat.data,
+                putovanjeSifra: Number(putovanje.sifra)
             })
 
             obavijesti("Trošak je dodan.")
@@ -184,12 +163,9 @@ export default function BudzetNovo() {
                         </span>
                     </div>
 
-                    <Form onSubmit={obradiSubmit}>
+                    <Form onSubmit={obradiSubmit} noValidate>
                         <fieldset disabled={spremanje}>
-                            <Form.Group
-                                controlId="trosak-naziv"
-                                className="mb-3"
-                            >
+                            <Form.Group controlId="trosak-naziv" className="mb-3">
                                 <Form.Label>Naziv troška</Form.Label>
 
                                 <Form.Control
@@ -198,13 +174,16 @@ export default function BudzetNovo() {
                                     placeholder="Npr. Povratne autobusne karte"
                                     maxLength={100}
                                     required
+                                    isInvalid={!!errors.naziv}
+                                    onFocus={() => ocistiGresku("naziv")}
                                 />
+
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.naziv}
+                                </Form.Control.Feedback>
                             </Form.Group>
 
-                            <Form.Group
-                                controlId="trosak-iznos"
-                                className="mb-3"
-                            >
+                            <Form.Group controlId="trosak-iznos" className="mb-3">
                                 <Form.Label>Iznos (€)</Form.Label>
 
                                 <Form.Control
@@ -214,39 +193,40 @@ export default function BudzetNovo() {
                                     placeholder="Npr. 45,50"
                                     maxLength={16}
                                     required
+                                    isInvalid={!!errors.iznos}
+                                    onFocus={() => ocistiGresku("iznos")}
                                 />
+
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.iznos}
+                                </Form.Control.Feedback>
                             </Form.Group>
 
-                            <Form.Group
-                                controlId="trosak-kategorija"
-                                className="mb-3"
-                            >
+                            <Form.Group controlId="trosak-kategorija" className="mb-3">
                                 <Form.Label>Kategorija</Form.Label>
 
                                 <Form.Select
                                     name="kategorija"
                                     defaultValue=""
                                     required
+                                    isInvalid={!!errors.kategorija}
+                                    onFocus={() => ocistiGresku("kategorija")}
                                 >
-                                    <option value="">
-                                        Odaberi kategoriju...
-                                    </option>
+                                    <option value="">Odaberi kategoriju...</option>
 
                                     {kategorije.map(kategorija => (
-                                        <option
-                                            key={kategorija}
-                                            value={kategorija}
-                                        >
+                                        <option key={kategorija} value={kategorija}>
                                             {kategorija}
                                         </option>
                                     ))}
                                 </Form.Select>
+
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.kategorija}
+                                </Form.Control.Feedback>
                             </Form.Group>
 
-                            <Form.Group
-                                controlId="trosak-datum"
-                                className="mb-3"
-                            >
+                            <Form.Group controlId="trosak-datum" className="mb-3">
                                 <Form.Label>Datum troška</Form.Label>
 
                                 <Form.Control
@@ -254,13 +234,16 @@ export default function BudzetNovo() {
                                     type="date"
                                     required
                                     onClick={e => e.currentTarget.showPicker?.()}
+                                    isInvalid={!!errors.datum}
+                                    onFocus={() => ocistiGresku("datum")}
                                 />
+
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.datum}
+                                </Form.Control.Feedback>
                             </Form.Group>
 
-                            <Form.Group
-                                controlId="trosak-napomena"
-                                className="mb-4"
-                            >
+                            <Form.Group controlId="trosak-napomena" className="mb-4">
                                 <Form.Label>Napomena</Form.Label>
 
                                 <Form.Control
@@ -268,7 +251,13 @@ export default function BudzetNovo() {
                                     as="textarea"
                                     rows={3}
                                     maxLength={1000}
+                                    isInvalid={!!errors.napomena}
+                                    onFocus={() => ocistiGresku("napomena")}
                                 />
+
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.napomena}
+                                </Form.Control.Feedback>
                             </Form.Group>
 
                             <Button type="submit">

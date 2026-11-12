@@ -13,6 +13,7 @@
     "@faker-js/faker": "^10.6.0",
     "@re-dev/react-truncate": "^0.6.0",
     "@react-pdf/renderer": "^4.9.0",
+    "bcryptjs": "^3.0.3",
     "bootstrap": "^5.3.8",
     "dayjs": "^1.11.23",
     "docx": "^9.15.3",
@@ -28,7 +29,8 @@
     "react-number-format": "^5.4.5",
     "react-router-dom": "^7.18.4",
     "recharts": "^3.10.1",
-    "timepicker-ui-react": "^1.6.1"
+    "timepicker-ui-react": "^1.6.1",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/react": "^19.3.0",

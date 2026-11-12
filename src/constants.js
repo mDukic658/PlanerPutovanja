@@ -4,6 +4,11 @@ export const IME_APLIKACIJE = 'Planer Putovanja'
 export const RouteNames = {
     HOME: '/',
 
+    OPERATERI: '/operateri',
+    OPERATERI_NOVI: '/operateri/novi',
+    OPERATERI_PROMJENA: '/operateri/:sifra',
+    OPERATERI_PROMJENA_LOZINKE: '/operateri/:sifra/lozinka',
+
     PUTOVANJA: '/putovanja',
     PUTOVANJA_DODAJ: '/novo/putovanje',
     PUTOVANJA_PROMIJENA: '/putovanja/:sifra',

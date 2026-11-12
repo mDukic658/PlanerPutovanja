@@ -3,6 +3,7 @@ import { Button, Form } from "react-bootstrap"
 import PredmetiService from "../../services/predmeti/PredmetiService"
 import PakiranjaService from "../../services/lista_pakiranja/PakiranjaService"
 import { useObavijesti } from "../../components/zajednicko/Obavijesti"
+import { ShemaPakiranje } from "../../schemas/ShemaListaPakiranja"
 
 export default function NovoPakiranje({ putovanjeSifra, ucitajPakiranja }) {
 
@@ -13,6 +14,7 @@ export default function NovoPakiranje({ putovanjeSifra, ucitajPakiranja }) {
     const [pretraga, setPretraga] = useState("")
     const [prikazi, setPrikazi] = useState(false)
     const [odabraniIndex, setOdabraniIndex] = useState(-1)
+    const [greske, setGreske] = useState({})
 
     useEffect(() => {
         ucitajPredmete()
@@ -28,11 +30,20 @@ export default function NovoPakiranje({ putovanjeSifra, ucitajPakiranja }) {
         predmet.naziv.toLowerCase().includes(pretraga.toLowerCase())
     )
 
+    function ocistiGresku(polje) {
+        setGreske(prethodne => {
+            const nove = { ...prethodne }
+            delete nove[polje]
+            return nove
+        })
+    }
+
     function odaberi(predmet) {
         setOdabraniPredmet(predmet)
         setPretraga("")
         setPrikazi(false)
         setOdabraniIndex(-1)
+        ocistiGresku('predmetSifra')
     }
 
     function obradiTipku(e) {
@@ -69,30 +80,53 @@ export default function NovoPakiranje({ putovanjeSifra, ucitajPakiranja }) {
 
     async function obradiSubmit(e) {
         e.preventDefault()
+        setGreske({})
 
-        const podaci = new FormData(e.target)
+        const obrazac = e.currentTarget
+        const podaci = new FormData(obrazac)
 
-        if (!podaci.get("predmetSifra")) {
-            alert("Morate odabrati predmet!")
+        const rezultat = ShemaPakiranje.safeParse({
+            predmetSifra: podaci.get("predmetSifra"),
+            putovanjeSifra,
+            spakirano: false,
+            napomena: String(podaci.get("napomena") ?? "")
+        })
+
+        if (!rezultat.success) {
+            const noveGreske = {}
+
+            rezultat.error.issues.forEach((issue) => {
+                const polje = issue.path[0]
+
+                if (!noveGreske[polje]) {
+                    noveGreske[polje] = issue.message
+                }
+            })
+
+            setGreske(noveGreske)
             return
         }
 
-        const predmetSifra = parseInt(
-            podaci.get('predmetSifra')
+        const predmetPostoji = predmeti.some(
+            predmet => Number(predmet.sifra) === rezultat.data.predmetSifra
         )
 
-        const obrazac = e.currentTarget
+        if (!predmetPostoji) {
+            setGreske({
+                predmetSifra: "Odabrani predmet nije pronađen."
+            })
+            return
+        }
 
         try {
-            await PakiranjaService.dodaj({
-                predmetSifra,
-                putovanjeSifra,
-                spakirano: false,
-                napomena: String(podaci.get("napomena") ?? "").trim()
-            })
+            await PakiranjaService.dodaj(rezultat.data)
 
             obrazac.reset()
             setOdabraniPredmet(null)
+            setPretraga("")
+            setPrikazi(false)
+            setOdabraniIndex(-1)
+            setGreske({})
 
             await ucitajPakiranja()
         } catch (error) {
@@ -104,7 +138,13 @@ export default function NovoPakiranje({ putovanjeSifra, ucitajPakiranja }) {
     }
 
     return (
-        <Form onSubmit={obradiSubmit}>
+        <Form noValidate onSubmit={obradiSubmit}>
+
+            {greske.putovanjeSifra && (
+                <div className="alert alert-danger" role="alert">
+                    {greske.putovanjeSifra}
+                </div>
+            )}
 
             <Form.Group controlId="predmetSifra" className="position-relative">
                 <Form.Label>Novi predmet</Form.Label>
@@ -112,6 +152,7 @@ export default function NovoPakiranje({ putovanjeSifra, ucitajPakiranja }) {
                 <Form.Control
                     type="text"
                     placeholder="Odaberi predmet..."
+                    isInvalid={!!greske.predmetSifra}
                     value={prikazi ? pretraga : odabraniPredmet?.naziv || ""}
                     onChange={(e) => {
                         setPretraga(e.target.value)
@@ -130,6 +171,9 @@ export default function NovoPakiranje({ putovanjeSifra, ucitajPakiranja }) {
                     onKeyDown={obradiTipku}
                     autoComplete="off"
                 />
+                <Form.Control.Feedback type="invalid">
+                    {greske.predmetSifra}
+                </Form.Control.Feedback>
 
                 <input
                     type="hidden"

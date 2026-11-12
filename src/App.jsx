@@ -30,6 +30,10 @@ import PutovanjaDetalji from './pages/putovanja/PutovanjaDetalji'
 import FotografijePregled from './pages/fotografije/FotografijePregled'
 import FotografijaNovo from './pages/fotografije/FotografijaNovo'
 import FotografijaPromjena from './pages/fotografije/FotografijaPromjena'
+import OperaterPregled from './pages/operateri/OperaterPregled'
+import OperaterNovi from './pages/operateri/OperaterNovi'
+import OperaterPromjena from './pages/operateri/OperaterPromjena'
+import OperaterPromjenaLozinke from './pages/operateri/OperaterPromjenaLozinke'
 
 function App() {
 
@@ -45,7 +49,7 @@ function App() {
             <Route path={RouteNames.LISTA_PAKIRANJA} element={<ListaPakiranja />} />
             <Route path={RouteNames.LISTA_PAKIRANJA_ODABRANO} element={<ListaPakiranja />} />
             <Route path={RouteNames.PUTOVANJA_PROMIJENA} element={<PutovanjePromjena />} />
-            <Route path={RouteNames.PUTOVANJA_DETALJI} element={<PutovanjaDetalji />} /> 
+            <Route path={RouteNames.PUTOVANJA_DETALJI} element={<PutovanjaDetalji />} />
             <Route path={RouteNames.PREDMETI} element={<Predmeti />} />
             <Route path={RouteNames.PREDMET_PROMJENA} element={<PredmetPromjena />} />
             <Route path={RouteNames.LISTA_PAKIRANJA_UREDI} element={<UrediListuPakiranja />} />
@@ -60,12 +64,16 @@ function App() {
             <Route path={RouteNames.BUDZET} element={<BudzetPregled />} />
             <Route path={RouteNames.BUDZET_PROMJENA} element={<BudzetPromjena />} />
             <Route path={RouteNames.BUDZET_NOVO} element={<BudzetNovo />} />
-            <Route path={RouteNames.KARTA_POSJETA} element={ <KartaPregled/> } /> 
-            <Route path={RouteNames.KARTA_POSJETA_PROMJENA} element={ <KartaPromjena /> } /> 
-            <Route path={RouteNames.KARTA_POSJETA_NOVO} element={ <KartaNovo /> } />
-            <Route path={RouteNames.FOTOGRAFIJE} element={ <FotografijePregled /> } />
-            <Route path={RouteNames.FOTOGRAFIJE_NOVO} element={ <FotografijaNovo /> } />
-            <Route path={RouteNames.FOTOGRAFIJE_PROMJENA} element={ <FotografijaPromjena /> } />
+            <Route path={RouteNames.KARTA_POSJETA} element={<KartaPregled />} />
+            <Route path={RouteNames.KARTA_POSJETA_PROMJENA} element={<KartaPromjena />} />
+            <Route path={RouteNames.KARTA_POSJETA_NOVO} element={<KartaNovo />} />
+            <Route path={RouteNames.FOTOGRAFIJE} element={<FotografijePregled />} />
+            <Route path={RouteNames.FOTOGRAFIJE_NOVO} element={<FotografijaNovo />} />
+            <Route path={RouteNames.FOTOGRAFIJE_PROMJENA} element={<FotografijaPromjena />} />
+            <Route path={RouteNames.OPERATERI} element={<OperaterPregled />} />
+            <Route path={RouteNames.OPERATERI_NOVI} element={<OperaterNovi />} />
+            <Route path={RouteNames.OPERATERI_PROMJENA} element={<OperaterPromjena />} />
+            <Route path={RouteNames.OPERATERI_PROMJENA_LOZINKE} element={<OperaterPromjenaLozinke />} />
           </Routes>
         </Container>
         <hr className="footer-hr" />

@@ -8,6 +8,7 @@ import { FaArrowLeft, FaPlus, FaTimes } from "react-icons/fa"
 import { Timepicker } from "timepicker-ui-react"
 import "timepicker-ui/main.css"
 import { useObavijesti } from "../../components/zajednicko/Obavijesti"
+import { kreirajShemuItinerara } from "../../schemas/ShemaItinerar"
 
 
 export default function ItinerarNovo({
@@ -21,7 +22,7 @@ export default function ItinerarNovo({
 
     const [searchParams] = useSearchParams()
     const putovanjeSifra = pocetnoPutovanjeSifra ?? searchParams.get("putovanjeSifra")
-
+    const [greske, setGreske] = useState({})
     const [putovanja, setPutovanja] = useState([])
     const [aktivnosti, setAktivnosti] = useState([])
     const [ucitavanje, setUcitavanje] = useState(true)
@@ -173,6 +174,37 @@ export default function ItinerarNovo({
         }
     }
 
+    function ocistiGresku(polje) {
+        setGreske(prethodne => {
+            const nove = { ...prethodne }
+            delete nove[polje]
+            return nove
+        })
+    }
+
+    function provjeriStavku(maksimalniDan) {
+        const rezultat = kreirajShemuItinerara(maksimalniDan)
+            .safeParse(stavka)
+
+        if (!rezultat.success) {
+            const noveGreske = {}
+
+            rezultat.error.issues.forEach((issue) => {
+                const polje = issue.path[0]
+
+                if (!noveGreske[polje]) {
+                    noveGreske[polje] = issue.message
+                }
+            })
+
+            setGreske(noveGreske)
+            return null
+        }
+
+        setGreske({})
+        return rezultat.data
+    }
+
     function promijeniVrijednost(e) {
         const { name, value } = e.target
 
@@ -180,8 +212,12 @@ export default function ItinerarNovo({
             return
         }
 
+        ocistiGresku(name)
+
         if (name === "dan") {
-            setStavka((stara) => ({
+            ocistiGresku('vrijeme')
+
+            setStavka(stara => ({
                 ...stara,
                 dan: value,
                 vrijeme: predloziVrijeme(
@@ -194,7 +230,7 @@ export default function ItinerarNovo({
             return
         }
 
-        setStavka((stara) => ({
+        setStavka(stara => ({
             ...stara,
             [name]: value
         }))
@@ -219,35 +255,15 @@ export default function ItinerarNovo({
             return
         }
 
-        const dan = Number(stavka.dan)
+        const provjereniPodaci = provjeriStavku(maksimalniDan)
 
-        if (
-            !Number.isInteger(dan) ||
-            dan < 1 ||
-            dan > maksimalniDan
-        ) {
-            obavijesti(
-                `Dan mora biti između 1 i ${maksimalniDan}.`,
-                "danger"
-            )
-            return
-        }
-
-        if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(stavka.vrijeme)) {
-            obavijesti("Odaberi vrijeme aktivnosti.", "danger")
-            return
-        }
-
-        if (!stavka.naziv.trim()) {
-            obavijesti("Unesi naziv aktivnosti.", "danger")
+        if (!provjereniPodaci) {
             return
         }
 
         const novaStavka = {
-            ...stavka,
-            putovanjeSifra: Number(putovanjeSifra),
-            dan,
-            naziv: stavka.naziv.trim()
+            ...provjereniPodaci,
+            putovanjeSifra: Number(putovanjeSifra)
         }
 
         setSpremanje(true)
@@ -307,7 +323,7 @@ export default function ItinerarNovo({
                 </div>
             )}
 
-            <Form onSubmit={spremi} className="itinerar-obrazac">
+            <Form noValidate onSubmit={spremi} className="itinerar-obrazac">
                 <Row className="g-3">
 
                     <Col xs={12}>
@@ -338,11 +354,13 @@ export default function ItinerarNovo({
                                 name="dan"
                                 value={stavka.dan}
                                 onChange={promijeniVrijednost}
-                                disabled={
-                                    onemoguceno || !odabranoPutovanje
-                                }
-                                required
+                                disabled={onemoguceno || !odabranoPutovanje}
+                                isInvalid={!!greske.dan}
                             />
+
+                            <Form.Control.Feedback type="invalid">
+                                {greske.dan}
+                            </Form.Control.Feedback>
                         </Form.Group>
                     </Col>
 
@@ -353,12 +371,10 @@ export default function ItinerarNovo({
                             <Timepicker
                                 id="vrijeme"
                                 name="vrijeme"
-                                className="form-control"
+                                className={`form-control${greske.vrijeme ? ' is-invalid' : ''}`}
                                 placeholder="Odaberi vrijeme"
                                 value={stavka.vrijeme}
-                                disabled={
-                                    onemoguceno || !odabranoPutovanje
-                                }
+                                disabled={onemoguceno || !odabranoPutovanje}
                                 options={{
                                     clock: {
                                         type: "24h",
@@ -370,20 +386,23 @@ export default function ItinerarNovo({
                                     }
                                 }}
                                 onConfirm={(podaci) => {
-                                    const sati = String(
-                                        podaci.hour
-                                    ).padStart(2, "0")
+                                    const sati = String(podaci.hour).padStart(2, "0")
+                                    const minute = String(podaci.minutes).padStart(2, "0")
 
-                                    const minute = String(
-                                        podaci.minutes
-                                    ).padStart(2, "0")
-
-                                    setStavka((stara) => ({
+                                    setStavka(stara => ({
                                         ...stara,
                                         vrijeme: `${sati}:${minute}`
                                     }))
+
+                                    ocistiGresku('vrijeme')
                                 }}
                             />
+
+                            {greske.vrijeme && (
+                                <div className="text-danger small mt-1" role="alert">
+                                    {greske.vrijeme}
+                                </div>
+                            )}
 
                             {!stavka.vrijeme && (
                                 <Form.Text className="text-muted">
@@ -405,8 +424,12 @@ export default function ItinerarNovo({
                                 value={stavka.naziv}
                                 onChange={promijeniVrijednost}
                                 disabled={onemoguceno}
-                                required
+                                isInvalid={!!greske.naziv}
                             />
+
+                            <Form.Control.Feedback type="invalid">
+                                {greske.naziv}
+                            </Form.Control.Feedback>
                         </Form.Group>
                     </Col>
 

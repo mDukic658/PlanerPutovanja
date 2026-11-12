@@ -6,6 +6,7 @@ import { RouteNames } from "../../constants"
 import { FaArrowLeft, FaPen, FaSave, FaTimes } from "react-icons/fa";
 import { useObavijesti } from "../../components/zajednicko/Obavijesti";
 import PutovanjaService from "../../services/putovanja/PutovanjaService";
+import { kreirajShemuItinerara } from "../../schemas/ShemaItinerar";
 
 export default function ItinerarPromjena({
     pocetnaSifra,
@@ -18,7 +19,7 @@ export default function ItinerarPromjena({
     const sifra = pocetnaSifra ?? params.sifra
     const [searchParams] = useSearchParams()
     const obavijesti = useObavijesti()
-
+    const [greske, setGreske] = useState({})
     const putovanjeSifra = searchParams.get('putovanjeSifra')
     const [nazivPutovanja, setNazivPutovanja] = useState("")
 
@@ -73,12 +74,45 @@ export default function ItinerarPromjena({
         }
     }
 
+    function ocistiGresku(polje) {
+        setGreske(prethodne => {
+            const nove = { ...prethodne }
+            delete nove[polje]
+            return nove
+        })
+    }
+
+    function provjeriStavku(maksimalniDan) {
+        const rezultat = kreirajShemuItinerara(maksimalniDan)
+            .safeParse(stavka)
+
+        if (!rezultat.success) {
+            const noveGreske = {}
+
+            rezultat.error.issues.forEach((issue) => {
+                const polje = issue.path[0]
+
+                if (!noveGreske[polje]) {
+                    noveGreske[polje] = issue.message
+                }
+            })
+
+            setGreske(noveGreske)
+            return null
+        }
+
+        setGreske({})
+        return rezultat.data
+    }
+
     function promijeniVrijednost(e) {
         const { name, value } = e.target
 
         if (name === "putovanjeSifra") {
             return
         }
+
+        ocistiGresku(name)
 
         setStavka(stara => ({
             ...stara,
@@ -124,31 +158,13 @@ export default function ItinerarPromjena({
             (povratak - polazak) / 86400000
         ) + 1
 
-        const dan = Number(stavka.dan)
-
-        if (
-            !Number.isInteger(dan) ||
-            dan < 1 ||
-            dan > maksimalniDan
-        ) {
-            obavijesti(
-                `Dan mora biti između 1 i ${maksimalniDan}.`,
-                "danger"
-            )
-            return
-        }
-
-        if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(stavka.vrijeme)) {
-            obavijesti("Odaberi ispravno vrijeme aktivnosti.", "danger")
-            return
-        }
-
-        if (!stavka.naziv.trim()) {
-            obavijesti("Unesi naziv aktivnosti.", "danger")
-            return
-        }
-
         let izvornaStavka
+
+        const provjereniPodaci = provjeriStavku(maksimalniDan)
+
+        if (!provjereniPodaci) {
+            return
+        }
 
         try {
             const odgovor = await ItinerarService.getBySifra(sifra)
@@ -166,9 +182,8 @@ export default function ItinerarPromjena({
 
         const promijenjenaStavka = {
             ...stavka,
-            putovanjeSifra: izvornaStavka.putovanjeSifra,
-            dan,
-            naziv: stavka.naziv.trim()
+            ...provjereniPodaci,
+            putovanjeSifra: izvornaStavka.putovanjeSifra
         }
 
         try {
@@ -212,7 +227,7 @@ export default function ItinerarPromjena({
                 Promjena stavke itinerara
             </h2>
 
-            <Form onSubmit={spremi} className="itinerar-obrazac">
+            <Form noValidate onSubmit={spremi} className="itinerar-obrazac">
                 <Row className="g-3">
 
                     <Col xs={12}>
@@ -234,11 +249,15 @@ export default function ItinerarPromjena({
                             <Form.Control
                                 type="number"
                                 min="1"
+                                step="1"
                                 name="dan"
                                 value={stavka.dan}
                                 onChange={promijeniVrijednost}
-                                required
+                                isInvalid={!!greske.dan}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                {greske.dan}
+                            </Form.Control.Feedback>
                         </Form.Group>
                     </Col>
 
@@ -250,8 +269,11 @@ export default function ItinerarPromjena({
                                 name="vrijeme"
                                 value={stavka.vrijeme || ""}
                                 onChange={promijeniVrijednost}
-                                required
+                                isInvalid={!!greske.vrijeme}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                {greske.vrijeme}
+                            </Form.Control.Feedback>
                         </Form.Group>
                     </Col>
 
@@ -263,8 +285,11 @@ export default function ItinerarPromjena({
                                 name="naziv"
                                 value={stavka.naziv}
                                 onChange={promijeniVrijednost}
-                                required
+                                isInvalid={!!greske.naziv}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                {greske.naziv}
+                            </Form.Control.Feedback>
                         </Form.Group>
                     </Col>
 
