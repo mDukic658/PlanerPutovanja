@@ -5,7 +5,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom"
 import { RouteNames } from "../../constants"
 import { BsSuitcase2Fill } from "react-icons/bs"
 import { FaPlus, FaPen, FaTrash, FaCamera, FaSearch } from "react-icons/fa"
-import { useObavijesti } from "../../components/Obavijesti"
+import { useObavijesti } from "../../components/zajednicko/Obavijesti"
 
 export default function PutovanjePregled() {
 

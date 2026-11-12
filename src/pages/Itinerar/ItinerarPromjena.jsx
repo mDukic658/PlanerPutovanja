@@ -4,7 +4,7 @@ import { Button, Row, Form, Col } from "react-bootstrap";
 import ItinerarService from "../../services/itinerar/ItinerarService"
 import { RouteNames } from "../../constants"
 import { FaArrowLeft, FaPen, FaSave, FaTimes } from "react-icons/fa";
-import { useObavijesti } from "../../components/Obavijesti";
+import { useObavijesti } from "../../components/zajednicko/Obavijesti";
 import PutovanjaService from "../../services/putovanja/PutovanjaService";
 
 export default function ItinerarPromjena({

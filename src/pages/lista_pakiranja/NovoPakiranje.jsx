@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { Button, Form } from "react-bootstrap"
 import PredmetiService from "../../services/predmeti/PredmetiService"
 import PakiranjaService from "../../services/lista_pakiranja/PakiranjaService"
-import { useObavijesti } from "../../components/Obavijesti"
+import { useObavijesti } from "../../components/zajednicko/Obavijesti"
 
 export default function NovoPakiranje({ putovanjeSifra, ucitajPakiranja }) {
 

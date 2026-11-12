@@ -6,9 +6,9 @@ import { Button, Card, Col, Row, Form, ProgressBar, Pagination, InputGroup } fro
 import Pakiranje from "./Pakiranje"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import { FaSuitcaseRolling, FaPen, FaMapMarkerAlt, FaFilePdf, FaSearch, FaArrowLeft } from "react-icons/fa"
-import { useObavijesti } from "../../components/Obavijesti"
-import ListaPakiranjaPDFGenerator from "../../components/ListaPakiranjaPDFGenerator"
-import Napomena from "../../components/Napomena"
+import { useObavijesti } from "../../components/zajednicko/Obavijesti"
+import ListaPakiranjaPDFGenerator from "../../components/dokumenti/ListaPakiranjaPDFGenerator"
+import Napomena from "../../components/obrasci/Napomena"
 import { RouteNames } from "../../constants"
 
 export default function ListaPakiranja() {

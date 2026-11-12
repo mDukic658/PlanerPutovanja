@@ -6,9 +6,9 @@ import dayjs from "dayjs";
 import ItinerarService from "../../services/itinerar/ItinerarService"
 import PakiranjaService from "../../services/lista_pakiranja/PakiranjaService"
 import PredmetiService from "../../services/predmeti/PredmetiService"
-import { useObavijesti } from "../Obavijesti"
-import { generirajItinerarWord } from "../WordGenerator"
-import ListaPakiranjaPDFGenerator from "../ListaPakiranjaPDFGenerator"
+import { useObavijesti } from "../zajednicko/Obavijesti"
+import { generirajItinerarWord } from "../dokumenti/WordGenerator"
+import ListaPakiranjaPDFGenerator from "../dokumenti/ListaPakiranjaPDFGenerator"
 import { RouteNames } from "../../constants";
 
 export default function PutovanjePanel({

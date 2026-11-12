@@ -7,7 +7,7 @@ import ItinerarService from "../../services/itinerar/ItinerarService"
 import { FaArrowLeft, FaPlus, FaTimes } from "react-icons/fa"
 import { Timepicker } from "timepicker-ui-react"
 import "timepicker-ui/main.css"
-import { useObavijesti } from "../../components/Obavijesti"
+import { useObavijesti } from "../../components/zajednicko/Obavijesti"
 
 
 export default function ItinerarNovo({

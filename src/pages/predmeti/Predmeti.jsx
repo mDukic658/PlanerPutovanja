@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom"
 import PredmetiService from "../../services/predmeti/PredmetiService"
 import { RouteNames } from "../../constants"
 import { FaListUl, FaPlus, FaPen, FaTrash, FaSearch } from "react-icons/fa"
-import { useObavijesti } from "../../components/Obavijesti"
+import { useObavijesti } from "../../components/zajednicko/Obavijesti"
 
 export default function Predmeti() {
 

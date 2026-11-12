@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import { FaPen, FaTimes } from "react-icons/fa";
-import PakiranjaService from "../services/lista_pakiranja/PakiranjaService";
-import { useObavijesti } from "./Obavijesti";
+import PakiranjaService from "../../services/lista_pakiranja/PakiranjaService";
+import { useObavijesti } from "../zajednicko/Obavijesti";
 
 export default function Napomena({
     pakiranje, ucitajPakiranja

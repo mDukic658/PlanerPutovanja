@@ -4,7 +4,7 @@ import { FaArrowLeft, FaPen, FaImages, FaSuitcaseRolling, FaList } from "react-i
 import { RouteNames } from "../../constants"
 import { Card, Row, Col, Button, Modal } from "react-bootstrap"
 import { NumericFormat } from "react-number-format"
-import FormatDatuma from "../../components/FormatDatuma"
+import FormatDatuma from "../../components/zajednicko/FormatDatuma"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import ItinerarService from "../../services/itinerar/ItinerarService"
 import PakiranjaService from "../../services/lista_pakiranja/PakiranjaService"

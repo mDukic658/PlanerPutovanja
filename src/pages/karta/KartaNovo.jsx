@@ -4,7 +4,7 @@ import { FaArrowLeft } from "react-icons/fa"
 import { RouteNames } from "../../constants"
 import KartaServis from "../../services/karta/KartaServis"
 import PosjetObrazac from "../../components/karta/PosjetObrazac"
-import { useObavijesti } from "../../components/Obavijesti"
+import { useObavijesti } from "../../components/zajednicko/Obavijesti"
 
 export default function KartaNovo() {
 

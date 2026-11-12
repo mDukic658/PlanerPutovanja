@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import { ikonaPosjeta } from "../../utils/kartaIkone"
-import FormatDatuma from "../FormatDatuma"
+import FormatDatuma from "../zajednicko/FormatDatuma"
 import "leaflet/dist/leaflet.css"
 
 function PrilagodiPrikaz({ posjeti }) {

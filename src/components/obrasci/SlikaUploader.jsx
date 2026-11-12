@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { Button, Modal, ButtonGroup, Form } from "react-bootstrap";
 import Cropper from "react-easy-crop";
-import { izreziSliku } from "../utils/cropSlika";
+import { izreziSliku } from "../../utils/cropSlika";
 
 const OMJERI = [
     { naziv: "16:9", vrijednost: 16 / 9 },

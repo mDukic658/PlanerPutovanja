@@ -6,7 +6,7 @@ import { RouteNames } from "../../constants"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import BudzetServis from "../../services/budzet/BudzetServis"
 import { kategorije } from "../../services/budzet/BudzetKategorije"
-import { useObavijesti } from "../../components/Obavijesti"
+import { useObavijesti } from "../../components/zajednicko/Obavijesti"
 
 export default function BudzetPromjena() {
 

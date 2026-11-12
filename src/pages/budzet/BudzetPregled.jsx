@@ -5,8 +5,8 @@ import { FaPlus, FaPen, FaTrash } from "react-icons/fa";
 import { RouteNames } from "../../constants"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import BudzetServis from "../../services/budzet/BudzetServis"
-import FormatDatuma from "../../components/FormatDatuma"
-import { useObavijesti } from "../../components/Obavijesti"
+import FormatDatuma from "../../components/zajednicko/FormatDatuma"
+import { useObavijesti } from "../../components/zajednicko/Obavijesti"
 import BudzetGrafikon from "../../components/budzet/BudzetGrafikon";
 
 function formatirajIznos(iznos) {

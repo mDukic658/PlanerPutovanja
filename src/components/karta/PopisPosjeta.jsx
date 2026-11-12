@@ -2,7 +2,7 @@ import { Link } from "react-router-dom"
 import { Button, Card, Col, Row } from "react-bootstrap"
 import { FaPen, FaTrash } from "react-icons/fa"
 import { RouteNames } from "../../constants"
-import FormatDatuma from "../FormatDatuma"
+import FormatDatuma from "../zajednicko/FormatDatuma"
 
 export default function PopisPosjeta({
     posjeti,

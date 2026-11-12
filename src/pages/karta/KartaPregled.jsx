@@ -5,7 +5,7 @@ import { Link } from "react-router-dom"
 import { FaPlus } from "react-icons/fa"
 import { RouteNames } from "../../constants"
 import PopisPosjeta from "../../components/karta/PopisPosjeta"
-import { useObavijesti } from "../../components/Obavijesti"
+import { useObavijesti } from "../../components/zajednicko/Obavijesti"
 
 export default function KartaPregled() {
     const [posjeti, setPosjeti] = useState([])

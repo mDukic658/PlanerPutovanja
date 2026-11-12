@@ -5,8 +5,8 @@ import { FaArrowLeft, FaPlus } from "react-icons/fa"
 import { RouteNames } from "../../constants"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import FotografijeService from "../../services/fotografije/FotografijeService"
-import SlikaUploader from "../../components/SlikaUploader"
-import { useObavijesti } from "../../components/Obavijesti"
+import SlikaUploader from "../../components/obrasci/SlikaUploader"
+import { useObavijesti } from "../../components/zajednicko/Obavijesti"
 
 export default function FotografijaNovo() {
     const navigate = useNavigate()

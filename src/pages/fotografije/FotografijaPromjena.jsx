@@ -4,8 +4,8 @@ import { Button, Form } from "react-bootstrap"
 import { FaArrowLeft, FaSave } from "react-icons/fa"
 import { RouteNames } from "../../constants"
 import FotografijeService from "../../services/fotografije/FotografijeService"
-import SlikaUploader from "../../components/SlikaUploader"
-import { useObavijesti } from "../../components/Obavijesti"
+import SlikaUploader from "../../components/obrasci/SlikaUploader"
+import { useObavijesti } from "../../components/zajednicko/Obavijesti"
 
 export default function FotografijaPromjena() {
     const { sifra } = useParams()

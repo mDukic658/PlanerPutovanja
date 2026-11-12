@@ -5,7 +5,7 @@ import { FaPlus, FaPen, FaTrash } from "react-icons/fa"
 import { RouteNames } from "../../constants"
 import FotografijeService from "../../services/fotografije/FotografijeService"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
-import { useObavijesti } from "../../components/Obavijesti"
+import { useObavijesti } from "../../components/zajednicko/Obavijesti"
 
 export default function FotografijePregled() {
     const [searchParams, setSearchParams] = useSearchParams()

@@ -1,7 +1,7 @@
 import { Modal } from "react-bootstrap";
 import NovoPutovanje from "../../pages/putovanja/NovoPutovanje";
 import PutovanjePromjena from "../../pages/putovanja/PutovanjePromjena";
-import { useObavijesti } from "../Obavijesti";
+import { useObavijesti } from "../zajednicko/Obavijesti";
 
 export default function PutovanjeModali({
     pocetniDatumi,

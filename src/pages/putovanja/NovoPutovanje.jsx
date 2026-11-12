@@ -4,10 +4,10 @@ import { RouteNames } from "../../constants"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import DrzaveService from '../../services/drzave/DrzaveService'
 import { useEffect, useState } from "react"
-import PretragaDrzava from "../../components/PretragaDrzava"
+import PretragaDrzava from "../../components/obrasci/PretragaDrzava"
 import { FaArrowLeft, FaPlaneDeparture, FaPlus, FaTimes } from "react-icons/fa"
-import { useObavijesti } from "../../components/Obavijesti"
-import SlikaUploader from "../../components/SlikaUploader"
+import { useObavijesti } from "../../components/zajednicko/Obavijesti"
+import SlikaUploader from "../../components/obrasci/SlikaUploader"
 
 
 export default function NovoPutovanje({

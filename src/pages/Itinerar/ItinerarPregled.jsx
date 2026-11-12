@@ -5,8 +5,8 @@ import { RouteNames } from "../../constants";
 import PutovanjaService from '../../services/putovanja/PutovanjaService'
 import ItinerarService from '../../services/itinerar/ItinerarService'
 import { FaRoute, FaPlus, FaPen, FaTrash, FaClock, FaCalendarDay, FaFileWord } from "react-icons/fa";
-import { useObavijesti } from "../../components/Obavijesti";
-import { generirajItinerarWord } from "../../components/WordGenerator";
+import { useObavijesti } from "../../components/zajednicko/Obavijesti";
+import { generirajItinerarWord } from "../../components/dokumenti/WordGenerator";
 
 
 export default function ItinerarPregled() {

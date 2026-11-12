@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { Button, Form } from "react-bootstrap"
 import OdabirLokacije from "./OdabirLokacije"
-import PretragaDrzava from "../PretragaDrzava"
+import PretragaDrzava from "../obrasci/PretragaDrzava"
 import DrzaveService from "../../services/drzave/DrzaveService"
 import PretragaLokacije from "./PretragaLokacije"
 

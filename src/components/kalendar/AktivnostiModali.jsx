@@ -4,7 +4,7 @@ import ItinerarNovo from "../../pages/Itinerar/ItinerarNovo";
 import ItinerarPromjena from "../../pages/Itinerar/ItinerarPromjena";
 import ItinerarService from "../../services/itinerar/ItinerarService";
 import { useState } from "react";
-import { useObavijesti } from "../Obavijesti";
+import { useObavijesti } from "../zajednicko/Obavijesti";
 
 
 export default function AktivnostModali({

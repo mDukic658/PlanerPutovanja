@@ -5,7 +5,7 @@ import { FaArrowLeft, FaPlus } from "react-icons/fa"
 import { RouteNames } from "../../constants"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import BudzetServis from "../../services/budzet/BudzetServis"
-import { useObavijesti } from "../../components/Obavijesti"
+import { useObavijesti } from "../../components/zajednicko/Obavijesti"
 import { kategorije } from "../../services/budzet/BudzetKategorije"
 
 export default function BudzetNovo() {
