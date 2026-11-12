@@ -284,15 +284,19 @@ export default function PutovanjaDetalji() {
                                         Planirani budžet
                                     </h3>
 
-                                    <NumericFormat
-                                        value={putovanje.budzet}
-                                        displayType="text"
-                                        decimalSeparator=","
-                                        thousandSeparator="."
-                                        decimalScale={2}
-                                        fixedDecimalScale
-                                        suffix=" €"
-                                    />
+                                    <Link
+                                        to={`${RouteNames.BUDZET}?putovanjeSifra=${sifra}`}
+                                        className="budzet-poveznica">
+                                        <NumericFormat
+                                            value={putovanje.budzet}
+                                            displayType="text"
+                                            decimalSeparator=","
+                                            thousandSeparator="."
+                                            decimalScale={2}
+                                            fixedDecimalScale
+                                            suffix=" €"
+                                        />
+                                    </Link>
                                 </Card.Body>
                             </Card>
                         </Col>
