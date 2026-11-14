@@ -33,6 +33,7 @@ export default {
         dohvatiServis().getByPutovanje(putovanjeSifra),
     dodaj: (fotografija) =>
         dohvatiServis().dodaj(fotografija),
+    dodajVise: (fotografije) => dohvatiServis().dodajVise(fotografije),
     promijeni: (sifra, fotografija) =>
         dohvatiServis().promijeni(sifra, fotografija),
     obrisi: (sifra) =>

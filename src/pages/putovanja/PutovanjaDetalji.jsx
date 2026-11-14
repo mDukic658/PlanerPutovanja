@@ -420,7 +420,7 @@ export default function PutovanjaDetalji() {
                                 id="detalji-galerija"
                                 className="h4 mb-0"
                             >
-                                Galerija fotografija ({fotografije.length})
+                                Album putovanja ({fotografije.length})
                             </h3>
 
                             <Link
@@ -428,14 +428,14 @@ export default function PutovanjaDetalji() {
                                 className="btn btn-primary"
                             >
                                 <FaImages />
-                                {" "}Otvori galeriju
+                                {" "}Otvori album
                             </Link>
                         </div>
 
                         {fotografije.length === 0 ? (
                             <p>
                                 Ovo putovanje još nema fotografija.
-                                Dodaj ih kroz galeriju.
+                                Dodaj ih u album putovanja.
                             </p>
                         ) : (
                             <Row className="g-3">

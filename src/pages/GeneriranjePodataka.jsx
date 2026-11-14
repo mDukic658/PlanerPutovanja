@@ -6,6 +6,8 @@ import PredmetiService from '../services/predmeti/PredmetiService'
 import PutovanjaService from '../services/putovanja/PutovanjaService'
 import PakiranjaService from '../services/lista_pakiranja/PakiranjaService'
 import ItinerarService from "../services/itinerar/ItinerarService";
+import OperaterService from "../services/operateri/OperaterService"
+import { ShemaOperater } from "../schemas/ShemaOperater"
 import { DATA_SOURCE } from "../constants";
 
 export default function GeneriranjePodataka() {
@@ -15,6 +17,7 @@ export default function GeneriranjePodataka() {
     const [brojPutovanja, setBrojPutovanja] = useState(10)
     const [brojPakiranja, setBrojPakiranja] = useState(10)
     const [brojItinerara, setBrojItinerara] = useState(10)
+    const [brojOperatera, setBrojOperatera] = useState(5)
     const [poruka, setPoruka] = useState(null)
     const [loading, setLoading] = useState(false)
 
@@ -212,6 +215,33 @@ export default function GeneriranjePodataka() {
         }
     }
 
+    const generirajOperatere = async (broj) => {
+        if (!Number.isInteger(broj) || broj < 1 || broj > 50) {
+            throw new Error(
+                "Unesite cijeli broj operatera između 1 i 50."
+            )
+        }
+
+        for (let i = 0; i < broj; i++) {
+            const operater = ShemaOperater.parse({
+                email: `test.${faker.string.uuid()}@example.com`,
+                lozinka: "PlanerPutovanja123!",
+                uloga: faker.helpers.arrayElement([
+                    "admin",
+                    "korisnik"
+                ])
+            })
+
+            const odgovor = await OperaterService.dodaj(operater)
+
+            if (!odgovor.success) {
+                throw new Error(
+                    odgovor.message || "Dodavanje operatera nije uspjelo."
+                )
+            }
+        }
+    }
+
     const obrisiSve = async (servis, naziv) => {
         if (!window.confirm(`Jeste li sigurni da želite obrisati sve ${naziv}?`)) {
             return;
@@ -308,6 +338,7 @@ export default function GeneriranjePodataka() {
         setPoruka(null)
 
         try {
+            await generirajOperatere(brojOperatera)
             await generirajDrzave(brojDrzava)
             await generirajPredmete(brojPredmeta)
             await generirajPutovanja(brojPutovanja)
@@ -316,7 +347,7 @@ export default function GeneriranjePodataka() {
 
             setPoruka({
                 tip: 'success',
-                tekst: `Uspješno generirano: ${brojDrzava} država, ${brojPredmeta} predmeta, ${brojPutovanja} putovanja, ${brojItinerara} stavki itinerara i ${brojPakiranja} pakiranja!`
+                tekst: `Uspješno generirano:${brojOperatera} operatera, ${brojDrzava} država, ${brojPredmeta} predmeta, ${brojPutovanja} putovanja, ${brojItinerara} stavki itinerara i ${brojPakiranja} pakiranja!`
             })
         } catch (error) {
             setPoruka({
@@ -389,6 +420,14 @@ export default function GeneriranjePodataka() {
 
     const kartaGeneriranja = [
         {
+            naziv: 'Operateri',
+            broj: brojOperatera,
+            setBroj: setBrojOperatera,
+            max: 50,
+            generiraj: (broj) => generirajOperatere(broj),
+            handler: (e) => handleGeneriraj(e, generirajOperatere, brojOperatera, 'operatera')
+        },
+        {
             naziv: 'Države',
             broj: brojDrzava,
             setBroj: setBrojDrzava,
@@ -442,6 +481,11 @@ export default function GeneriranjePodataka() {
             <p className="text-muted">
                 Generirajte testne podatke s lažnim (fake) podacima na hrvatskom jeziku.
             </p>
+
+            <Alert variant="info">
+                Lozinka svih generiranih testnih operatera:
+                {" "}<strong>PlanerPutovanja123!</strong>
+            </Alert>
 
             {generiranjeZabranjeno && (
                 <Alert variant="warning">

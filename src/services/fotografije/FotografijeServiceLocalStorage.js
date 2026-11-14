@@ -95,11 +95,35 @@ async function obrisi(sifra) {
     spremiUStorage(fotografije)
 }
 
+async function dodajVise(stavke) {
+    const fotografije = dohvatiSveIzStorage()
+
+    const pocetnaSifra = fotografije.reduce(
+        (najveca, fotografija) =>
+            Math.max(najveca, fotografija.sifra),
+        0
+    ) + 1
+
+    const noveFotografije = stavke.map((fotografija, index) => ({
+        ...fotografija,
+        sifra: pocetnaSifra + index,
+        putovanjeSifra: Number(fotografija.putovanjeSifra)
+    }))
+
+    spremiUStorage([
+        ...fotografije,
+        ...noveFotografije
+    ])
+
+    return { data: noveFotografije }
+}
+
 export default {
     get,
     getBySifra,
     getByPutovanje,
     dodaj,
+    dodajVise,
     promijeni,
     obrisi
 }

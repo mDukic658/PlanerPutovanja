@@ -140,7 +140,6 @@ export default function FotografijaPromjena() {
                                 type="text"
                                 value={fotografija.naziv ?? ""}
                                 maxLength={100}
-                                required
                                 isInvalid={!!errors.naziv}
                                 onFocus={() => setErrors(prethodne => ({
                                     ...prethodne,

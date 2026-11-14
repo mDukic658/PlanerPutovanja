@@ -5,7 +5,6 @@ import { FaArrowLeft, FaPlus } from "react-icons/fa"
 import { RouteNames } from "../../constants"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import FotografijeService from "../../services/fotografije/FotografijeService"
-import SlikaUploader from "../../components/obrasci/SlikaUploader"
 import { useObavijesti } from "../../components/zajednicko/Obavijesti"
 import { ShemaNovaFotografija } from "../../schemas/ShemaFotografije"
 
@@ -18,7 +17,7 @@ export default function FotografijaNovo() {
     const [putovanjeSifra, setPutovanjeSifra] = useState(
         searchParams.get("putovanjeSifra") || ""
     )
-    const [slika, setSlika] = useState(null)
+    const [datoteke, setDatoteke] = useState([])
     const [ucitavanje, setUcitavanje] = useState(true)
     const [greska, setGreska] = useState("")
     const [spremanje, setSpremanje] = useState(false)
@@ -57,6 +56,24 @@ export default function FotografijaNovo() {
         }
     }, [])
 
+    function procitajSliku(datoteka) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader()
+
+            reader.onload = () => resolve(reader.result)
+
+            reader.onerror = () => reject(
+                new Error(`Učitavanje datoteke ${datoteka.name} nije uspjelo.`)
+            )
+
+            reader.onabort = () => reject(
+                new Error("Učitavanje slike je prekinuto.")
+            )
+
+            reader.readAsDataURL(datoteka)
+        })
+    }
+
     async function obradiSubmit(e) {
         e.preventDefault()
 
@@ -66,27 +83,43 @@ export default function FotografijaNovo() {
 
         setErrors({})
 
-        const podaci = new FormData(e.currentTarget)
-
         const rezultat = ShemaNovaFotografija.safeParse({
             putovanjeSifra,
-            naziv: String(podaci.get("naziv") || ""),
-            opis: String(podaci.get("opis") || ""),
-            slika
+            naziv: "",
+            opis: "",
+            slika: datoteke[0] || null
         })
 
         if (!rezultat.success) {
             const noveGreske = {}
 
-            rezultat.error.issues.forEach((issue) => {
-                const kljuc = issue.path[0]
+            rezultat.error.issues.forEach(issue => {
+                const polje = issue.path[0]
 
-                if (!noveGreske[kljuc]) {
-                    noveGreske[kljuc] = issue.message
+                if (!noveGreske[polje]) {
+                    noveGreske[polje] = issue.message
                 }
             })
 
             setErrors(noveGreske)
+            return
+        }
+
+        const dozvoljeniFormati = [
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+        ]
+
+        const neispravna = datoteke.find(datoteka =>
+            !dozvoljeniFormati.includes(datoteka.type) ||
+            datoteka.size > 15 * 1024 * 1024
+        )
+
+        if (neispravna) {
+            setErrors({
+                slika: `${neispravna.name}: dozvoljeni su JPG, PNG i WEBP do 15 MB po slici.`
+            })
             return
         }
 
@@ -102,7 +135,9 @@ export default function FotografijaNovo() {
         setSpremanje(true)
 
         try {
-            const odgovor = await PutovanjaService.getBySifra(sifraPutovanja)
+            const odgovor = await PutovanjaService.getBySifra(
+                sifraPutovanja
+            )
 
             if (!odgovor.data) {
                 setErrors({
@@ -111,13 +146,32 @@ export default function FotografijaNovo() {
                 return
             }
 
-            await FotografijeService.dodaj(rezultat.data)
+            const fotografije = []
 
-            obavijesti("Fotografija je dodana.")
+            for (const datoteka of datoteke) {
+                const slika = await procitajSliku(datoteka)
+
+                fotografije.push({
+                    putovanjeSifra: sifraPutovanja,
+                    naziv: "",
+                    opis: "",
+                    slika
+                })
+            }
+
+            await FotografijeService.dodajVise(fotografije)
+
+            obavijesti(`Dodano fotografija: ${fotografije.length}.`)
             navigate(povratak)
         } catch (error) {
             console.error(error)
-            obavijesti("Spremanje fotografije nije uspjelo.", "danger")
+
+            obavijesti(
+                error.name === "QuotaExceededError"
+                    ? "Nema dovoljno prostora u lokalnoj pohrani. Odaberite manje slika. Ova skupina nije spremljena."
+                    : "Spremanje fotografija nije uspjelo. Pokušajte ponovno.",
+                "danger"
+            )
         } finally {
             setSpremanje(false)
         }
@@ -127,10 +181,10 @@ export default function FotografijaNovo() {
         <section className="fotografija-novo">
             <Link to={povratak} className="natrag-na-pregled">
                 <FaArrowLeft />
-                {" "}Natrag na galeriju
+                {" "}Natrag na album
             </Link>
 
-            <h2>Dodavanje fotografije</h2>
+            <h2>Dodavanje fotografija</h2>
 
             {ucitavanje ? (
                 <p>Učitavanje...</p>
@@ -170,71 +224,52 @@ export default function FotografijaNovo() {
                             </Form.Control.Feedback>
                         </Form.Group>
 
-                        <Form.Group controlId="fotografija-naziv" className="mb-3">
-                            <Form.Label>Naziv fotografije</Form.Label>
+                        <Form.Group
+                            controlId="fotografije-datoteke"
+                            className="mb-4"
+                        >
+                            <Form.Label>Fotografije</Form.Label>
 
                             <Form.Control
-                                type="text"
-                                name="naziv"
-                                maxLength={100}
-                                required
-                                isInvalid={!!errors.naziv}
-                                onFocus={() => setErrors(prethodne => ({
-                                    ...prethodne,
-                                    naziv: ""
-                                }))}
-                            />
-
-                            <Form.Control.Feedback type="invalid">
-                                {errors.naziv}
-                            </Form.Control.Feedback>
-                        </Form.Group>
-
-                        <Form.Group controlId="fotografija-opis" className="mb-3">
-                            <Form.Label>Opis</Form.Label>
-
-                            <Form.Control
-                                as="textarea"
-                                name="opis"
-                                rows={3}
-                                maxLength={1000}
-                                isInvalid={!!errors.opis}
-                                onFocus={() => setErrors(prethodne => ({
-                                    ...prethodne,
-                                    opis: ""
-                                }))}
-                            />
-
-                            <Form.Control.Feedback type="invalid">
-                                {errors.opis}
-                            </Form.Control.Feedback>
-                        </Form.Group>
-
-                        <div className="mb-4">
-                            <p className="form-label">Fotografija</p>
-
-                            <SlikaUploader
-                                value={slika}
-                                onChange={novaSlika => {
-                                    setSlika(novaSlika)
+                                type="file"
+                                accept="image/jpeg,image/png,image/webp"
+                                multiple
+                                isInvalid={!!errors.slika}
+                                onChange={e => {
+                                    setDatoteke(Array.from(e.target.files || []))
 
                                     setErrors(prethodne => ({
                                         ...prethodne,
                                         slika: ""
                                     }))
                                 }}
+                                aria-describedby="fotografije-upute"
                             />
 
-                            {errors.slika && (
-                                <p className="text-danger mt-2 mb-0" role="alert">
-                                    {errors.slika}
-                                </p>
-                            )}
-                        </div>
+                            <Form.Control.Feedback type="invalid">
+                                {errors.slika}
+                            </Form.Control.Feedback>
 
-                        <Button type="submit">
+                            <Form.Text id="fotografije-upute">
+                                Možeš odabrati više fotografija odjednom.
+                                Dozvoljeni su JPG, PNG i WEBP do 15 MB po slici.
+                                Naziv i opis možeš dodati kasnije kroz uređivanje.
+                            </Form.Text>
+
+                            <p className="mt-2 mb-0" role="status">
+                                Odabrano fotografija: {datoteke.length}
+                            </p>
+                        </Form.Group>
+
+                        <Button
+                            type="submit"
+                            disabled={spremanje || datoteke.length === 0}
+                        >
                             <FaPlus />
-                            {" "}{spremanje ? "Spremanje..." : "Dodaj fotografiju"}
+                            {" "}
+                            {spremanje
+                                ? "Spremanje..."
+                                : `Dodaj fotografije (${datoteke.length})`}
                         </Button>
                     </fieldset>
                 </Form>

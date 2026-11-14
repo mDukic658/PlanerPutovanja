@@ -71,11 +71,30 @@ async function obrisi(sifra) {
     fotografije.splice(index, 1)
 }
 
+async function dodajVise(stavke) {
+    const pocetnaSifra = fotografije.reduce(
+        (najveca, fotografija) =>
+            Math.max(najveca, fotografija.sifra),
+        0
+    ) + 1
+
+    const noveFotografije = stavke.map((fotografija, index) => ({
+        ...fotografija,
+        sifra: pocetnaSifra + index,
+        putovanjeSifra: Number(fotografija.putovanjeSifra)
+    }))
+
+    fotografije.push(...noveFotografije)
+
+    return { data: noveFotografije }
+}
+
 export default {
     get,
     getBySifra,
     getByPutovanje,
     dodaj,
+    dodajVise,
     promijeni,
     obrisi
 }

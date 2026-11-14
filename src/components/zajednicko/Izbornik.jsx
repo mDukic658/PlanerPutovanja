@@ -26,7 +26,7 @@ export default function Izbornik() {
 
                         <Nav.Link
                             onClick={() => { navigate(RouteNames.FOTOGRAFIJE) }}>
-                            Galerija slika</Nav.Link>
+                            Albumi</Nav.Link>
 
                         <NavDropdown title="Putovanja" id='basic-nav-dropdown' >
                             <NavDropdown.Item

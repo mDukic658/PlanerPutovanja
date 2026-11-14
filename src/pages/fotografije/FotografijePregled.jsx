@@ -44,7 +44,7 @@ export default function FotografijePregled() {
                 console.error(error)
 
                 if (aktivno) {
-                    setGreska("Učitavanje galerije nije uspjelo.")
+                    setGreska("Učitavanje albuma nije uspjelo.")
                 }
             } finally {
                 if (aktivno) {
@@ -72,6 +72,22 @@ export default function FotografijePregled() {
     )
 
     const otvorenaFotografija = prikazaneFotografije[trenutniIndeks]
+
+    const albumi = putovanja
+        .map(putovanje => {
+            const slikePutovanja = fotografije.filter(
+                fotografija =>
+                    Number(fotografija.putovanjeSifra) ===
+                    Number(putovanje.sifra)
+            )
+
+            return {
+                putovanje,
+                brojFotografija: slikePutovanja.length,
+                naslovnaSlika: slikePutovanja[0]?.slika
+            }
+        })
+        .filter(album => album.brojFotografija > 0)
 
     function promijeniSliku(pomak) {
         if (trenutniIndeks === -1 || prikazaneFotografije.length === 0) {
@@ -169,7 +185,7 @@ export default function FotografijePregled() {
     }
 
     async function obrisi(fotografija) {
-        if (!confirm(`Obrisati fotografiju „${fotografija.naziv}”?`)) {
+        if (!confirm(`Obrisati fotografiju „${fotografija.naziv || "Bez naziva"}”?`)) {
             return
         }
 
@@ -224,14 +240,18 @@ export default function FotografijePregled() {
     return (
         <section className="fotografije-pregled">
             <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-                <h2 className="mb-0">Galerija fotografija</h2>
+                <h2 className="mb-0">
+                    {putovanjeSifra
+                        ? odabranoPutovanje?.naziv || "Album putovanja"
+                        : "Albumi putovanja"}
+                </h2>
 
                 <Link
                     to={poveznicaDodavanja}
                     className="btn btn-primary"
                 >
                     <FaPlus />
-                    {" "}Dodaj fotografiju
+                    {" "}Dodaj fotografije
                 </Link>
             </div>
 
@@ -331,17 +351,79 @@ export default function FotografijePregled() {
                                 className="mt-3"
                                 onClick={() => odaberiPutovanje("")}
                             >
-                                Prikaži sva putovanja
+                                Svi albumi
                             </Button>
                         )}
                     </div>
 
-                    {prikazaneFotografije.length === 0 ? (
-                        <p>
-                            {putovanjeSifra
-                                ? "Ovo putovanje još nema fotografija."
-                                : "Još nema dodanih fotografija."}
-                        </p>
+                    {!putovanjeSifra ? (
+                        albumi.length === 0 ? (
+                            <p>
+                                Još nema albuma. Dodaj fotografije nekom putovanju
+                                i njegov će se album pojaviti ovdje.
+                            </p>
+                        ) : (
+                            <Row className="g-4">
+                                {albumi.map(album => (
+                                    <Col
+                                        key={album.putovanje.sifra}
+                                        xs={12}
+                                        md={6}
+                                        lg={4}
+                                    >
+                                        <Card className="h-100 border-0 shadow-sm">
+                                            <Button
+                                                type="button"
+                                                variant="link"
+                                                className="d-block border-0 p-0 w-100"
+                                                aria-label={`Otvori album ${album.putovanje.naziv}`}
+                                                onClick={() =>
+                                                    odaberiPutovanje(album.putovanje.sifra)
+                                                }
+                                            >
+                                                <Card.Img
+                                                    variant="top"
+                                                    src={album.naslovnaSlika}
+                                                    alt={`Naslovna fotografija albuma ${album.putovanje.naziv}`}
+                                                    loading="lazy"
+                                                    style={{
+                                                        height: 220,
+                                                        objectFit: "cover"
+                                                    }}
+                                                />
+                                            </Button>
+
+                                            <Card.Body className="d-flex flex-column">
+                                                <Card.Title>
+                                                    {album.putovanje.naziv}
+                                                </Card.Title>
+
+                                                <Card.Text className="text-muted">
+                                                    {album.putovanje.destinacija},
+                                                    {" "}{album.putovanje.drzava}
+                                                </Card.Text>
+
+                                                <Card.Text>
+                                                    Fotografija: {album.brojFotografija}
+                                                </Card.Text>
+
+                                                <Button
+                                                    type="button"
+                                                    className="mt-auto align-self-start"
+                                                    onClick={() =>
+                                                        odaberiPutovanje(album.putovanje.sifra)
+                                                    }
+                                                >
+                                                    Otvori album
+                                                </Button>
+                                            </Card.Body>
+                                        </Card>
+                                    </Col>
+                                ))}
+                            </Row>
+                        )
+                    ) : prikazaneFotografije.length === 0 ? (
+                        <p>Ovo putovanje još nema fotografija.</p>
                     ) : (
                         <Row className="g-4">
                             {prikazaneFotografije.map(fotografija => (
@@ -355,13 +437,13 @@ export default function FotografijePregled() {
                                         <Button
                                             type="button"
                                             className="border-0 p-0 bg-transparent w-100"
-                                            aria-label={`Otvori fotografiju ${fotografija.naziv}`}
+                                            aria-label={`Otvori fotografiju ${fotografija.naziv || "Bez naziva"}`}
                                             onClick={() => setOtvorenaSifra(fotografija.sifra)}
                                         >
                                             <Card.Img
                                                 variant="top"
                                                 src={fotografija.slika}
-                                                alt={fotografija.naziv}
+                                                alt={fotografija.naziv || "Fotografija putovanja"}
                                                 loading="lazy"
                                                 style={{
                                                     height: 220,
@@ -372,7 +454,7 @@ export default function FotografijePregled() {
 
                                         <Card.Body className="d-flex flex-column">
                                             <Card.Title>
-                                                {fotografija.naziv}
+                                                {fotografija.naziv || "Bez naziva"}
                                             </Card.Title>
 
                                             <p className="text-muted">
@@ -427,7 +509,7 @@ export default function FotografijePregled() {
             >
                 <Modal.Header closeButton>
                     <Modal.Title>
-                        {otvorenaFotografija?.naziv}
+                        {otvorenaFotografija?.naziv || "Bez naziva"}
                     </Modal.Title>
                 </Modal.Header>
 
@@ -436,7 +518,7 @@ export default function FotografijePregled() {
                         <>
                             <img
                                 src={otvorenaFotografija.slika}
-                                alt={otvorenaFotografija.naziv}
+                                alt={otvorenaFotografija.naziv || "Fotografija putovanja"}
                                 style={{
                                     width: "100%",
                                     maxHeight: "70vh",

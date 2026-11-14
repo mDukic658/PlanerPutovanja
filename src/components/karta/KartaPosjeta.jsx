@@ -25,7 +25,10 @@ function PrilagodiPrikaz({ posjeti }) {
     return null
 }
 
-export default function KartaPosjeta({ posjeti = [] }) {
+export default function KartaPosjeta({
+    posjeti = [],
+    visina = 500
+}) {
     const posjetiSKoordinatama = posjeti.filter(
         posjet =>
             Number.isFinite(posjet.lat) &&
@@ -42,7 +45,7 @@ export default function KartaPosjeta({ posjeti = [] }) {
             zoom={4}
             scrollWheelZoom={false}
             style={{
-                height: 500,
+                height: visina,
                 width: "100%",
                 borderRadius: 12
             }}
