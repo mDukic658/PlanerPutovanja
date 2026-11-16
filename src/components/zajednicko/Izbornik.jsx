@@ -4,10 +4,12 @@ import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import { IME_APLIKACIJE, RouteNames } from '../../constants';
 import { Link, useNavigate } from 'react-router-dom';
+import useAuth from '../../hooks/useAuth';
 
 export default function Izbornik() {
 
     const navigate = useNavigate()
+    const { isLoggedIn, authUser, logout } = useAuth()
 
     return (
         <Navbar expand="lg" className="bg-body-tertiary">
@@ -55,17 +57,47 @@ export default function Izbornik() {
                             Karta posjeta
                         </Nav.Link>
 
-                        <NavDropdown title="Programi" id="basic-nav-dropdown">
-                            <NavDropdown.Item
-                                onClick={() => { navigate(RouteNames.DRZAVE) }}
-                            >Države</NavDropdown.Item>
-                            <NavDropdown.Item as={Link} to={RouteNames.OPERATERI}>
-                                Operateri
-                            </NavDropdown.Item>
-                            <NavDropdown.Item
-                                onClick={() => { navigate(RouteNames.GENERIRANJE_PODATAKA) }}
-                            >Generiranje podataka</NavDropdown.Item>
-                        </NavDropdown>
+                        {isLoggedIn && authUser.uloga === 'admin' && (
+                            <NavDropdown title="Programi" id="programi-dropdown">
+                                <NavDropdown.Item as={Link} to={RouteNames.DRZAVE}>
+                                    Države
+                                </NavDropdown.Item>
+
+                                <NavDropdown.Item as={Link} to={RouteNames.OPERATERI}>
+                                    Operateri
+                                </NavDropdown.Item>
+
+                                <NavDropdown.Item
+                                    as={Link}
+                                    to={RouteNames.GENERIRANJE_PODATAKA}
+                                >
+                                    Generiranje podataka
+                                </NavDropdown.Item>
+                            </NavDropdown>
+                        )}
+                    </Nav>
+                    <Nav className="ms-auto">
+                        {isLoggedIn ? (
+                            <NavDropdown
+                                title={authUser.email}
+                                id="korisnicki-izbornik"
+                                align="end"
+                            >
+                                <NavDropdown.ItemText>
+                                    Uloga: {authUser.uloga}
+                                </NavDropdown.ItemText>
+
+                                <NavDropdown.Divider />
+
+                                <NavDropdown.Item onClick={logout}>
+                                    Odjava
+                                </NavDropdown.Item>
+                            </NavDropdown>
+                        ) : (
+                            <Nav.Link as={Link} to={RouteNames.LOGIN}>
+                                Prijava
+                            </Nav.Link>
+                        )}
                     </Nav>
                 </Navbar.Collapse>
             </Container>

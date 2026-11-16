@@ -43,7 +43,9 @@ export const RouteNames = {
 
     FOTOGRAFIJE: '/fotografije',
     FOTOGRAFIJE_NOVO: '/fotografije/novo',
-    FOTOGRAFIJE_PROMJENA: '/fotografije/promjena/:sifra'
+    FOTOGRAFIJE_PROMJENA: '/fotografije/promjena/:sifra',
+
+    LOGIN: '/login'
 }
 
 // memorija, localStorage, firebase
