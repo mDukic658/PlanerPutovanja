@@ -7,6 +7,7 @@ import { FaArrowLeft, FaPen, FaSave, FaTimes } from "react-icons/fa";
 import { useObavijesti } from "../../components/zajednicko/Obavijesti";
 import PutovanjaService from "../../services/putovanja/PutovanjaService";
 import { kreirajShemuItinerara } from "../../schemas/ShemaItinerar";
+import RichTextEditor from "../../components/ui/RichTextEditor/RichTextEditor";
 
 export default function ItinerarPromjena({
     pocetnaSifra,
@@ -293,18 +294,25 @@ export default function ItinerarPromjena({
                         </Form.Group>
                     </Col>
 
+
                     <Col xs={12}>
-                        <Form.Group controlId="biljeska">
+                        <Form.Group>
                             <Form.Label>Bilješka</Form.Label>
-                            <Form.Control
-                                as="textarea"
-                                rows={3}
-                                name="biljeska"
+
+                            <RichTextEditor
                                 value={stavka.biljeska || ""}
-                                onChange={promijeniVrijednost}
+                                onChange={(html) => {
+                                    setStavka(stara => ({
+                                        ...stara,
+                                        biljeska: html
+                                    }))
+
+                                    ocistiGresku("biljeska")
+                                }}
                             />
                         </Form.Group>
                     </Col>
+
 
                 </Row>
 

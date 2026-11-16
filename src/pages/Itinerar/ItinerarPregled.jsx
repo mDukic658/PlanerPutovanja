@@ -7,6 +7,7 @@ import ItinerarService from '../../services/itinerar/ItinerarService'
 import { FaRoute, FaPlus, FaPen, FaTrash, FaClock, FaCalendarDay, FaFileWord } from "react-icons/fa";
 import { useObavijesti } from "../../components/zajednicko/Obavijesti";
 import { generirajItinerarWord } from "../../components/dokumenti/WordGenerator";
+import RichTextPrikaz from "../../components/ui/RichTextEditor/RichTextPrikaz";
 
 
 export default function ItinerarPregled() {
@@ -295,9 +296,9 @@ export default function ItinerarPregled() {
                                                 </Card.Title>
 
                                                 {s.biljeska && (
-                                                    <Card.Text>
-                                                        {s.biljeska}
-                                                    </Card.Text>
+                                                    <div className="itinerar-biljeska">
+                                                        <RichTextPrikaz html={s.biljeska} />
+                                                    </div>
                                                 )}
                                             </Card.Body>
 

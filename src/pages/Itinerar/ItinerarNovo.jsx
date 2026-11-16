@@ -9,6 +9,7 @@ import { Timepicker } from "timepicker-ui-react"
 import "timepicker-ui/main.css"
 import { useObavijesti } from "../../components/zajednicko/Obavijesti"
 import { kreirajShemuItinerara } from "../../schemas/ShemaItinerar"
+import RichTextEditor from "../../components/ui/RichTextEditor/RichTextEditor"
 
 
 export default function ItinerarNovo({
@@ -437,13 +438,16 @@ export default function ItinerarNovo({
                         <Form.Group controlId="biljeska">
                             <Form.Label>Bilješka</Form.Label>
 
-                            <Form.Control
-                                as="textarea"
-                                rows={3}
-                                name="biljeska"
-                                placeholder="Dodatne informacije o aktivnosti..."
+                            <RichTextEditor
                                 value={stavka.biljeska}
-                                onChange={promijeniVrijednost}
+                                onChange={(html) => {
+                                    setStavka(stara => ({
+                                        ...stara,
+                                        biljeska: html
+                                    }))
+
+                                    ocistiGresku("biljeska")
+                                }}
                                 disabled={onemoguceno}
                             />
                         </Form.Group>

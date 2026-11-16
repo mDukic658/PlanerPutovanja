@@ -1,7 +1,8 @@
 import {
     Document, Packer, Paragraph, TextRun,
     HeadingLevel, Table, TableRow, TableCell,
-    WidthType, BorderStyle, ShadingType
+    WidthType, BorderStyle, ShadingType,
+    ExternalHyperlink
 } from "docx";
 import { saveAs } from "file-saver";
 
@@ -246,12 +247,18 @@ function stvoriRedakTablice(vrijeme, naziv, biljeska) {
         children: [
             stvoriCeliju(vrijeme, 15),
             stvoriCeliju(naziv, 35),
-            stvoriCeliju(biljeska, 50)
+            stvoriCeliju(biljeska, 50, false, true)
         ]
     })
 }
 
-function stvoriCeliju(vrijednost, sirina, zaglavlje = false) {
+
+function stvoriCeliju(
+    vrijednost,
+    sirina,
+    zaglavlje = false,
+    formatiranaBiljeska = false
+) {
     const obrub = {
         style: BorderStyle.SINGLE,
         size: 1,
@@ -259,6 +266,26 @@ function stvoriCeliju(vrijednost, sirina, zaglavlje = false) {
     }
 
     const redovi = String(vrijednost ?? "").split(/\r?\n/)
+
+    const sadrzaj = formatiranaBiljeska
+        ? pretvoriBiljeskuUWord(vrijednost)
+        : [
+            new Paragraph({
+                children: redovi.map((red, index) =>
+                    new TextRun({
+                        text: red,
+                        ...(index > 0 && { break: 1 }),
+                        bold: zaglavlje,
+                        size: 22,
+                        color: zaglavlje ? "FFFFFF" : "1F2937"
+                    })
+                ),
+                spacing: {
+                    before: 80,
+                    after: 80
+                }
+            })
+        ]
 
     return new TableCell({
         width: {
@@ -288,27 +315,136 @@ function stvoriCeliju(vrijednost, sirina, zaglavlje = false) {
             right: obrub
         },
 
-        children: [
-            new Paragraph({
-                children: redovi.map((red, index) =>
-                    new TextRun({
-                        text: red,
+        children: sadrzaj
+    })
+}
 
-                        ...(index > 0 && {
-                            break: 1
-                        }),
 
-                        bold: zaglavlje,
-                        size: 22,
-                        color: zaglavlje ? "FFFFFF" : "1F2937"
+function pretvoriBiljeskuUWord(biljeska) {
+    const tekst = String(biljeska ?? "")
+
+    if (!tekst.trim() || !tekst.replace(/<[^>]*>/g, "").trim()) {
+        return [new Paragraph({ text: "—" })]
+    }
+
+    const dokument = new DOMParser().parseFromString(tekst, "text/html")
+    const rezultat = []
+
+    function obradiTekst(cvor, stil = {}) {
+        if (cvor.nodeType === 3) {
+            return cvor.textContent
+                ? [new TextRun({
+                    text: cvor.textContent,
+                    ...stil
+                })]
+                : []
+        }
+
+        if (cvor.nodeType !== 1) return []
+
+        const oznaka = cvor.tagName.toLowerCase()
+
+        if (oznaka === "br") {
+            return [new TextRun({ text: "", break: 1 })]
+        }
+
+        const noviStil = { ...stil }
+
+        if (oznaka === "strong" || oznaka === "b") {
+            noviStil.bold = true
+        }
+
+        if (oznaka === "em" || oznaka === "i") {
+            noviStil.italics = true
+        }
+
+        if (oznaka === "u") {
+            noviStil.underline = {}
+        }
+
+        if (["s", "strike", "del"].includes(oznaka)) {
+            noviStil.strike = true
+        }
+
+        const djeca = Array.from(cvor.childNodes)
+            .flatMap(dijete => obradiTekst(dijete, noviStil))
+
+        if (oznaka === "a") {
+            const href = cvor.getAttribute("href")
+
+            if (href && /^https?:\/\//i.test(href)) {
+                return [
+                    new ExternalHyperlink({
+                        link: href,
+                        children: djeca
                     })
-                ),
+                ]
+            }
+        }
 
-                spacing: {
-                    before: 80,
-                    after: 80
-                }
+        return djeca
+    }
+
+    function dodajParagraf(cvor, opcije = {}) {
+        const djeca = Array.from(cvor.childNodes)
+            .flatMap(dijete => obradiTekst(dijete))
+
+        rezultat.push(new Paragraph({
+            ...opcije,
+            children: djeca,
+            spacing: { after: 100 }
+        }))
+    }
+
+    function obradiBlok(cvor) {
+        const oznaka = cvor.tagName.toLowerCase()
+
+        if (oznaka === "ul" || oznaka === "ol") {
+            Array.from(cvor.children)
+                .filter(dijete => dijete.tagName.toLowerCase() === "li")
+                .forEach((stavka, index) => {
+                    const djeca = Array.from(stavka.childNodes)
+                        .flatMap(dijete => obradiTekst(dijete))
+
+                    rezultat.push(new Paragraph({
+                        children: [
+                            new TextRun({
+                                text: oznaka === "ol"
+                                    ? `${index + 1}. `
+                                    : "• "
+                            }),
+                            ...djeca
+                        ],
+                        indent: { left: 360 },
+                        spacing: { after: 80 }
+                    }))
+                })
+
+            return
+        }
+
+        const opcije = {}
+
+        if (oznaka === "h2") {
+            opcije.heading = HeadingLevel.HEADING_2
+        }
+
+        if (oznaka === "h3") {
+            opcije.heading = HeadingLevel.HEADING_3
+        }
+
+        dodajParagraf(cvor, opcije)
+    }
+
+    Array.from(dokument.body.children).forEach(obradiBlok)
+
+    if (rezultat.length === 0) {
+        return [
+            new Paragraph({
+                text: dokument.body.textContent || tekst
             })
         ]
-    })
+    }
+
+    return rezultat
 }
