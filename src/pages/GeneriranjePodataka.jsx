@@ -9,6 +9,15 @@ import ItinerarService from "../services/itinerar/ItinerarService";
 import OperaterService from "../services/operateri/OperaterService"
 import { ShemaOperater } from "../schemas/ShemaOperater"
 import { DATA_SOURCE } from "../constants";
+import { drzave } from '../services/drzave/DrzavePodaci'
+import { predmeti } from '../services/predmeti/PredmetiPodaci'
+import { putovanja } from '../services/putovanja/PutovanjaPodaci'
+import { pakiranja } from '../services/lista_pakiranja/PakiranjaPodaci'
+import { stavkeItinerara } from '../services/itinerar/ItinerarPodaci'
+import { troskovi } from '../services/budzet/BudzetPodaci'
+import { fotografije } from '../services/fotografije/FotografijePodaci'
+import { posjeti } from '../services/karta/KartaPodaci'
+import { operateri } from '../services/operateri/OperaterPodaci'
 
 export default function GeneriranjePodataka() {
 
@@ -474,6 +483,45 @@ export default function GeneriranjePodataka() {
         }
     ]
 
+    const handleMemorijaULocalStorage = async () => {
+        if (!window.confirm(
+            'Jeste li sigurni da želite presipati sve podatke iz memorije u localStorage? Postojeći podaci bit će zamijenjeni.'
+        )) {
+            return
+        }
+
+        setLoading(true)
+        setPoruka(null)
+
+        try {
+            localStorage.setItem('marta_drzave', JSON.stringify(drzave))
+            localStorage.setItem('marta_predmeti', JSON.stringify(predmeti))
+            localStorage.setItem('marta_putovanja', JSON.stringify(putovanja))
+            localStorage.setItem('marta_pakiranja', JSON.stringify(pakiranja))
+            localStorage.setItem('marta_itinerar', JSON.stringify(stavkeItinerara))
+            localStorage.setItem('marta_budzet', JSON.stringify(troskovi))
+            localStorage.setItem('marta_fotografije', JSON.stringify(fotografije))
+            localStorage.setItem('marta_posjecena_mjesta', JSON.stringify(posjeti))
+            localStorage.setItem('operateri', JSON.stringify(operateri))
+
+            setPoruka({
+                tip: 'success',
+                tekst: 'Podaci su uspješno presipani u localStorage!'
+            })
+        } catch (error) {
+            setPoruka({
+                tip: 'danger',
+                tekst: 'Greška pri presipavanju podataka: ' + error.message
+            })
+        } finally {
+            setLoading(false)
+        }
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        })
+    }
+
     return (
 
         <Container className="mt-4">
@@ -604,6 +652,32 @@ export default function GeneriranjePodataka() {
             <Alert variant="danger" className="mt-3">
                 <strong>Oprez!</strong> Brisanje podataka je trajna akcija i ne može se poništiti.
             </Alert>
+
+            {DATA_SOURCE === 'memorija' && (
+                <>
+                    <hr className="my-4" />
+
+                    <h3>Presipavanje podataka</h3>
+
+                    <p className="text-muted">
+                        Kopiranje podataka iz memorije u localStorage.
+                        Postojeći podaci bit će zamijenjeni.
+                    </p>
+
+                    <Row className="mt-3">
+                        <Col md={3}>
+                            <Button
+                                variant="danger"
+                                onClick={handleMemorijaULocalStorage}
+                                disabled={loading}
+                                className="w-100 mb-2"
+                            >
+                                {loading ? 'Presipavanje...' : 'Presipaj'}
+                            </Button>
+                        </Col>
+                    </Row>
+                </>
+            )}
         </Container>
 
     )
