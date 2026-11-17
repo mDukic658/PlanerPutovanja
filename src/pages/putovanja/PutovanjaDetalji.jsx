@@ -9,6 +9,9 @@ import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import ItinerarService from "../../services/itinerar/ItinerarService"
 import PakiranjaService from "../../services/lista_pakiranja/PakiranjaService"
 import FotografijeService from "../../services/fotografije/FotografijeService"
+import BudzetGrafikon from "../../components/budzet/BudzetGrafikon"
+import BudzetServis from "../../services/budzet/BudzetServis"
+import OdredistePutovanja from "../../components/karta/OdredistePutovanja"
 
 
 export default function PutovanjaDetalji() {
@@ -21,6 +24,7 @@ export default function PutovanjaDetalji() {
     const [aktivnosti, setAktivnosti] = useState([])
     const [pakiranja, setPakiranja] = useState([])
     const [fotografije, setFotografije] = useState([])
+    const [troskovi, setTroskovi] = useState([])
     const [ucitavanje, setUcitavanje] = useState(true)
     const [greska, setGreska] = useState("")
     const [otvorenaSifra, setOtvorenaSifra] = useState(null)
@@ -35,6 +39,7 @@ export default function PutovanjaDetalji() {
             setAktivnosti([])
             setPakiranja([])
             setFotografije([])
+            setTroskovi([])
             setOtvorenaSifra(null)
 
             try {
@@ -52,11 +57,13 @@ export default function PutovanjaDetalji() {
                 const [
                     odgovorAktivnosti,
                     odgovorPakiranja,
-                    odgovorFotografija
+                    odgovorFotografija,
+                    odgovorTroskova
                 ] = await Promise.all([
                     ItinerarService.get(),
                     PakiranjaService.get(),
-                    FotografijeService.getByPutovanje(sifra)
+                    FotografijeService.getByPutovanje(sifra),
+                    BudzetServis.getByPutovanje(sifra)
                 ])
 
                 if (!aktivno) {
@@ -92,6 +99,13 @@ export default function PutovanjaDetalji() {
                 )
 
                 setFotografije(odgovorFotografija.data)
+                if (odgovorTroskova.success === false) {
+                    throw new Error(
+                        odgovorTroskova.message || "Učitavanje troškova nije uspjelo."
+                    )
+                }
+
+                setTroskovi(odgovorTroskova.data)
             } catch (error) {
                 console.error(error)
 
@@ -197,6 +211,25 @@ export default function PutovanjaDetalji() {
     const itinerarPutanja =
         `${RouteNames.ITINERAR}?putovanjeSifra=${sifra}`
 
+    const planiranoCenti = Math.round(
+        Number(putovanje?.budzet || 0) * 100
+    )
+
+    const potrosenoCenti = troskovi.reduce(
+        (ukupno, trosak) =>
+            ukupno + Math.round(Number(trosak.iznos) * 100),
+        0
+    )
+
+    const preostaloCenti = planiranoCenti - potrosenoCenti
+
+    function formatirajIznos(iznos) {
+        return new Intl.NumberFormat("hr-HR", {
+            style: "currency",
+            currency: "EUR"
+        }).format(iznos)
+    }
+
     return (
         <section className="putovanje-detalji">
             <Link
@@ -301,6 +334,89 @@ export default function PutovanjaDetalji() {
                             </Card>
                         </Col>
                     </Row>
+
+                    <OdredistePutovanja
+                        key={`${sifra}-${putovanje.destinacija}-${putovanje.drzava}`}
+                        destinacija={putovanje.destinacija}
+                        drzava={putovanje.drzava}
+                    />
+
+                    <section
+                        className="mb-5"
+                        aria-labelledby="detalji-budzet"
+                    >
+                        <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+                            <h3 id="detalji-budzet" className="h4 mb-0">
+                                Budžet i troškovi
+                            </h3>
+
+                            <Link
+                                to={`${RouteNames.BUDZET}?putovanjeSifra=${sifra}`}
+                                className="btn btn-primary"
+                            >
+                                Upravljaj troškovima
+                            </Link>
+                        </div>
+
+                        <Row className="g-3 mb-4">
+                            <Col xs={12} md={4}>
+                                <Card className="h-100">
+                                    <Card.Body>
+                                        <h4 className="h6">Planirani budžet</h4>
+
+                                        <strong>
+                                            {formatirajIznos(planiranoCenti / 100)}
+                                        </strong>
+                                    </Card.Body>
+                                </Card>
+                            </Col>
+
+                            <Col xs={12} md={4}>
+                                <Card className="h-100">
+                                    <Card.Body>
+                                        <h4 className="h6">Potrošeno</h4>
+
+                                        <strong>
+                                            {formatirajIznos(potrosenoCenti / 100)}
+                                        </strong>
+                                    </Card.Body>
+                                </Card>
+                            </Col>
+
+                            <Col xs={12} md={4}>
+                                <Card
+                                    className={`h-100 ${preostaloCenti < 0 ? "border-danger" : ""
+                                        }`}
+                                >
+                                    <Card.Body>
+                                        <h4 className="h6">
+                                            {preostaloCenti < 0
+                                                ? "Prekoračenje"
+                                                : "Preostalo"}
+                                        </h4>
+
+                                        <strong
+                                            className={
+                                                preostaloCenti < 0
+                                                    ? "text-danger"
+                                                    : "text-success"
+                                            }
+                                        >
+                                            {formatirajIznos(
+                                                Math.abs(preostaloCenti) / 100
+                                            )}
+                                        </strong>
+                                    </Card.Body>
+                                </Card>
+                            </Col>
+                        </Row>
+
+                        {troskovi.length === 0 ? (
+                            <p>Ovo putovanje još nema evidentiranih troškova.</p>
+                        ) : (
+                            <BudzetGrafikon troskovi={troskovi} />
+                        )}
+                    </section>
 
                     <section
                         className="mb-5"

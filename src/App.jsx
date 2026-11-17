@@ -36,6 +36,7 @@ import OperaterPromjena from './pages/operateri/OperaterPromjena'
 import OperaterPromjenaLozinke from './pages/operateri/OperaterPromjenaLozinke'
 import Login from './pages/login/Login'
 import ZasticenaRuta from './components/ZasticenaRuta'
+import NepostojecaStranica from './pages/NepostojecaStranica'
 
 function App() {
 
@@ -98,6 +99,9 @@ function App() {
                 element={<OperaterPromjenaLozinke />}
               />
             </Route>
+
+            <Route path="*" element={<NepostojecaStranica />} />
+
           </Routes>
         </Container>
         <hr className="footer-hr" />
