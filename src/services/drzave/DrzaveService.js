@@ -2,6 +2,7 @@
 import { DATA_SOURCE } from "../../constants";
 import DrzaveServiceLocalStorage from "./DrzaveServiceLocalStorage";
 import DrzaveServiceMemorija from "./DrzaveServiceMemorija";
+import DrzaveServiceFirebase from "./DrzaveServiceFirebase";
 
 
 let Servis = null;
@@ -12,6 +13,9 @@ switch (DATA_SOURCE) {
         break;
     case 'localStorage':
         Servis = DrzaveServiceLocalStorage;
+        break;
+    case 'firebase':
+        Servis = DrzaveServiceFirebase
         break;
     default:
         Servis = null;

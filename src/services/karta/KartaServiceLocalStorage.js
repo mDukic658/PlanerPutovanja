@@ -1,14 +1,14 @@
-const STORAGE_KEY = "marta_posjecena_mjesta"
+import { PrefixStorage } from "../../constants"
 
 function dohvatiSveIzStorage() {
-    const podaci = localStorage.getItem(STORAGE_KEY)
+    const podaci = localStorage.getItem(PrefixStorage.POSJETI)
 
     return podaci ? JSON.parse(podaci) : []
 }
 
 function spremiUStorage(podaci) {
     localStorage.setItem(
-        STORAGE_KEY,
+        PrefixStorage.POSJETI,
         JSON.stringify(podaci)
     )
 }

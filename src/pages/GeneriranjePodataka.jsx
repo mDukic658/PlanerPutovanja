@@ -8,7 +8,7 @@ import PakiranjaService from '../services/lista_pakiranja/PakiranjaService'
 import ItinerarService from "../services/itinerar/ItinerarService";
 import OperaterService from "../services/operateri/OperaterService"
 import { ShemaOperater } from "../schemas/ShemaOperater"
-import { DATA_SOURCE } from "../constants";
+import { DATA_SOURCE, PrefixStorage } from "../constants";
 import { drzave } from '../services/drzave/DrzavePodaci'
 import { predmeti } from '../services/predmeti/PredmetiPodaci'
 import { putovanja } from '../services/putovanja/PutovanjaPodaci'
@@ -494,15 +494,15 @@ export default function GeneriranjePodataka() {
         setPoruka(null)
 
         try {
-            localStorage.setItem('marta_drzave', JSON.stringify(drzave))
-            localStorage.setItem('marta_predmeti', JSON.stringify(predmeti))
-            localStorage.setItem('marta_putovanja', JSON.stringify(putovanja))
-            localStorage.setItem('marta_pakiranja', JSON.stringify(pakiranja))
-            localStorage.setItem('marta_itinerar', JSON.stringify(stavkeItinerara))
-            localStorage.setItem('marta_budzet', JSON.stringify(troskovi))
-            localStorage.setItem('marta_fotografije', JSON.stringify(fotografije))
-            localStorage.setItem('marta_posjecena_mjesta', JSON.stringify(posjeti))
-            localStorage.setItem('operateri', JSON.stringify(operateri))
+            localStorage.setItem(PrefixStorage.DRZAVE, JSON.stringify(drzave))
+            localStorage.setItem(PrefixStorage.PREDMETI, JSON.stringify(predmeti))
+            localStorage.setItem(PrefixStorage.PUTOVANJA, JSON.stringify(putovanja))
+            localStorage.setItem(PrefixStorage.PAKIRANJA, JSON.stringify(pakiranja))
+            localStorage.setItem(PrefixStorage.ITINERAR, JSON.stringify(stavkeItinerara))
+            localStorage.setItem(PrefixStorage.BUDZET, JSON.stringify(troskovi))
+            localStorage.setItem(PrefixStorage.FOTOGRAFIJE, JSON.stringify(fotografije))
+            localStorage.setItem(PrefixStorage.POSJETI, JSON.stringify(posjeti))
+            localStorage.setItem(PrefixStorage.OPERATERI, JSON.stringify(operateri))
 
             setPoruka({
                 tip: 'success',

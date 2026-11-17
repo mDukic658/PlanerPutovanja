@@ -2,7 +2,7 @@
 import { DATA_SOURCE } from "../../constants";
 import KartaServiceMemorija from "./KartaServiceMemorija";
 import KartaServiceLocalStorage from "./KartaServiceLocalStorage";
-
+import KartaServiceFirebase from "./KartaServiceFirebase";
 
 let Servis = null
 
@@ -12,6 +12,9 @@ switch (DATA_SOURCE) {
         break
     case "localStorage":
         Servis = KartaServiceLocalStorage
+        break
+    case 'firebase':
+        Servis = KartaServiceFirebase
         break
     default:
         Servis = null

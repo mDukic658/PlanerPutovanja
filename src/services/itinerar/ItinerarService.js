@@ -1,6 +1,7 @@
 import { DATA_SOURCE } from '../../constants'
 import ItinerarServiceLocaleStorage from './ItinerarServiceLocalStorage'
 import ItinerarServiceMemorija from './ItinerarServiceMemorija'
+import ItinerarServiceFirebase from './ItinerarServiceFirebase'
 
 let Servis = null
 
@@ -11,6 +12,9 @@ switch (DATA_SOURCE) {
         break
     case 'localStorage':
         Servis = ItinerarServiceLocaleStorage
+        break
+    case 'firebase':
+        Servis = ItinerarServiceFirebase
         break
     default:
         Servis = null

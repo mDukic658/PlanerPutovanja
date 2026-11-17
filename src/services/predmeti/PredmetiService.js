@@ -2,6 +2,7 @@ import { DATA_SOURCE } from "../../constants"
 import PredmetiServiceLocalStorage from "./PredmetiServiceLocalStorage"
 import PredmetiServiceMemorija from "./PredmetiServiceMemorija"
 import PakiranjaService from "../lista_pakiranja/PakiranjaService"
+import PredmetiServiceFirebase from "./PredmetiServiceFirebase"
 
 let Servis = null
 
@@ -11,6 +12,9 @@ switch (DATA_SOURCE) {
         break
     case 'localStorage':
         Servis = PredmetiServiceLocalStorage
+        break
+    case 'firebase':
+        Servis = PredmetiServiceFirebase
         break
     default:
         Servis = null
@@ -38,21 +42,45 @@ const PrazanServis = {
 const AktivniServis = Servis || PrazanServis
 
 async function obrisi(sifra) {
-    const sifraPredmeta = Number(sifra)
+    const sifraPredmeta = DATA_SOURCE === 'firebase'
+        ? String(sifra)
+        : Number(sifra)
 
     const odgovor = await PakiranjaService.get()
-    const povezanaPakiranja = odgovor.data.filter(
-        pakiranje => Number(pakiranje.predmetSifra) === sifraPredmeta
-    )
 
-    for (const pakiranje of povezanaPakiranja) {
-        await PakiranjaService.obrisi(
-            pakiranje.predmetSifra,
-            pakiranje.putovanjeSifra
+    if (odgovor.success === false) {
+        throw new Error(
+            odgovor.message || 'Dohvat pakiranja nije uspio.'
         )
     }
 
-    await AktivniServis.obrisi(sifraPredmeta)
+    const povezanaPakiranja = odgovor.data.filter(
+        pakiranje =>
+            String(pakiranje.predmetSifra) === String(sifraPredmeta)
+    )
+
+    for (const pakiranje of povezanaPakiranja) {
+        const rezultat = await PakiranjaService.obrisi(
+            pakiranje.predmetSifra,
+            pakiranje.putovanjeSifra
+        )
+
+        if (rezultat?.success === false) {
+            throw new Error(
+                rezultat.message || 'Brisanje pakiranja nije uspjelo.'
+            )
+        }
+    }
+
+    const rezultat = await AktivniServis.obrisi(sifraPredmeta)
+
+    if (rezultat?.success === false) {
+        throw new Error(
+            rezultat.message || 'Brisanje predmeta nije uspjelo.'
+        )
+    }
+
+    return rezultat
 }
 
 export default {

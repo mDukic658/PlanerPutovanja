@@ -1,10 +1,10 @@
 import ItinerarService from "../itinerar/ItinerarServiceLocalStorage"
 import { provjeriTrajanjePutovanja } from "../../utils/provjeriTrajanjePutovanja"
 
-const STORAGE_KEY = 'marta_putovanja'
+import { PrefixStorage } from "../../constants"
 
 function dohvatiSveIzStorage() {
-    const podaci = localStorage.getItem(STORAGE_KEY)
+    const podaci = localStorage.getItem(PrefixStorage.PUTOVANJA)
 
     if (podaci) {
         return JSON.parse(podaci)
@@ -14,7 +14,7 @@ function dohvatiSveIzStorage() {
 }
 
 function spremiUStorage(podaci) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(podaci))
+    localStorage.setItem(PrefixStorage.PUTOVANJA, JSON.stringify(podaci))
 }
 
 async function get() {

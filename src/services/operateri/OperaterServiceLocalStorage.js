@@ -1,16 +1,16 @@
 import bcrypt from 'bcryptjs'
-const STORAGE_KEY='operateri'
+import { PrefixStorage } from '../../constants'
 
 
 // Pomoćna funkcija za dohvaćanje podataka iz local storage-a
 function dohvatiSveIzStorage() {
-    const podaci = localStorage.getItem(STORAGE_KEY)
+    const podaci = localStorage.getItem(PrefixStorage.OPERATERI)
     return podaci ? JSON.parse(podaci) : []
 }
 
 // Pomoćna funkcija za spremanje podataka
 function spremiUStorage(podaci) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(podaci))
+    localStorage.setItem(PrefixStorage.OPERATERI, JSON.stringify(podaci))
 }
 
 // 1/4 Read - dohvati sve

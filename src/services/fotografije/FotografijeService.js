@@ -1,6 +1,7 @@
 import { DATA_SOURCE } from "../../constants"
 import FotografijeServiceMemorija from "./FotografijeServiceMemorija"
 import FotografijeServiceLocalStorage from "./FotografijeServiceLocalStorage"
+import FotografijeServiceFirebase from "./FotografijeServiceFirebase"
 
 let Servis = null
 
@@ -11,6 +12,9 @@ switch (DATA_SOURCE) {
 
     case "localStorage":
         Servis = FotografijeServiceLocalStorage
+        break
+    case 'firebase':
+        Servis = FotografijeServiceFirebase
         break
 
     default:

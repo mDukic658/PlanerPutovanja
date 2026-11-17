@@ -22,7 +22,7 @@ export function provjeriTrajanjePutovanja(putovanje, aktivnosti) {
     ) + 1
 
     const izvanTrajanja = aktivnosti.some(aktivnost =>
-        Number(aktivnost.putovanjeSifra) === Number(putovanje.sifra) &&
+        String(aktivnost.putovanjeSifra) === String(putovanje.sifra) &&
         Number(aktivnost.dan) > brojDana
     )
 
