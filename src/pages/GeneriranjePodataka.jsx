@@ -18,6 +18,15 @@ import { troskovi } from '../services/budzet/BudzetPodaci'
 import { fotografije } from '../services/fotografije/FotografijePodaci'
 import { posjeti } from '../services/karta/KartaPodaci'
 import { operateri } from '../services/operateri/OperaterPodaci'
+import OperaterServiceFirebase from "../services/operateri/OperaterServiceFirebase";
+import DrzaveServiceFirebase from "../services/drzave/DrzaveServiceFirebase";
+import KartaServiceFirebase from "../services/karta/KartaServiceFirebase";
+import PredmetiServiceFirebase from "../services/predmeti/PredmetiServiceFirebase";
+import PutovanjaServiceFirebase from "../services/putovanja/PutovanjaServiceFirebase";
+import BudzetServiceFirebase from "../services/budzet/BudzetServiceFirebase";
+import ItinerarServiceFirebase from "../services/itinerar/ItinerarServiceFirebase";
+import PakiranjaServiceFirebase from "../services/lista_pakiranja/PakiranjaServiceFirebase";
+import FotografijeServiceFirebase from "../services/fotografije/FotografijeServiceFirebase";
 
 export default function GeneriranjePodataka() {
 
@@ -522,6 +531,139 @@ export default function GeneriranjePodataka() {
         })
     }
 
+    const handleMemorijaUFirebase = async () => {
+    if (!window.confirm('Jeste li sigurni da želite pretočiti iz memorije u firebase?')) {
+        return;
+    }
+
+    console.log('Krećem')
+
+    setLoading(true);
+    setPoruka(null);
+
+    try {
+        // 1. Samostalni entiteti (ne trebamo njihove nove ID-ove za vanjske ključeve)
+        const operateriPromises = operateri.map(e => {
+            const { sifra, ...ostatak } = e;
+            return OperaterServiceFirebase.dodajBezHash(ostatak);
+        });
+        await Promise.all(operateriPromises);
+
+        console.log('Operateri gotovi')
+
+        // Države idu u batch-evima ili paralelno (195 komada)
+        const drzavePromises = drzave.map(e => {
+            const { sifra, ...ostatak } = e;
+            return DrzaveServiceFirebase.dodaj(ostatak);
+        });
+        await Promise.all(drzavePromises);
+
+        console.log('Države gotovi')
+
+        const posjetiPromises = posjeti.map(e => {
+            const { sifra, ...ostatak } = e;
+            return KartaServiceFirebase.dodaj(ostatak);
+        });
+        await Promise.all(posjetiPromises);
+
+        console.log('Karte gotovi')
+
+        // 2. Predmeti (trebamo nove ID-ove za pakiranja)
+        const mapiranjeSifriPredmeta = [];
+        for (const e of predmeti) {
+            const { sifra, ...ostatak } = e;
+            const fb = await PredmetiServiceFirebase.dodaj(ostatak);
+            const noviId = fb.id; // ili fb.data.sifra ovisno o implementaciji servisa
+            mapiranjeSifriPredmeta.push({ sifram: sifra, sifraf: noviId });
+        }
+
+        console.log('Predmeti gotovi')
+
+
+        // 3. Putovanja (trebamo nove ID-ove za troškove, stavke itinerara i pakiranja)
+        const mapiranjeSifriPutovanja = [];
+        for (const e of putovanja) {
+            const { sifra, ...ostatak } = e;
+            const fb = await PutovanjaServiceFirebase.dodaj(ostatak);
+            const noviId = fb.id; // ili fb.data.sifra ovisno o implementaciji servisa
+            mapiranjeSifriPutovanja.push({ sifram: sifra, sifraf: noviId });
+        }
+
+        console.log('Putovanja gotovi')
+
+
+        // 4. Troškovi (povezivanje putovanjeSifra s novim Firebase ID-om putovanja)
+        const troskoviPromises = troskovi.map(e => {
+            const { sifra, ...ostatak } = e;
+            const mPutovanje = mapiranjeSifriPutovanja.find(m => m.sifram == ostatak.putovanjeSifra);
+            ostatak.putovanjeSifra = mPutovanje ? mPutovanje.sifraf : null;
+            return BudzetServiceFirebase.dodaj(ostatak);
+        });
+        await Promise.all(troskoviPromises);
+
+        console.log('Budžet gotovi')
+
+
+        // 5. Stavke itinerara (povezivanje putovanjeSifra s novim Firebase ID-om putovanja)
+        const stavkePromises = stavkeItinerara.map(e => {
+            const { sifra, ...ostatak } = e;
+            const mPutovanje = mapiranjeSifriPutovanja.find(m => m.sifram == ostatak.putovanjeSifra);
+            ostatak.putovanjeSifra = mPutovanje ? mPutovanje.sifraf : null;
+            return ItinerarServiceFirebase.dodaj(ostatak);
+        });
+        await Promise.all(stavkePromises);
+
+        console.log('Itinerar gotovi')
+
+
+        // 6. Pakiranja (vezna tablica: povezivanje predmetSifra i putovanjeSifra)
+        const pakiranjaPromises = pakiranja.map(e => {
+            const ostatak = { ...e };
+            
+            const mPredmet = mapiranjeSifriPredmeta.find(m => m.sifram == ostatak.predmetSifra);
+            ostatak.predmetSifra = mPredmet ? mPredmet.sifraf : null;
+
+            const mPutovanje = mapiranjeSifriPutovanja.find(m => m.sifram == ostatak.putovanjeSifra);
+            ostatak.putovanjeSifra = mPutovanje ? mPutovanje.sifraf : null;
+
+            return PakiranjaServiceFirebase.dodaj(ostatak);
+        });
+        await Promise.all(pakiranjaPromises);
+
+        console.log('Pakiranja gotovi')
+
+
+        // 7. Fotografije (ako u budućnosti bude zapisa s putovanjeSifra ili posjetSifra)
+        if (fotografije && fotografije.length > 0) {
+            const fotografijePromises = fotografije.map(e => {
+                const { sifra, ...ostatak } = e;
+                if (ostatak.putovanjeSifra) {
+                    const mPutovanje = mapiranjeSifriPutovanja.find(m => m.sifram == ostatak.putovanjeSifra);
+                    ostatak.putovanjeSifra = mPutovanje ? mPutovanje.sifraf : null;
+                }
+                return FotografijeServiceFirebase.dodaj(ostatak);
+            });
+            await Promise.all(fotografijePromises);
+        }
+
+        console.log('Fotografije gotovi')
+
+        setPoruka({
+            tip: 'success',
+            tekst: 'Uspješno presipano u Firebase'
+        });
+
+    } catch (error) {
+        console.error("Greška pri presipanju:", error);
+        setPoruka({
+            tip: 'error',
+            tekst: 'Došlo je do greške prilikom sinkronizacije.'
+        });
+    } finally {
+        setLoading(false);
+    }
+};
+
     return (
 
         <Container className="mt-4">
@@ -672,7 +814,17 @@ export default function GeneriranjePodataka() {
                                 disabled={loading}
                                 className="w-100 mb-2"
                             >
-                                {loading ? 'Presipavanje...' : 'Presipaj'}
+                                {loading ? 'Presipavanje...' : 'Presipaj iz memorije u localStorage'}
+                            </Button>
+                        </Col>
+                        <Col md={3}>
+                            <Button
+                                variant="danger"
+                                onClick={handleMemorijaUFirebase}
+                                disabled={loading}
+                                className="w-100 mb-2"
+                            >
+                                {loading ? 'Presipavanje...' : 'Presipaj iz memorije u firebase'}
                             </Button>
                         </Col>
                     </Row>
