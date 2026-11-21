@@ -161,7 +161,7 @@ export default function ListaPakiranja() {
 
     const odabranoPutovanje = params.sifra
         ? putovanja.find(
-            p => Number(p.sifra) === Number(params.sifra)
+            p => p.sifra === params.sifra
         )
         : null
 

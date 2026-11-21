@@ -49,7 +49,7 @@ export const RouteNames = {
 }
 
 // memorija, localStorage, firebase
-export const DATA_SOURCE = 'memorija'
+export const DATA_SOURCE = 'firebase'
 
 export const PrefixStorage = {
     DRZAVE: 'e31.drzave',

@@ -107,7 +107,7 @@ export default function UrediListuPakiranja() {
                 <div className="pakiranja-stavke">
                     {pakiranja
                         .filter((pakiranje) =>
-                            pakiranje.putovanjeSifra === parseInt(params.sifra)
+                            pakiranje.putovanjeSifra === params.sifra
                         )
                         .map((pakiranje) => (
                             <div
@@ -152,7 +152,7 @@ export default function UrediListuPakiranja() {
                 </div>
 
                 {!pakiranja.some((pakiranje) =>
-                    pakiranje.putovanjeSifra === parseInt(params.sifra)
+                    pakiranje.putovanjeSifra === params.sifra
                 ) && (
                         <p className="pakiranja-prazno">
                             Lista je prazna. Dodaj prvi predmet ispod.
@@ -166,7 +166,7 @@ export default function UrediListuPakiranja() {
                     </h4>
 
                     <NovoPakiranje
-                        putovanjeSifra={parseInt(params.sifra)}
+                        putovanjeSifra={params.sifra}
                         ucitajPakiranja={ucitajPakiranja}
                     />
                 </div>
