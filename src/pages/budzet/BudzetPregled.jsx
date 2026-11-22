@@ -8,6 +8,7 @@ import BudzetServis from "../../services/budzet/BudzetServis"
 import FormatDatuma from "../../components/zajednicko/FormatDatuma"
 import { useObavijesti } from "../../components/zajednicko/Obavijesti"
 import BudzetGrafikon from "../../components/budzet/BudzetGrafikon";
+import PotvrdaBrisanja from "../../components/zajednicko/PotvrdaBrisanja";
 
 function formatirajIznos(iznos) {
     return new Intl.NumberFormat("hr-HR", {
@@ -28,6 +29,7 @@ export default function BudzetPregled() {
     const [ucitavanje, setUcitavanje] = useState(true)
     const [greska, setGreska] = useState("")
     const [brisanjeSifra, setBrisanjeSifra] = useState(null)
+    const [trosakZaBrisanje, setTrosakZaBrisanje] = useState(null)
 
     const obavijesti = useObavijesti()
 
@@ -115,10 +117,6 @@ export default function BudzetPregled() {
             return
         }
 
-        if (!confirm(`Obrisati trošak „${trosak.naziv}”?`)) {
-            return
-        }
-
         setBrisanjeSifra(trosak.sifra)
 
         try {
@@ -140,6 +138,7 @@ export default function BudzetPregled() {
             obavijesti("Brisanje troška nije uspjelo.", "danger")
         } finally {
             setBrisanjeSifra(null)
+            setTrosakZaBrisanje(null)
         }
     }
 
@@ -389,7 +388,7 @@ export default function BudzetPregled() {
                                                             type="button"
                                                             variant="outline-danger"
                                                             disabled={brisanjeSifra !== null}
-                                                            onClick={() => obrisi(trosak)}
+                                                            onClick={() => setTrosakZaBrisanje(trosak)}
                                                         >
                                                             <FaTrash />
                                                             {" "}
@@ -408,6 +407,19 @@ export default function BudzetPregled() {
                     )}
                 </>
             )}
+
+            <PotvrdaBrisanja
+                otvoreno={trosakZaBrisanje !== null}
+                naslov="Brisanje troška"
+                brisanjeUTijeku={brisanjeSifra !== null}
+                onOdustani={() => setTrosakZaBrisanje(null)}
+                onPotvrdi={() => {
+                    if (trosakZaBrisanje) obrisi(trosakZaBrisanje)
+                }}
+            >
+                Želiš li obrisati trošak „{trosakZaBrisanje?.naziv}”?
+            </PotvrdaBrisanja>
+
         </section>
     )
 

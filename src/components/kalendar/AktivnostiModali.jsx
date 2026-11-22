@@ -5,7 +5,8 @@ import ItinerarPromjena from "../../pages/Itinerar/ItinerarPromjena";
 import ItinerarService from "../../services/itinerar/ItinerarService";
 import { useState } from "react";
 import { useObavijesti } from "../zajednicko/Obavijesti";
-
+import PotvrdaBrisanja from "../zajednicko/PotvrdaBrisanja";
+import RichTextPrikaz from "../ui/RichTextEditor/RichTextPrikaz";
 
 export default function AktivnostModali({
     putovanjeZaAktivnost,
@@ -19,6 +20,7 @@ export default function AktivnostModali({
 
     const [aktivnostZaUredivanje, setAktivnostZaUredivanje] = useState(null)
     const [brisanjeAktivnosti, setBrisanjeAktivnosti] = useState(false)
+    const [potvrdaBrisanjaOtvorena, setPotvrdaBrisanjaOtvorena] = useState(false)
 
 
     function urediOdabranuAktivnost() {
@@ -50,39 +52,35 @@ export default function AktivnostModali({
     async function obrisiOdabranuAktivnost() {
         if (!odabranaAktivnost || brisanjeAktivnosti) return
 
-        const stavka = odabranaAktivnost.stavka
-
-        if (!window.confirm(
-            `Želite li obrisati aktivnost "${stavka.naziv}"?`
-        )) {
-            return
-        }
-
+        const { sifra } = odabranaAktivnost.stavka
         setBrisanjeAktivnosti(true)
 
         try {
-            await ItinerarService.obrisi(stavka.sifra)
+            const odgovor = await ItinerarService.obrisi(sifra)
+
+            if (odgovor?.success === false) {
+                throw new Error(odgovor.message)
+            }
         } catch (error) {
             console.error(error)
             obavijesti("Brisanje aktivnosti nije uspjelo.", "danger")
-            setBrisanjeAktivnosti(false)
             return
+        } finally {
+            setBrisanjeAktivnosti(false)
         }
 
         onZatvoriDetalje()
+        setPotvrdaBrisanjaOtvorena(false)
         obavijesti("Aktivnost je obrisana.")
 
         try {
             await onPromjena()
         } catch (error) {
             console.error(error)
-
             obavijesti(
                 "Aktivnost je obrisana, ali osvježavanje kalendara nije uspjelo.",
                 "danger"
             )
-        } finally {
-            setBrisanjeAktivnosti(false)
         }
     }
 
@@ -142,7 +140,7 @@ export default function AktivnostModali({
 
             <Modal
                 className="kalendar-modal"
-                show={odabranaAktivnost !== null}
+                show={odabranaAktivnost !== null && !potvrdaBrisanjaOtvorena}
                 onHide={() => {
                     if (!brisanjeAktivnosti) {
                         zatvoriDetaljeAktivnosti()
@@ -181,10 +179,10 @@ export default function AktivnostModali({
                             </p>
 
                             {odabranaAktivnost.stavka.biljeska && (
-                                <p style={{ whiteSpace: "pre-wrap" }}>
-                                    <strong>Bilješka: </strong>
-                                    {odabranaAktivnost.stavka.biljeska}
-                                </p>
+                                <div>
+                                    <strong>Bilješka:</strong>
+                                    <RichTextPrikaz html={odabranaAktivnost.stavka.biljeska} />
+                                </div>
                             )}
                         </>
                     )}
@@ -203,7 +201,7 @@ export default function AktivnostModali({
                     <Button
                         type="button"
                         variant="danger"
-                        onClick={obrisiOdabranuAktivnost}
+                        onClick={() => setPotvrdaBrisanjaOtvorena(true)}
                         disabled={brisanjeAktivnosti}
                     >
                         {brisanjeAktivnosti ? "Brisanje..." : "Obriši"}
@@ -235,6 +233,17 @@ export default function AktivnostModali({
                     )}
                 </Modal.Body>
             </Modal>
+
+            <PotvrdaBrisanja
+                otvoreno={odabranaAktivnost !== null && potvrdaBrisanjaOtvorena}
+                naslov="Brisanje aktivnosti"
+                brisanjeUTijeku={brisanjeAktivnosti}
+                onOdustani={() => setPotvrdaBrisanjaOtvorena(false)}
+                onPotvrdi={obrisiOdabranuAktivnost}
+            >
+                Želiš li obrisati aktivnost „{odabranaAktivnost?.stavka.naziv}”?
+            </PotvrdaBrisanja>
+
         </>
     )
 

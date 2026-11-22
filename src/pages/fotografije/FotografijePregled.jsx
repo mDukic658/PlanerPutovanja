@@ -6,6 +6,7 @@ import { RouteNames } from "../../constants"
 import FotografijeService from "../../services/fotografije/FotografijeService"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import { useObavijesti } from "../../components/zajednicko/Obavijesti"
+import PotvrdaBrisanja from "../../components/zajednicko/PotvrdaBrisanja"
 
 export default function FotografijePregled() {
     const [searchParams, setSearchParams] = useSearchParams()
@@ -19,6 +20,8 @@ export default function FotografijePregled() {
     const [pretragaPutovanje, setPretragaPutovanje] = useState("")
     const [prikaziAutocomplete, setPrikaziAutocomplete] = useState(false)
     const [odabraniIndex, setOdabraniIndex] = useState(-1)
+    const [fotografijaZaBrisanje, setFotografijaZaBrisanje] = useState(null)
+    const [brisanjeUTijeku, setBrisanjeUTijeku] = useState(false)
 
     const obavijesti = useObavijesti()
 
@@ -185,23 +188,26 @@ export default function FotografijePregled() {
     }
 
     async function obrisi(fotografija) {
-        if (!confirm(`Obrisati fotografiju „${fotografija.naziv || "Bez naziva"}”?`)) {
+        if (brisanjeUTijeku) {
             return
         }
+
+        setBrisanjeUTijeku(true)
 
         try {
             await FotografijeService.obrisi(fotografija.sifra)
 
             setFotografije(prethodne =>
-                prethodne.filter(
-                    stavka => stavka.sifra !== fotografija.sifra
-                )
+                prethodne.filter(stavka => stavka.sifra !== fotografija.sifra)
             )
 
+            setFotografijaZaBrisanje(null)
             obavijesti("Fotografija je obrisana.")
         } catch (error) {
             console.error(error)
             obavijesti("Brisanje fotografije nije uspjelo.", "danger")
+        } finally {
+            setBrisanjeUTijeku(false)
         }
     }
 
@@ -485,7 +491,7 @@ export default function FotografijePregled() {
 
                                                 <Button
                                                     variant="outline-danger"
-                                                    onClick={() => obrisi(fotografija)}
+                                                    onClick={() => setFotografijaZaBrisanje(fotografija)}
                                                 >
                                                     <FaTrash />
                                                     {" "}Izbriši
@@ -559,6 +565,18 @@ export default function FotografijePregled() {
                     </Button>
                 </Modal.Footer>
             </Modal>
+
+            <PotvrdaBrisanja
+                otvoreno={fotografijaZaBrisanje !== null}
+                naslov="Brisanje fotografije"
+                brisanjeUTijeku={brisanjeUTijeku}
+                onOdustani={() => setFotografijaZaBrisanje(null)}
+                onPotvrdi={() => {
+                    if (fotografijaZaBrisanje) obrisi(fotografijaZaBrisanje)
+                }}
+            >
+                Želiš li obrisati fotografiju „{fotografijaZaBrisanje?.naziv || "Bez naziva"}”?
+            </PotvrdaBrisanja>
 
         </section>
     )

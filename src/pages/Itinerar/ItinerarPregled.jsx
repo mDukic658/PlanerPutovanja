@@ -8,6 +8,7 @@ import { FaRoute, FaPlus, FaPen, FaTrash, FaClock, FaCalendarDay, FaFileWord } f
 import { useObavijesti } from "../../components/zajednicko/Obavijesti";
 import { generirajItinerarWord } from "../../components/dokumenti/WordGenerator";
 import RichTextPrikaz from "../../components/ui/RichTextEditor/RichTextPrikaz";
+import PotvrdaBrisanja from "../../components/zajednicko/PotvrdaBrisanja";
 
 
 export default function ItinerarPregled() {
@@ -18,6 +19,8 @@ export default function ItinerarPregled() {
     const [odabranoPutovanje, setOdabranoPutovanje] = useState({})
     const [pretragaPutovanje, setPretragaPutovanje] = useState('')
     const [generiranjeWorda, setGeneriranjeWorda] = useState(false)
+    const [aktivnostZaBrisanje, setAktivnostZaBrisanje] = useState(null)
+    const [brisanjeAktivnosti, setBrisanjeAktivnosti] = useState(false)
 
     const obavijesti = useObavijesti()
     const navigate = useNavigate()
@@ -68,15 +71,28 @@ export default function ItinerarPregled() {
         })
     }
 
-    async function obrisi(sifra) {
-        if (!confirm('Sigurno obrisati?')) {
-            return
+    async function obrisi() {
+        if (!aktivnostZaBrisanje || brisanjeAktivnosti) return
+
+        const { sifra } = aktivnostZaBrisanje
+        setBrisanjeAktivnosti(true)
+
+        try {
+            const odgovor = await ItinerarService.obrisi(sifra)
+
+            if (odgovor?.success === false) {
+                throw new Error(odgovor.message)
+            }
+
+            setStavke(prethodne => prethodne.filter(stavka => stavka.sifra !== sifra))
+            setAktivnostZaBrisanje(null)
+            obavijesti("Aktivnost je obrisana.")
+        } catch (error) {
+            console.error(error)
+            obavijesti("Brisanje aktivnosti nije uspjelo.", "danger")
+        } finally {
+            setBrisanjeAktivnosti(false)
         }
-
-        await ItinerarService.obrisi(sifra)
-        ucitajStavke()
-
-        obavijesti("Aktivnost je obrisana")
     }
 
     async function generirajWord() {
@@ -265,7 +281,7 @@ export default function ItinerarPregled() {
                                                 <Button
                                                     size="sm"
                                                     variant="danger"
-                                                    onClick={() => obrisi(s.sifra)}
+                                                    onClick={() => setAktivnostZaBrisanje(s)}
                                                 >
                                                     <FaTrash />
                                                     Izbriši
@@ -298,6 +314,16 @@ export default function ItinerarPregled() {
                     </Badge>
                 </div>
             )}
+
+            <PotvrdaBrisanja
+                otvoreno={aktivnostZaBrisanje !== null}
+                naslov="Brisanje aktivnosti"
+                brisanjeUTijeku={brisanjeAktivnosti}
+                onOdustani={() => setAktivnostZaBrisanje(null)}
+                onPotvrdi={obrisi}
+            >
+                Želiš li obrisati aktivnost „{aktivnostZaBrisanje?.naziv}”?
+            </PotvrdaBrisanja>
 
         </section>
 
