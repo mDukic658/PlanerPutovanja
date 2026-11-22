@@ -42,6 +42,12 @@ export default function BudzetPregled() {
                         BudzetServis.get()
                     ])
 
+                if (odgovorPutovanja.success === false || odgovorTroskova.success === false) {
+                    throw new Error(
+                        odgovorPutovanja.message || odgovorTroskova.message
+                    )
+                }
+
                 if (aktivno) {
                     setPutovanja(odgovorPutovanja.data)
                     setTroskovi(odgovorTroskova.data)
@@ -67,7 +73,7 @@ export default function BudzetPregled() {
     }, [])
 
     const odabranoPutovanje = putovanja.find(
-        putovanje => Number(putovanje.sifra) === Number(putovanjeSifra)
+        putovanje => String(putovanje.sifra) === String(putovanjeSifra)
     )
 
     const filtriranaPutovanja = [...putovanja]
@@ -78,12 +84,12 @@ export default function BudzetPregled() {
     const prikazaniTroskovi = troskovi
         .filter(
             trosak =>
-                Number(trosak.putovanjeSifra) === Number(putovanjeSifra)
+                String(trosak.putovanjeSifra) === String(putovanjeSifra)
         )
         .sort(
             (a, b) =>
                 String(b.datum).localeCompare(String(a.datum)) ||
-                Number(b.sifra) - Number(a.sifra)
+                String(b.sifra).localeCompare(String(a.sifra), "hr", { numeric: true })
         )
 
     const planiranoCenti = Math.round(
@@ -116,7 +122,11 @@ export default function BudzetPregled() {
         setBrisanjeSifra(trosak.sifra)
 
         try {
-            await BudzetServis.obrisi(trosak.sifra)
+            const odgovorBrisanja = await BudzetServis.obrisi(trosak.sifra)
+
+            if (odgovorBrisanja?.success === false) {
+                throw new Error(odgovorBrisanja.message)
+            }
 
             setTroskovi(prethodni =>
                 prethodni.filter(
@@ -167,8 +177,29 @@ export default function BudzetPregled() {
                                 }
                             }}
                             onKeyDown={e => {
+                                const polje = e.currentTarget.querySelector('input[type="search"]')
+
                                 if (e.key === "Escape") {
+                                    polje?.focus()
                                     setPrikaziPrijedloge(false)
+                                    return
+                                }
+
+                                if (e.key !== "ArrowDown" && e.key !== "ArrowUp") {
+                                    return
+                                }
+
+                                const prijedlozi = [
+                                    ...e.currentTarget.querySelectorAll(".itinerar-prijedlog")
+                                ]
+                                const trenutni = prijedlozi.indexOf(e.target)
+                                const sljedeci = e.key === "ArrowDown"
+                                    ? prijedlozi[trenutni + 1]
+                                    : trenutni === 0 ? polje : prijedlozi[trenutni - 1]
+
+                                if (sljedeci) {
+                                    e.preventDefault()
+                                    sljedeci.focus()
                                 }
                             }}
                         >

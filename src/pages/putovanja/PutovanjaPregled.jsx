@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import { Button, Badge, Card, Col, Row, Pagination, InputGroup, Form } from "react-bootstrap"
 import { Link, useNavigate, useSearchParams } from "react-router-dom"
@@ -7,10 +7,14 @@ import { BsSuitcase2Fill } from "react-icons/bs"
 import { FaPlus, FaPen, FaTrash, FaCamera, FaSearch } from "react-icons/fa"
 import { useObavijesti } from "../../components/zajednicko/Obavijesti"
 import PotvrdaBrisanjaPutovanja from "../../components/zajednicko/PotvrdaBrisanjaPutovanja"
+import IndikatorUcitavanja from "../../components/zajednicko/IndikatorUcitavanja"
 
 export default function PutovanjePregled() {
 
     const [putovanja, setPutovanja] = useState([])
+    const [ucitavanje, setUcitavanje] = useState(true)
+    const [greskaDohvata, setGreskaDohvata] = useState(false)
+    const zadnjiDohvat = useRef(0)
     const [putovanjeZaBrisanje, setPutovanjeZaBrisanje] = useState(null)
     const [brisanjeUTijeku, setBrisanjeUTijeku] = useState(false)
     const [ukupnoStranica, setUkupnoStranica] = useState(0)
@@ -44,15 +48,36 @@ export default function PutovanjePregled() {
     }, [trenutnaStranica, uvjetPretrazivanja])
 
     async function ucitajPutovanja(stranica) {
-        const odgovor = await PutovanjaService.dohvatiStranicu(
-            stranica,
-            velicinaStranice,
-            uvjetPretrazivanja
-        )
+        const brojDohvata = ++zadnjiDohvat.current
+        setUcitavanje(true)
+        setGreskaDohvata(false)
 
-        setPutovanja(odgovor.data)
-        setUkupnoStranica(odgovor.ukupnoStranica)
-        setUkupnoStavki(odgovor.ukupnoStavki)
+        try {
+            const odgovor = await PutovanjaService.dohvatiStranicu(
+                stranica,
+                velicinaStranice,
+                uvjetPretrazivanja
+            )
+
+            if (brojDohvata !== zadnjiDohvat.current) return
+
+            if (odgovor.success === false) {
+                throw new Error(odgovor.message)
+            }
+
+            setPutovanja(odgovor.data)
+            setUkupnoStranica(odgovor.ukupnoStranica)
+            setUkupnoStavki(odgovor.ukupnoStavki)
+        } catch (error) {
+            if (brojDohvata !== zadnjiDohvat.current) return
+
+            setGreskaDohvata(true)
+            throw error
+        } finally {
+            if (brojDohvata === zadnjiDohvat.current) {
+                setUcitavanje(false)
+            }
+        }
     }
 
     function promijeniStranicu(stranica) {
@@ -147,7 +172,11 @@ export default function PutovanjePregled() {
                 />
             </InputGroup>
 
-            {putovanja.length === 0 ? (
+            {ucitavanje ? (
+                <IndikatorUcitavanja poruka="Učitavanje putovanja..." />
+            ) : greskaDohvata ? (
+                <p role="alert">Učitavanje putovanja nije uspjelo.</p>
+            ) : putovanja.length === 0 ? (
                 <p className="putovanja-prazno">
                     {uvjetPretrazivanja.trim()
                         ? "Nema putovanja koja odgovaraju pretrazi."
@@ -237,7 +266,7 @@ export default function PutovanjePregled() {
                 </Row>
             )}
 
-            {ukupnoStranica > 1 && (
+            {!ucitavanje && !greskaDohvata && ukupnoStranica > 1 && (
                 <nav
                     className="mt-4"
                 >

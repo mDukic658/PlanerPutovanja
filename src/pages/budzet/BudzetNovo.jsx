@@ -35,9 +35,9 @@ export default function BudzetNovo() {
             setPutovanje(null)
 
             try {
-                const sifra = Number(putovanjeSifra)
+                const sifra = putovanjeSifra.trim()
 
-                if (!Number.isSafeInteger(sifra) || sifra <= 0) {
+                if (!sifra) {
                     if (aktivno) {
                         setGreska("Prvo odaberi putovanje na pregledu budžeta.")
                     }
@@ -124,10 +124,14 @@ export default function BudzetNovo() {
                 return
             }
 
-            await BudzetServis.dodaj({
+            const odgovorSpremanja = await BudzetServis.dodaj({
                 ...rezultat.data,
-                putovanjeSifra: Number(putovanje.sifra)
+                putovanjeSifra: putovanje.sifra
             })
+
+            if (odgovorSpremanja?.success === false) {
+                throw new Error(odgovorSpremanja.message)
+            }
 
             obavijesti("Trošak je dodan.")
             navigate(povratak)

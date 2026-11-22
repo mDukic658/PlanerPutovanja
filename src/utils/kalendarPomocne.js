@@ -12,7 +12,7 @@ export function pretvoriDatum(vrijednost) {
 export function dohvatiNapredakPakiranja(pakiranja, putovanjeSifra) {
     const stavke = pakiranja.filter(
         pakiranje =>
-            Number(pakiranje.putovanjeSifra) === Number(putovanjeSifra)
+            String(pakiranje.putovanjeSifra) === String(putovanjeSifra)
     )
 
     const ukupno = stavke.length
@@ -55,7 +55,7 @@ export function napraviDogadajeItinerara(stavkeItinerara, putovanja) {
     return stavkeItinerara.flatMap(stavka => {
         const putovanje = putovanja.find(
             putovanje =>
-                Number(putovanje.sifra) === Number(stavka.putovanjeSifra)
+                String(putovanje.sifra) === String(stavka.putovanjeSifra)
         )
 
         if (!putovanje) return []

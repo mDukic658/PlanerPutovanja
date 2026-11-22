@@ -27,6 +27,7 @@ import BudzetServiceFirebase from "../services/budzet/BudzetServiceFirebase";
 import ItinerarServiceFirebase from "../services/itinerar/ItinerarServiceFirebase";
 import PakiranjaServiceFirebase from "../services/lista_pakiranja/PakiranjaServiceFirebase";
 import FotografijeServiceFirebase from "../services/fotografije/FotografijeServiceFirebase";
+import IndikatorUcitavanja from "../components/zajednicko/IndikatorUcitavanja";
 
 export default function GeneriranjePodataka() {
 
@@ -38,6 +39,7 @@ export default function GeneriranjePodataka() {
     const [brojOperatera, setBrojOperatera] = useState(5)
     const [poruka, setPoruka] = useState(null)
     const [loading, setLoading] = useState(false)
+    const [presipavanjeFirebase, setPresipavanjeFirebase] = useState(false)
 
     const generiranjeZabranjeno = DATA_SOURCE === 'memorija'
 
@@ -539,6 +541,7 @@ export default function GeneriranjePodataka() {
         }
 
         setLoading(true)
+        setPresipavanjeFirebase(true)
         setPoruka(null)
 
         try {
@@ -609,6 +612,7 @@ export default function GeneriranjePodataka() {
                 tekst: `Presipavanje je prekinuto. ${error.message} Ranije spremljeni zapisi ostaju u Firebaseu.`
             })
         } finally {
+            setPresipavanjeFirebase(false)
             setLoading(false)
         }
     }
@@ -775,6 +779,9 @@ export default function GeneriranjePodataka() {
                             >
                                 {loading ? 'Presipavanje...' : 'Presipaj iz memorije u firebase'}
                             </Button>
+                            {presipavanjeFirebase && (
+                                <IndikatorUcitavanja poruka="Presipavanje u Firebase..." />
+                            )}
                         </Col>
                     </Row>
                 </>

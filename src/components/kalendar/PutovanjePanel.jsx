@@ -10,6 +10,7 @@ import { useObavijesti } from "../zajednicko/Obavijesti"
 import { generirajItinerarWord } from "../dokumenti/WordGenerator"
 import ListaPakiranjaPDFGenerator from "../dokumenti/ListaPakiranjaPDFGenerator"
 import { RouteNames } from "../../constants";
+import RichTextPrikaz from "../ui/RichTextEditor/RichTextPrikaz"
 
 export default function PutovanjePanel({
     odabranoPutovanje,
@@ -103,8 +104,8 @@ export default function PutovanjePanel({
         ? stavkeItinerara
             .filter(
                 stavka =>
-                    Number(stavka.putovanjeSifra) ===
-                    Number(odabranoPutovanje.sifra)
+                    String(stavka.putovanjeSifra) ===
+                    String(odabranoPutovanje.sifra)
             )
             .sort(
                 (a, b) =>
@@ -210,11 +211,7 @@ export default function PutovanjePanel({
                                                             {aktivnost.naziv}
                                                         </strong>
 
-                                                        {aktivnost.biljeska && (
-                                                            <p>
-                                                                {aktivnost.biljeska}
-                                                            </p>
-                                                        )}
+                                                        <RichTextPrikaz html={aktivnost.biljeska} />
                                                     </div>
                                                 </div>
                                             ))}

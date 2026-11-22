@@ -12,7 +12,7 @@ import FotografijeService from "../../services/fotografije/FotografijeService"
 import BudzetGrafikon from "../../components/budzet/BudzetGrafikon"
 import BudzetServis from "../../services/budzet/BudzetServis"
 import OdredistePutovanja from "../../components/karta/OdredistePutovanja"
-
+import RichTextPrikaz from "../../components/ui/RichTextEditor/RichTextPrikaz"
 
 export default function PutovanjaDetalji() {
     const { sifra } = useParams()
@@ -70,7 +70,7 @@ export default function PutovanjaDetalji() {
                     return
                 }
 
-                const sifraPutovanja = Number(sifra)
+                const sifraPutovanja = String(sifra)
 
                 setPutovanje(odgovorPutovanja.data)
 
@@ -78,7 +78,7 @@ export default function PutovanjaDetalji() {
                     odgovorAktivnosti.data
                         .filter(
                             aktivnost =>
-                                Number(aktivnost.putovanjeSifra) ===
+                                String(aktivnost.putovanjeSifra) ===
                                 sifraPutovanja
                         )
                         .sort(
@@ -93,7 +93,7 @@ export default function PutovanjaDetalji() {
                 setPakiranja(
                     odgovorPakiranja.data.filter(
                         pakiranje =>
-                            Number(pakiranje.putovanjeSifra) ===
+                            String(pakiranje.putovanjeSifra) ===
                             sifraPutovanja
                     )
                 )
@@ -465,17 +465,7 @@ export default function PutovanjaDetalji() {
                                                                             {aktivnost.naziv}
                                                                         </h5>
 
-                                                                        {aktivnost.biljeska && (
-                                                                            <p
-                                                                                className="text-muted mb-0"
-                                                                                style={{
-                                                                                    whiteSpace: "pre-wrap",
-                                                                                    overflowWrap: "anywhere"
-                                                                                }}
-                                                                            >
-                                                                                {aktivnost.biljeska}
-                                                                            </p>
-                                                                        )}
+                                                                        <RichTextPrikaz html={aktivnost.biljeska} />
                                                                     </div>
                                                                 </div>
                                                             </li>

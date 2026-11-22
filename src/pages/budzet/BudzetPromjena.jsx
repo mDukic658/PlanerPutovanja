@@ -134,10 +134,14 @@ export default function BudzetPromjena() {
                 return
             }
 
-            await BudzetServis.promijeni(sifra, {
+            const odgovorSpremanja = await BudzetServis.promijeni(sifra, {
                 ...rezultat.data,
-                putovanjeSifra: Number(trosak.putovanjeSifra)
+                putovanjeSifra: trosak.putovanjeSifra
             })
+
+            if (odgovorSpremanja?.success === false) {
+                throw new Error(odgovorSpremanja.message)
+            }
 
             obavijesti("Trošak je promijenjen.")
             navigate(povratak)
