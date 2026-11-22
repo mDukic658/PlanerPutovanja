@@ -17,8 +17,6 @@ export default function ItinerarPregled() {
     const [stavke, setStavke] = useState([])
     const [odabranoPutovanje, setOdabranoPutovanje] = useState({})
     const [pretragaPutovanje, setPretragaPutovanje] = useState('')
-    const [prikaziAutocomplete, setPrikaziAutocomplete] = useState(false)
-    const [odabraniIndex, setOdabraniIndex] = useState(-1)
     const [generiranjeWorda, setGeneriranjeWorda] = useState(false)
 
     const obavijesti = useObavijesti()
@@ -130,43 +128,12 @@ export default function ItinerarPregled() {
         )
     }
 
-    function handleKeyUp(e) {
-        const filtriranaPutovanja = filtrirajPutovanje()
-
-        if (e.key === 'ArrowDown') {
-            e.preventDefault()
-            setOdabraniIndex(prev => {
-                if (prev + 1 === filtriranaPutovanja.length) {
-                    return 0
-                }
-                return prev < filtriranaPutovanja.length - 1 ? prev + 1 : prev
-            }
-
-            )
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault()
-            setOdabraniIndex(prev => {
-                if (prev === 0) {
-                    return filtriranaPutovanja.length - 1
-                }
-                return prev > 0 ? prev - 1 : 0
-            })
-        } else if (e.key === 'Enter' && odabraniIndex >= 0 && filtriranaPutovanja.length > 0) {
-            e.preventDefault()
-            postaviOdabranoPutovanje(filtriranaPutovanja[odabraniIndex].sifra)
-            setPrikaziAutocomplete(false)
-            setPretragaPutovanje('')
-            setOdabraniIndex(-1)
-        } else if (e.key === 'Escape') {
-            setPrikaziAutocomplete(false)
-            setOdabraniIndex(-1)
-        }
-    }
-
     function postaviOdabranoPutovanje(sifra) {
         setOdabranoPutovanje(putovanja.find(p => p.sifra === sifra))
         setOdabranaSifra(sifra)
     }
+
+    const filtriranaPutovanja = filtrirajPutovanje()
 
     return (
 
@@ -201,60 +168,39 @@ export default function ItinerarPregled() {
             </div>
 
             <div className="itinerar-odabir">
-                <Form.Group
-                    controlId="pretragaPutovanja"
-                    className="position-relative"
-                >
+                <Form.Group controlId="pretragaPutovanja" className="mb-3">
                     <Form.Label>Odaberi putovanje</Form.Label>
-
                     <Form.Control
-                        type="text"
+                        type="search"
                         placeholder="Pretraži putovanja..."
                         value={pretragaPutovanje}
-                        onChange={(e) => {
-                            setPretragaPutovanje(e.target.value)
-                            setOdabraniIndex(-1)
-                            setPrikaziAutocomplete(true)
-                        }}
-                        onFocus={() => setPrikaziAutocomplete(true)}
-                        onBlur={() => setPrikaziAutocomplete(false)}
-                        onKeyUp={handleKeyUp}
-                        autoComplete="off"
+                        onChange={(e) => setPretragaPutovanje(e.target.value)}
                     />
-
-                    {prikaziAutocomplete && (
-                        <div className="itinerar-prijedlozi">
-                            {filtrirajPutovanje().map((o, index) => (
-                                <div
-                                    key={o.sifra}
-                                    className={
-                                        index === odabraniIndex
-                                            ? "itinerar-prijedlog aktivan"
-                                            : "itinerar-prijedlog"
-                                    }
-                                    onMouseDown={(e) => e.preventDefault()}
-                                    onClick={() => {
-                                        postaviOdabranoPutovanje(o.sifra)
-                                        setPrikaziAutocomplete(false)
-                                        setPretragaPutovanje("")
-                                        setOdabraniIndex(-1)
-                                    }}
-                                    onMouseEnter={() => {
-                                        setOdabraniIndex(index)
-                                    }}
-                                >
-                                    {o.naziv}
-                                </div>
-                            ))}
-
-                            {filtrirajPutovanje().length === 0 && (
-                                <div className="p-3">
-                                    Nema pronađenih putovanja.
-                                </div>
-                            )}
-                        </div>
-                    )}
                 </Form.Group>
+
+                {filtriranaPutovanja.length === 0 ? (
+                    <p>Nema pronađenih putovanja.</p>
+                ) : (
+                    <div className="row g-2 mb-3">
+                        {filtriranaPutovanja.map((putovanje) => (
+                            <div className="col-12 col-sm-6 col-lg-4" key={putovanje.sifra}>
+                                <Button
+                                    type="button"
+                                    variant={
+                                        String(odabranoPutovanje.sifra) === String(putovanje.sifra)
+                                            ? "primary"
+                                            : "outline-primary"
+                                    }
+                                    className="w-100 h-100 text-start"
+                                    onClick={() => postaviOdabranoPutovanje(putovanje.sifra)}
+                                >
+                                    <strong className="d-block">{putovanje.naziv}</strong>
+                                    <span>{putovanje.destinacija}, {putovanje.drzava}</span>
+                                </Button>
+                            </div>
+                        ))}
+                    </div>
+                )}
 
                 {Boolean(odabranoPutovanje.sifra) && (
                     <div className="itinerar-odabrano">

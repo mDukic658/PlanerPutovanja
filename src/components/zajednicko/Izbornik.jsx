@@ -30,30 +30,9 @@ export default function Izbornik() {
                         >
                             Početna
                         </Nav.Link>
-                        <Nav.Link
-                            as={Link}
-                            to={RouteNames.O_APLIKACIJI}
-                            eventKey={RouteNames.O_APLIKACIJI}
-                        >
-                            O aplikaciji
-                        </Nav.Link>
 
                         {isLoggedIn && (
                             <>
-                                <Nav.Link
-                                    as={Link}
-                                    to={RouteNames.KALENDAR}
-                                    eventKey={RouteNames.KALENDAR}
-                                >
-                                    Kalendar
-                                </Nav.Link>
-
-                                <Nav.Link
-                                    onClick={() => navigate(RouteNames.FOTOGRAFIJE)}
-                                    eventKey={RouteNames.FOTOGRAFIJE}
-                                >
-                                    Albumi
-                                </Nav.Link>
 
                                 <NavDropdown title="Putovanja" id="putovanja-dropdown">
                                     <NavDropdown.Item
@@ -61,6 +40,20 @@ export default function Izbornik() {
                                         eventKey={RouteNames.PUTOVANJA}
                                     >
                                         Pregled putovanja
+                                    </NavDropdown.Item>
+
+                                    <NavDropdown.Item
+                                        onClick={() => navigate(RouteNames.LISTA_PAKIRANJA)}
+                                        eventKey={RouteNames.LISTA_PAKIRANJA}
+                                    >
+                                        Lista pakiranja
+                                    </NavDropdown.Item>
+
+                                    <NavDropdown.Item
+                                        onClick={() => navigate(RouteNames.PREDMETI)}
+                                        eventKey={RouteNames.PREDMETI}
+                                    >
+                                        Predmeti
                                     </NavDropdown.Item>
 
                                     <NavDropdown.Item
@@ -78,24 +71,20 @@ export default function Izbornik() {
                                     </NavDropdown.Item>
                                 </NavDropdown>
 
-                                <NavDropdown
-                                    title="Evidencija pakiranja"
-                                    id="pakiranja-dropdown"
+                                <Nav.Link
+                                    as={Link}
+                                    to={RouteNames.KALENDAR}
+                                    eventKey={RouteNames.KALENDAR}
                                 >
-                                    <NavDropdown.Item
-                                        onClick={() => navigate(RouteNames.LISTA_PAKIRANJA)}
-                                        eventKey={RouteNames.LISTA_PAKIRANJA}
-                                    >
-                                        Lista pakiranja
-                                    </NavDropdown.Item>
+                                    Kalendar
+                                </Nav.Link>
 
-                                    <NavDropdown.Item
-                                        onClick={() => navigate(RouteNames.PREDMETI)}
-                                        eventKey={RouteNames.PREDMETI}
-                                    >
-                                        Predmeti
-                                    </NavDropdown.Item>
-                                </NavDropdown>
+                                <Nav.Link
+                                    onClick={() => navigate(RouteNames.FOTOGRAFIJE)}
+                                    eventKey={RouteNames.FOTOGRAFIJE}
+                                >
+                                    Albumi
+                                </Nav.Link>
 
                                 <Nav.Link
                                     as={Link}
@@ -134,6 +123,14 @@ export default function Izbornik() {
                                 </NavDropdown.Item>
                             </NavDropdown>
                         )}
+
+                        <Nav.Link
+                            as={Link}
+                            to={RouteNames.O_APLIKACIJI}
+                            eventKey={RouteNames.O_APLIKACIJI}
+                        >
+                            O aplikaciji
+                        </Nav.Link>
                     </Nav>
 
                     <Nav className="ms-auto">
