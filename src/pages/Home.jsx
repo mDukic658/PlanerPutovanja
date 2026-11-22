@@ -10,10 +10,39 @@ import { GiAirplaneArrival, GiAirplaneDeparture } from "react-icons/gi";
 import { TbMoneybag } from "react-icons/tb";
 import KartaPosjeta from "../components/karta/KartaPosjeta";
 import KartaServis from "../services/karta/KartaServis"
+import useAuth from "../hooks/useAuth";
 
 
 export default function Home() {
+    const { isLoggedIn } = useAuth()
 
+    return isLoggedIn ? <PrijavljenaPocetna /> : <JavnaPocetna />
+}
+
+function JavnaPocetna() {
+    return (
+        <section className="py-5">
+            <h1>Planer putovanja</h1>
+
+            <p className="lead">
+                Isplaniraj putovanje, složi dnevni itinerar i listu pakiranja
+                te prati troškove na jednom mjestu.
+            </p>
+
+            <div className="d-flex flex-wrap gap-2">
+                <Button as={Link} to={RouteNames.LOGIN} variant="primary">
+                    Prijavi se
+                </Button>
+
+                <Button as={Link} to={RouteNames.O_APLIKACIJI} variant="outline-primary">
+                    O aplikaciji
+                </Button>
+            </div>
+        </section>
+    )
+}
+
+function PrijavljenaPocetna() {
     const [putovanja, setPutovanja] = useState([])
     const [animiraniBrojevi, setAnimiraniBrojevi] = useState({
         putovanja: 0,
@@ -139,19 +168,22 @@ export default function Home() {
                 <Col xs={12} lg={5}>
                     <h1>Planer putovanja</h1>
 
-                    <p>
-                        Isplaniraj svoje putovanje, organiziraj lokacije,
-                        pakiranje, aktivnosti i troškove na jednom mjestu.
-                    </p>
+                    <p>Otvori svoja putovanja, provjeri kalendar ili isplaniraj novi put.</p>
 
-                    <Button
-                        as={Link}
-                        to={RouteNames.PUTOVANJA_DODAJ}
-                        variant="primary"
-                    >
-                        <FaPlaneDeparture />
-                        {" "}Novo putovanje
-                    </Button>
+                    <div className="d-flex flex-wrap gap-2">
+                        <Button as={Link} to={RouteNames.PUTOVANJA_DODAJ} variant="primary">
+                            <FaPlaneDeparture aria-hidden="true" />
+                            {" "}Novo putovanje
+                        </Button>
+
+                        <Button as={Link} to={RouteNames.PUTOVANJA} variant="outline-primary">
+                            Moja putovanja
+                        </Button>
+
+                        <Button as={Link} to={RouteNames.KALENDAR} variant="outline-primary">
+                            Kalendar
+                        </Button>
+                    </div>
                 </Col>
 
                 <Col xs={12} lg={7}>

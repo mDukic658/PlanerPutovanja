@@ -30,71 +30,82 @@ export default function Izbornik() {
                         >
                             Početna
                         </Nav.Link>
-
                         <Nav.Link
                             as={Link}
-                            to={RouteNames.KALENDAR}
-                            eventKey={RouteNames.KALENDAR}
+                            to={RouteNames.O_APLIKACIJI}
+                            eventKey={RouteNames.O_APLIKACIJI}
                         >
-                            Kalendar
+                            O aplikaciji
                         </Nav.Link>
 
-                        <Nav.Link
-                            onClick={() => navigate(RouteNames.FOTOGRAFIJE)}
-                            eventKey={RouteNames.FOTOGRAFIJE}
-                        >
-                            Albumi
-                        </Nav.Link>
+                        {isLoggedIn && (
+                            <>
+                                <Nav.Link
+                                    as={Link}
+                                    to={RouteNames.KALENDAR}
+                                    eventKey={RouteNames.KALENDAR}
+                                >
+                                    Kalendar
+                                </Nav.Link>
 
-                        <NavDropdown title="Putovanja" id="putovanja-dropdown">
-                            <NavDropdown.Item
-                                onClick={() => navigate(RouteNames.PUTOVANJA)}
-                                eventKey={RouteNames.PUTOVANJA}
-                            >
-                                Pregled putovanja
-                            </NavDropdown.Item>
+                                <Nav.Link
+                                    onClick={() => navigate(RouteNames.FOTOGRAFIJE)}
+                                    eventKey={RouteNames.FOTOGRAFIJE}
+                                >
+                                    Albumi
+                                </Nav.Link>
 
-                            <NavDropdown.Item
-                                onClick={() => navigate(RouteNames.ITINERAR)}
-                                eventKey={RouteNames.ITINERAR}
-                            >
-                                Itinerar
-                            </NavDropdown.Item>
+                                <NavDropdown title="Putovanja" id="putovanja-dropdown">
+                                    <NavDropdown.Item
+                                        onClick={() => navigate(RouteNames.PUTOVANJA)}
+                                        eventKey={RouteNames.PUTOVANJA}
+                                    >
+                                        Pregled putovanja
+                                    </NavDropdown.Item>
 
-                            <NavDropdown.Item
-                                onClick={() => navigate(RouteNames.BUDZET)}
-                                eventKey={RouteNames.BUDZET}
-                            >
-                                Evidencija troškova
-                            </NavDropdown.Item>
-                        </NavDropdown>
+                                    <NavDropdown.Item
+                                        onClick={() => navigate(RouteNames.ITINERAR)}
+                                        eventKey={RouteNames.ITINERAR}
+                                    >
+                                        Itinerar
+                                    </NavDropdown.Item>
 
-                        <NavDropdown
-                            title="Evidencija pakiranja"
-                            id="pakiranja-dropdown"
-                        >
-                            <NavDropdown.Item
-                                onClick={() => navigate(RouteNames.LISTA_PAKIRANJA)}
-                                eventKey={RouteNames.LISTA_PAKIRANJA}
-                            >
-                                Lista pakiranja
-                            </NavDropdown.Item>
+                                    <NavDropdown.Item
+                                        onClick={() => navigate(RouteNames.BUDZET)}
+                                        eventKey={RouteNames.BUDZET}
+                                    >
+                                        Evidencija troškova
+                                    </NavDropdown.Item>
+                                </NavDropdown>
 
-                            <NavDropdown.Item
-                                onClick={() => navigate(RouteNames.PREDMETI)}
-                                eventKey={RouteNames.PREDMETI}
-                            >
-                                Predmeti
-                            </NavDropdown.Item>
-                        </NavDropdown>
+                                <NavDropdown
+                                    title="Evidencija pakiranja"
+                                    id="pakiranja-dropdown"
+                                >
+                                    <NavDropdown.Item
+                                        onClick={() => navigate(RouteNames.LISTA_PAKIRANJA)}
+                                        eventKey={RouteNames.LISTA_PAKIRANJA}
+                                    >
+                                        Lista pakiranja
+                                    </NavDropdown.Item>
 
-                        <Nav.Link
-                            as={Link}
-                            to={RouteNames.KARTA_POSJETA}
-                            eventKey={RouteNames.KARTA_POSJETA}
-                        >
-                            Karta posjeta
-                        </Nav.Link>
+                                    <NavDropdown.Item
+                                        onClick={() => navigate(RouteNames.PREDMETI)}
+                                        eventKey={RouteNames.PREDMETI}
+                                    >
+                                        Predmeti
+                                    </NavDropdown.Item>
+                                </NavDropdown>
+
+                                <Nav.Link
+                                    as={Link}
+                                    to={RouteNames.KARTA_POSJETA}
+                                    eventKey={RouteNames.KARTA_POSJETA}
+                                >
+                                    Karta posjeta
+                                </Nav.Link>
+                            </>
+                        )}
 
                         {isLoggedIn && authUser.uloga === 'admin' && (
                             <NavDropdown title="Programi" id="programi-dropdown">
@@ -157,6 +168,6 @@ export default function Izbornik() {
                     </Nav>
                 </Navbar.Collapse>
             </Container>
-        </Navbar>
+        </Navbar >
     )
 }
