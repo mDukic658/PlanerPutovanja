@@ -17,8 +17,8 @@ export async function generirajItinerarWord(
     const stavke = aktivnosti
         .filter(
             aktivnost =>
-                Number(aktivnost.putovanjeSifra) ===
-                Number(putovanje.sifra)
+                String(aktivnost.putovanjeSifra) ===
+                String(putovanje.sifra)
         )
         .sort(
             (a, b) =>

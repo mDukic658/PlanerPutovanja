@@ -108,7 +108,7 @@ export default function NovoPakiranje({ putovanjeSifra, ucitajPakiranja }) {
         }
 
         const predmetPostoji = predmeti.some(
-            predmet => Number(predmet.sifra) === rezultat.data.predmetSifra
+            predmet => String(predmet.sifra) === String(rezultat.data.predmetSifra)
         )
 
         if (!predmetPostoji) {

@@ -13,6 +13,7 @@ import PutovanjeModali from "../components/kalendar/PutovanjeModali"
 import AktivnostModali from "../components/kalendar/AktivnostiModali"
 import { dohvatiNapredakPakiranja, napraviDogadajeItinerara, napraviDogadajePutovanja, dohvatiStilDatuma } from "../utils/kalendarPomocne"
 import KalendarKontrole from "../components/kalendar/KalendarKontrole"
+import PotvrdaBrisanjaPutovanja from "../components/zajednicko/PotvrdaBrisanjaPutovanja"
 
 const localizer = dayjsLocalizer(dayjs)
 
@@ -31,6 +32,7 @@ export default function Kalendar() {
     const [odabranoPutovanje, setOdabranoPutovanje] = useState(null)
     const [putovanjeZaUredivanje, setPutovanjeZaUredivanje] = useState(null)
     const [brisanje, setBrisanje] = useState(false)
+    const [putovanjeZaBrisanje, setPutovanjeZaBrisanje] = useState(null)
     const [odabranaAktivnost, setOdabranaAktivnost] = useState(null)
     const [godisnjiPrikaz, setGodisnjiPrikaz] = useState(false)
     const [datumKalendara, setDatumKalendara] = useState(new Date())
@@ -133,12 +135,6 @@ export default function Kalendar() {
 
     async function obrisiOdabranoPutovanje() {
         if (!odabranoPutovanje || brisanje) return
-
-        if (!window.confirm(
-            `Želite li obrisati putovanje "${odabranoPutovanje.naziv}"?`
-        )) {
-            return
-        }
 
         setBrisanje(true)
 
@@ -332,7 +328,20 @@ export default function Kalendar() {
                     dodajAktivnostOdabranomPutovanju
                 }
                 urediOdabranoPutovanje={urediOdabranoPutovanje}
-                obrisiOdabranoPutovanje={obrisiOdabranoPutovanje}
+                obrisiOdabranoPutovanje={() => setPutovanjeZaBrisanje(odabranoPutovanje)}
+            />
+
+            <PotvrdaBrisanjaPutovanja
+                putovanje={putovanjeZaBrisanje}
+                brisanjeUTijeku={brisanje}
+                onOdustani={() => setPutovanjeZaBrisanje(null)}
+                onPotvrdi={async () => {
+                    try {
+                        await obrisiOdabranoPutovanje()
+                    } finally {
+                        setPutovanjeZaBrisanje(null)
+                    }
+                }}
             />
 
         </section>

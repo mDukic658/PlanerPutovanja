@@ -123,7 +123,7 @@ export default function ListaPakiranja() {
     function prikaziNapredak(putovanjeSifra) {
         const stavke = pakiranja.filter(
             pakiranje =>
-                Number(pakiranje.putovanjeSifra) === Number(putovanjeSifra)
+                String(pakiranje.putovanjeSifra) === String(putovanjeSifra)
         )
 
         const ukupno = stavke.length
@@ -188,7 +188,7 @@ export default function ListaPakiranja() {
 
     const odabranaPakiranja = odabranoPutovanje
         ? pakiranja.filter(
-            p => Number(p.putovanjeSifra) === Number(odabranoPutovanje.sifra)
+            p => String(p.putovanjeSifra) === String(odabranoPutovanje.sifra)
         )
         : []
 

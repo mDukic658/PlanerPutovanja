@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { Link, useNavigate, useSearchParams } from "react-router-dom"
 import { Button, Form } from "react-bootstrap"
 import { FaArrowLeft, FaPlus } from "react-icons/fa"
-import { RouteNames } from "../../constants"
+import { RouteNames, DATA_SOURCE } from "../../constants"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import FotografijeService from "../../services/fotografije/FotografijeService"
 import { useObavijesti } from "../../components/zajednicko/Obavijesti"
@@ -74,6 +74,40 @@ export default function FotografijaNovo() {
         })
     }
 
+    async function pripremiSliku(datoteka) {
+        const slika = await procitajSliku(datoteka)
+
+        if (DATA_SOURCE !== "firebase" || slika.length <= 850_000) {
+            return slika
+        }
+
+        const izvor = new Image()
+        izvor.src = slika
+        await izvor.decode()
+
+        const platno = document.createElement("canvas")
+        const kontekst = platno.getContext("2d")
+
+        for (const duljaStrana of [1600, 1200, 900, 640]) {
+            const omjer = Math.min(
+                1,
+                duljaStrana / Math.max(izvor.naturalWidth, izvor.naturalHeight)
+            )
+
+            platno.width = Math.max(1, Math.round(izvor.naturalWidth * omjer))
+            platno.height = Math.max(1, Math.round(izvor.naturalHeight * omjer))
+            kontekst.drawImage(izvor, 0, 0, platno.width, platno.height)
+
+            const smanjenaSlika = platno.toDataURL("image/webp", 0.8)
+
+            if (smanjenaSlika.length <= 850_000) {
+                return smanjenaSlika
+            }
+        }
+
+        throw new Error("Fotografija je prevelika za spremanje.")
+    }
+
     async function obradiSubmit(e) {
         e.preventDefault()
 
@@ -125,7 +159,7 @@ export default function FotografijaNovo() {
 
         const sifraPutovanja = rezultat.data.putovanjeSifra
 
-        if (!putovanja.some(p => Number(p.sifra) === sifraPutovanja)) {
+        if (!putovanja.some(p => String(p.sifra) === String(sifraPutovanja))) {
             setErrors({
                 putovanjeSifra: "Odaberite postojeće putovanje."
             })
@@ -149,7 +183,7 @@ export default function FotografijaNovo() {
             const fotografije = []
 
             for (const datoteka of datoteke) {
-                const slika = await procitajSliku(datoteka)
+                const slika = await pripremiSliku(datoteka)
 
                 fotografije.push({
                     putovanjeSifra: sifraPutovanja,
@@ -159,9 +193,14 @@ export default function FotografijaNovo() {
                 })
             }
 
-            await FotografijeService.dodajVise(fotografije)
+            const odgovorSpremanja = await FotografijeService.dodajVise(fotografije)
 
-            obavijesti(`Dodano fotografija: ${fotografije.length}.`)
+            if (odgovorSpremanja.success === false) {
+                obavijesti(odgovorSpremanja.message, "danger")
+                return
+            }
+
+            obavijesti(`Dodano fotografija: ${odgovorSpremanja.data.length}.`)
             navigate(povratak)
         } catch (error) {
             console.error(error)

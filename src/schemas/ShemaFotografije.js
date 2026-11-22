@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { DATA_SOURCE } from '../constants'
 
 export const ShemaFotografija = z.object({
     naziv: z.string()
@@ -17,7 +18,9 @@ export const ShemaFotografija = z.object({
 })
 
 export const ShemaNovaFotografija = ShemaFotografija.extend({
-    putovanjeSifra: z.coerce.number()
-        .int("Odaberite putovanje.")
-        .positive("Odaberite putovanje.")
+    putovanjeSifra: DATA_SOURCE === 'firebase'
+        ? z.string().trim().min(1, "Odaberite putovanje.")
+        : z.coerce.number()
+            .int("Odaberite putovanje.")
+            .positive("Odaberite putovanje.")
 })

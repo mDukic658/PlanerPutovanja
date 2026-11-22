@@ -63,7 +63,7 @@ export default function FotografijePregled() {
     const prikazaneFotografije = putovanjeSifra
         ? fotografije.filter(
             fotografija =>
-                Number(fotografija.putovanjeSifra) === Number(putovanjeSifra)
+                String(fotografija.putovanjeSifra) === String(putovanjeSifra)
         )
         : fotografije
 
@@ -77,8 +77,8 @@ export default function FotografijePregled() {
         .map(putovanje => {
             const slikePutovanja = fotografije.filter(
                 fotografija =>
-                    Number(fotografija.putovanjeSifra) ===
-                    Number(putovanje.sifra)
+                    String(fotografija.putovanjeSifra) ===
+                    String(putovanje.sifra)
             )
 
             return {
@@ -106,7 +106,7 @@ export default function FotografijePregled() {
         : RouteNames.FOTOGRAFIJE_NOVO
 
     const odabranoPutovanje = putovanja.find(
-        putovanje => Number(putovanje.sifra) === Number(putovanjeSifra)
+        putovanje => String(putovanje.sifra) === String(putovanjeSifra)
     )
 
     const filtriranaPutovanja = [...putovanja]
@@ -460,8 +460,8 @@ export default function FotografijePregled() {
                                             <p className="text-muted">
                                                 {putovanja.find(
                                                     putovanje =>
-                                                        Number(putovanje.sifra) ===
-                                                        Number(fotografija.putovanjeSifra)
+                                                        String(putovanje.sifra) ===
+                                                        String(fotografija.putovanjeSifra)
                                                 )?.naziv || "Nepoznato putovanje"}
                                             </p>
 

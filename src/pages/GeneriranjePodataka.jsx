@@ -532,137 +532,86 @@ export default function GeneriranjePodataka() {
     }
 
     const handleMemorijaUFirebase = async () => {
-    if (!window.confirm('Jeste li sigurni da želite pretočiti iz memorije u firebase?')) {
-        return;
-    }
+        if (loading) return
 
-    console.log('Krećem')
-
-    setLoading(true);
-    setPoruka(null);
-
-    try {
-        // 1. Samostalni entiteti (ne trebamo njihove nove ID-ove za vanjske ključeve)
-        const operateriPromises = operateri.map(e => {
-            const { sifra, ...ostatak } = e;
-            return OperaterServiceFirebase.dodajBezHash(ostatak);
-        });
-        await Promise.all(operateriPromises);
-
-        console.log('Operateri gotovi')
-
-        // Države idu u batch-evima ili paralelno (195 komada)
-        const drzavePromises = drzave.map(e => {
-            const { sifra, ...ostatak } = e;
-            return DrzaveServiceFirebase.dodaj(ostatak);
-        });
-        await Promise.all(drzavePromises);
-
-        console.log('Države gotovi')
-
-        const posjetiPromises = posjeti.map(e => {
-            const { sifra, ...ostatak } = e;
-            return KartaServiceFirebase.dodaj(ostatak);
-        });
-        await Promise.all(posjetiPromises);
-
-        console.log('Karte gotovi')
-
-        // 2. Predmeti (trebamo nove ID-ove za pakiranja)
-        const mapiranjeSifriPredmeta = [];
-        for (const e of predmeti) {
-            const { sifra, ...ostatak } = e;
-            const fb = await PredmetiServiceFirebase.dodaj(ostatak);
-            const noviId = fb.id; // ili fb.data.sifra ovisno o implementaciji servisa
-            mapiranjeSifriPredmeta.push({ sifram: sifra, sifraf: noviId });
+        if (!window.confirm('Presipati početne podatke iz memorije u Firebase?')) {
+            return
         }
 
-        console.log('Predmeti gotovi')
+        setLoading(true)
+        setPoruka(null)
 
+        try {
+            async function spremiZapise(zapisi, naziv, dodaj, pripremi = zapis => zapis) {
+                const noveSifre = new Map()
 
-        // 3. Putovanja (trebamo nove ID-ove za troškove, stavke itinerara i pakiranja)
-        const mapiranjeSifriPutovanja = [];
-        for (const e of putovanja) {
-            const { sifra, ...ostatak } = e;
-            const fb = await PutovanjaServiceFirebase.dodaj(ostatak);
-            const noviId = fb.id; // ili fb.data.sifra ovisno o implementaciji servisa
-            mapiranjeSifriPutovanja.push({ sifram: sifra, sifraf: noviId });
-        }
+                for (const zapis of zapisi) {
+                    const podaci = { ...zapis }
+                    delete podaci.sifra
 
-        console.log('Putovanja gotovi')
+                    try {
+                        const odgovor = await dodaj(pripremi(podaci))
 
+                        if (odgovor?.success !== true) {
+                            throw new Error(odgovor?.message || 'Upis nije uspio.')
+                        }
 
-        // 4. Troškovi (povezivanje putovanjeSifra s novim Firebase ID-om putovanja)
-        const troskoviPromises = troskovi.map(e => {
-            const { sifra, ...ostatak } = e;
-            const mPutovanje = mapiranjeSifriPutovanja.find(m => m.sifram == ostatak.putovanjeSifra);
-            ostatak.putovanjeSifra = mPutovanje ? mPutovanje.sifraf : null;
-            return BudzetServiceFirebase.dodaj(ostatak);
-        });
-        await Promise.all(troskoviPromises);
-
-        console.log('Budžet gotovi')
-
-
-        // 5. Stavke itinerara (povezivanje putovanjeSifra s novim Firebase ID-om putovanja)
-        const stavkePromises = stavkeItinerara.map(e => {
-            const { sifra, ...ostatak } = e;
-            const mPutovanje = mapiranjeSifriPutovanja.find(m => m.sifram == ostatak.putovanjeSifra);
-            ostatak.putovanjeSifra = mPutovanje ? mPutovanje.sifraf : null;
-            return ItinerarServiceFirebase.dodaj(ostatak);
-        });
-        await Promise.all(stavkePromises);
-
-        console.log('Itinerar gotovi')
-
-
-        // 6. Pakiranja (vezna tablica: povezivanje predmetSifra i putovanjeSifra)
-        const pakiranjaPromises = pakiranja.map(e => {
-            const ostatak = { ...e };
-            
-            const mPredmet = mapiranjeSifriPredmeta.find(m => m.sifram == ostatak.predmetSifra);
-            ostatak.predmetSifra = mPredmet ? mPredmet.sifraf : null;
-
-            const mPutovanje = mapiranjeSifriPutovanja.find(m => m.sifram == ostatak.putovanjeSifra);
-            ostatak.putovanjeSifra = mPutovanje ? mPutovanje.sifraf : null;
-
-            return PakiranjaServiceFirebase.dodaj(ostatak);
-        });
-        await Promise.all(pakiranjaPromises);
-
-        console.log('Pakiranja gotovi')
-
-
-        // 7. Fotografije (ako u budućnosti bude zapisa s putovanjeSifra ili posjetSifra)
-        if (fotografije && fotografije.length > 0) {
-            const fotografijePromises = fotografije.map(e => {
-                const { sifra, ...ostatak } = e;
-                if (ostatak.putovanjeSifra) {
-                    const mPutovanje = mapiranjeSifriPutovanja.find(m => m.sifram == ostatak.putovanjeSifra);
-                    ostatak.putovanjeSifra = mPutovanje ? mPutovanje.sifraf : null;
+                        noveSifre.set(String(zapis.sifra), odgovor.id)
+                    } catch (error) {
+                        const oznaka = zapis.sifra ?? `${zapis.putovanjeSifra}/${zapis.predmetSifra}`
+                        throw new Error(`${naziv} (${oznaka}): ${error.message}`)
+                    }
                 }
-                return FotografijeServiceFirebase.dodaj(ostatak);
-            });
-            await Promise.all(fotografijePromises);
+
+                return noveSifre
+            }
+
+            function povezanaSifra(noveSifre, staraSifra) {
+                const novaSifra = noveSifre.get(String(staraSifra))
+
+                if (!novaSifra) {
+                    throw new Error(`Nedostaje povezani zapis sa šifrom ${staraSifra}.`)
+                }
+
+                return novaSifra
+            }
+
+            await spremiZapise(operateri, 'Operateri', OperaterServiceFirebase.dodajBezHash)
+            await spremiZapise(drzave, 'Države', DrzaveServiceFirebase.dodaj)
+            await spremiZapise(posjeti, 'Posjeti', KartaServiceFirebase.dodaj)
+
+            const sifrePredmeta = await spremiZapise(
+                predmeti, 'Predmeti', PredmetiServiceFirebase.dodaj
+            )
+            const sifrePutovanja = await spremiZapise(
+                putovanja, 'Putovanja', PutovanjaServiceFirebase.dodaj
+            )
+
+            function poveziPutovanje(zapis) {
+                return {
+                    ...zapis,
+                    putovanjeSifra: povezanaSifra(sifrePutovanja, zapis.putovanjeSifra)
+                }
+            }
+
+            await spremiZapise(troskovi, 'Troškovi', BudzetServiceFirebase.dodaj, poveziPutovanje)
+            await spremiZapise(stavkeItinerara, 'Itinerar', ItinerarServiceFirebase.dodaj, poveziPutovanje)
+            await spremiZapise(pakiranja, 'Pakiranja', PakiranjaServiceFirebase.dodaj, zapis => ({
+                ...poveziPutovanje(zapis),
+                predmetSifra: povezanaSifra(sifrePredmeta, zapis.predmetSifra)
+            }))
+            await spremiZapise(fotografije, 'Fotografije', FotografijeServiceFirebase.dodaj, poveziPutovanje)
+
+            setPoruka({ tip: 'success', tekst: 'Uspješno presipano u Firebase.' })
+        } catch (error) {
+            setPoruka({
+                tip: 'danger',
+                tekst: `Presipavanje je prekinuto. ${error.message} Ranije spremljeni zapisi ostaju u Firebaseu.`
+            })
+        } finally {
+            setLoading(false)
         }
-
-        console.log('Fotografije gotovi')
-
-        setPoruka({
-            tip: 'success',
-            tekst: 'Uspješno presipano u Firebase'
-        });
-
-    } catch (error) {
-        console.error("Greška pri presipanju:", error);
-        setPoruka({
-            tip: 'error',
-            tekst: 'Došlo je do greške prilikom sinkronizacije.'
-        });
-    } finally {
-        setLoading(false);
     }
-};
 
     return (
 

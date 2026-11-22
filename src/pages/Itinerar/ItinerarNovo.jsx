@@ -121,7 +121,7 @@ export default function ItinerarNovo({
     function predloziVrijeme(sifraPutovanja, dan, sveAktivnosti) {
         const vremena = sveAktivnosti
             .filter((aktivnost) =>
-                Number(aktivnost.putovanjeSifra) === Number(sifraPutovanja) &&
+                String(aktivnost.putovanjeSifra) === String(sifraPutovanja) &&
                 Number(aktivnost.dan) === Number(dan)
             )
             .map((aktivnost) => aktivnost.vrijeme)
@@ -152,7 +152,7 @@ export default function ItinerarNovo({
 
     function predloziDanIVrijeme(sifraPutovanja, svaPutovanja, sveAktivnosti) {
         const putovanje = svaPutovanja.find(
-            (p) => Number(p.sifra) === Number(sifraPutovanja)
+            (p) => String(p.sifra) === String(sifraPutovanja)
         )
 
         const dani = sveAktivnosti
@@ -247,7 +247,7 @@ export default function ItinerarNovo({
         if (
             !putovanjeSifra ||
             !odabranoPutovanje ||
-            Number(stavka.putovanjeSifra) !== Number(putovanjeSifra)
+            String(stavka.putovanjeSifra) !== String(putovanjeSifra)
         ) {
             obavijesti(
                 "Vrati se na pregled itinerara i odaberi putovanje prije dodavanja aktivnosti.",
@@ -264,13 +264,21 @@ export default function ItinerarNovo({
 
         const novaStavka = {
             ...provjereniPodaci,
-            putovanjeSifra: Number(putovanjeSifra)
+            putovanjeSifra: odabranoPutovanje.sifra
         }
 
         setSpremanje(true)
 
         try {
-            await ItinerarService.dodaj(novaStavka)
+            const odgovorSpremanja = await ItinerarService.dodaj(novaStavka)
+
+            if (odgovorSpremanja?.success === false) {
+                obavijesti(
+                    odgovorSpremanja.message || "Spremanje aktivnosti nije uspjelo.",
+                    "danger"
+                )
+                return
+            }
         } catch (error) {
             console.error(error)
             obavijesti("Dodavanje aktivnosti nije uspjelo.", "danger")
@@ -290,7 +298,7 @@ export default function ItinerarNovo({
     }
 
     const odabranoPutovanje = putovanja.find(
-        (p) => Number(p.sifra) === Number(stavka.putovanjeSifra)
+        (p) => String(p.sifra) === String(stavka.putovanjeSifra)
     )
 
     const maksimalniDan = brojDanaPutovanja(odabranoPutovanje)

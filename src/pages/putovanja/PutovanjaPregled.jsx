@@ -6,11 +6,13 @@ import { RouteNames } from "../../constants"
 import { BsSuitcase2Fill } from "react-icons/bs"
 import { FaPlus, FaPen, FaTrash, FaCamera, FaSearch } from "react-icons/fa"
 import { useObavijesti } from "../../components/zajednicko/Obavijesti"
+import PotvrdaBrisanjaPutovanja from "../../components/zajednicko/PotvrdaBrisanjaPutovanja"
 
 export default function PutovanjePregled() {
 
     const [putovanja, setPutovanja] = useState([])
-
+    const [putovanjeZaBrisanje, setPutovanjeZaBrisanje] = useState(null)
+    const [brisanjeUTijeku, setBrisanjeUTijeku] = useState(false)
     const [ukupnoStranica, setUkupnoStranica] = useState(0)
     const [ukupnoStavki, setUkupnoStavki] = useState(0)
 
@@ -82,10 +84,6 @@ export default function PutovanjePregled() {
     }
 
     async function obrisi(sifra) {
-        if (!confirm("Sigurno obrisati?")) {
-            return
-        }
-
         try {
             await PutovanjaService.obrisi(sifra)
         } catch (error) {
@@ -206,7 +204,7 @@ export default function PutovanjePregled() {
 
                                         <Link
                                             to={RouteNames.PUTOVANJA_DETALJI.replace(":sifra", p.sifra)}
-                                            state={{povratakNaPregled}}
+                                            state={{ povratakNaPregled }}
                                             className="btn btn-primary"
                                         >
                                             Pogledaj putovanje
@@ -225,7 +223,7 @@ export default function PutovanjePregled() {
 
                                         <Button
                                             variant="outline-danger"
-                                            onClick={() => obrisi(p.sifra)}
+                                            onClick={() => setPutovanjeZaBrisanje(p)}
                                         >
                                             <FaTrash />
                                             {" "}Izbriši
@@ -330,6 +328,24 @@ export default function PutovanjePregled() {
                 </Badge>
                 {" "}putovanja
             </div>
+
+            <PotvrdaBrisanjaPutovanja
+                putovanje={putovanjeZaBrisanje}
+                brisanjeUTijeku={brisanjeUTijeku}
+                onOdustani={() => setPutovanjeZaBrisanje(null)}
+                onPotvrdi={async () => {
+                    if (!putovanjeZaBrisanje || brisanjeUTijeku) return
+
+                    setBrisanjeUTijeku(true)
+                    try {
+                        await obrisi(putovanjeZaBrisanje.sifra)
+                    } finally {
+                        setBrisanjeUTijeku(false)
+                        setPutovanjeZaBrisanje(null)
+                    }
+                }}
+            />
+
         </section>
     )
 }

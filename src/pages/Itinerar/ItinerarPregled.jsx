@@ -48,7 +48,7 @@ export default function ItinerarPregled() {
         if (!putovanjeSifra) return
 
         const putovanje = putovanja.find(
-            (p) => p.sifra === Number(putovanjeSifra)
+            (p) => String(p.sifra) === String(putovanjeSifra)
         )
 
         if (putovanje) {
@@ -178,7 +178,7 @@ export default function ItinerarPregled() {
                     Itinerar
                 </h2>
 
-                {odabranoPutovanje.sifra > 0 && (
+                {Boolean(odabranoPutovanje.sifra) && (
                     <div className="d-flex flex-wrap gap-2">
                         <Button
                             variant="primary"
@@ -256,7 +256,7 @@ export default function ItinerarPregled() {
                     )}
                 </Form.Group>
 
-                {odabranoPutovanje.sifra > 0 && (
+                {Boolean(odabranoPutovanje.sifra) && (
                     <div className="itinerar-odabrano">
                         <strong>{odabranoPutovanje.naziv}</strong>
                         <span>
@@ -338,13 +338,13 @@ export default function ItinerarPregled() {
                 </p>
             )}
 
-            {odabranoPutovanje.sifra > 0 && stavke.length === 0 && (
+            {Boolean(odabranoPutovanje.sifra) && stavke.length === 0 && (
                 <p className="itinerar-prazno">
                     Još nema aktivnosti za ovo putovanje.
                 </p>
             )}
 
-            {odabranoPutovanje.sifra > 0 && (
+            {Boolean(odabranoPutovanje.sifra) && (
                 <div className="itinerar-ukupno">
                     Ukupno aktivnosti:
                     <Badge pill bg="primary">

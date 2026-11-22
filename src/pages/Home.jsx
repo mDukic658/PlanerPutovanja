@@ -256,7 +256,7 @@ export default function Home() {
 
                                     <Button
                                         as={Link}
-                                        to={RouteNames.PUTOVANJA_PROMIJENA.replace(
+                                        to={RouteNames.PUTOVANJA_DETALJI.replace(
                                             ":sifra",
                                             putovanje.sifra
                                         )}
