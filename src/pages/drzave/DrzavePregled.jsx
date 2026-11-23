@@ -1,3 +1,5 @@
+import { useObavijesti } from "../../components/zajednicko/Obavijesti"
+import PotvrdaBrisanja from "../../components/zajednicko/PotvrdaBrisanja"
 
 import { useEffect, useState } from 'react'
 import { Button, Table } from 'react-bootstrap'
@@ -8,7 +10,10 @@ import { FaGlobeEurope, FaPlus, FaPen, FaTrash } from 'react-icons/fa'
 
 export default function DrzavePregled() {
     const navigate = useNavigate()
+    const obavijesti = useObavijesti()
     const [drzave, setDrzave] = useState([])
+    const [brisanjeUTijeku, setBrisanjeUTijeku] = useState(false)
+    const [drzavaZaBrisanje, setDrzavaZaBrisanje] = useState(null)
 
     useEffect(() => {
         ucitajDrzave()
@@ -19,9 +24,27 @@ export default function DrzavePregled() {
         setDrzave(odgovor.data)
     }
 
-    async function obrisi(sifra) {
-        await DrzaveService.obrisi(sifra)
-        await ucitajDrzave()
+    async function obrisi() {
+        if (!drzavaZaBrisanje || brisanjeUTijeku) return
+
+        setBrisanjeUTijeku(true)
+        try {
+            const odgovor = await DrzaveService.obrisi(drzavaZaBrisanje.sifra)
+            if (odgovor?.success === false) {
+                throw new Error(odgovor.message)
+            }
+
+            setDrzave(prethodni => prethodni.filter(
+                stavka => stavka.sifra !== drzavaZaBrisanje.sifra
+            ))
+            obavijesti("Država je obrisana.")
+        } catch (error) {
+            console.error(error)
+            obavijesti("Brisanje države nije uspjelo.", "danger")
+        } finally {
+            setDrzavaZaBrisanje(null)
+            setBrisanjeUTijeku(false)
+        }
     }
 
     return (
@@ -77,7 +100,7 @@ export default function DrzavePregled() {
 
                                         <Button
                                             variant="danger"
-                                            onClick={() => obrisi(drzava.sifra)}
+                                            onClick={() => setDrzavaZaBrisanje(drzava)}
                                         >
                                             <FaTrash />
                                             Obriši
@@ -103,6 +126,15 @@ export default function DrzavePregled() {
                 <span>{drzave.length}</span>
             </p>
 
+            <PotvrdaBrisanja
+                otvoreno={drzavaZaBrisanje !== null}
+                naslov="Brisanje države"
+                brisanjeUTijeku={brisanjeUTijeku}
+                onOdustani={() => setDrzavaZaBrisanje(null)}
+                onPotvrdi={obrisi}
+            >
+                Želiš li obrisati državu „{drzavaZaBrisanje?.naziv}”?
+            </PotvrdaBrisanja>
         </section>
     )
 }

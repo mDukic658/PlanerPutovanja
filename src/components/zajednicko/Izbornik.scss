@@ -43,7 +43,29 @@
   color: var(--wheat) !important;
 }
 
-.navbar .dropdown-item:hover {
+.navbar .dropdown-menu .dropdown-item:hover {
   background-color: var(--pacific-blue) !important;
-  color: white !important;
+  color: var(--charcoal) !important;
+}
+
+.navbar a:focus-visible,
+.navbar button:focus-visible {
+  outline: 2px solid var(--wheat);
+  outline-offset: 2px;
+}
+
+.navbar #korisnicki-izbornik {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+@media (max-width: 1199.98px) {
+  .navbar .dropdown-menu {
+    max-width: 100%;
+  }
+
+  .navbar .dropdown-item {
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
 }

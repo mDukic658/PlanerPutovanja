@@ -12,7 +12,7 @@ export default function Izbornik() {
     const { isLoggedIn, authUser, logout } = useAuth()
 
     return (
-        <Navbar collapseOnSelect expand="xl" className="bg-body-tertiary">
+        <Navbar collapseOnSelect expand="xl" className="bg-body-tertiary" as="nav" aria-label="Glavna navigacija">
             <Container>
                 <Navbar.Brand as={Link} to={RouteNames.HOME}>
                     {IME_APLIKACIJE}
@@ -150,6 +150,7 @@ export default function Izbornik() {
                                 <NavDropdown.Item
                                     onClick={logout}
                                     eventKey="odjava"
+                                    aria-label={`Odjavi korisnika ${authUser.email}`}
                                 >
                                     Odjava
                                 </NavDropdown.Item>

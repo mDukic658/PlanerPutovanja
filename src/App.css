@@ -3300,3 +3300,14 @@ body {
   background-color: #075465;
   border-color: #075465;
 }
+.prelazak-na-sadrzaj:focus {
+  position: fixed;
+  z-index: 1050;
+  inset-block-start: 0.75rem;
+  inset-inline-start: 0.75rem;
+  padding: 0.625rem 1rem;
+  color: var(--charcoal);
+  background: white;
+  border: 2px solid var(--charcoal);
+  border-radius: 0.5rem;
+}

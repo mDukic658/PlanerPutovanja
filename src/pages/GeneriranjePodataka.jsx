@@ -1,3 +1,4 @@
+import { z } from "zod"
 import { base, en, Faker, hr } from "@faker-js/faker";
 import { useState } from "react";
 import { Button, Form, Alert, Container, Row, Col } from "react-bootstrap";
@@ -299,7 +300,16 @@ export default function GeneriranjePodataka() {
         }
     }
 
-    const handleGeneriraj = async (e, generiraj, broj, naziv) => {
+    function provjeriBroj({ broj, max }) {
+        const poruka = `Unesite cijeli broj između 1 i ${max}.`
+        return z.number().int().min(1).max(max).safeParse(
+            broj === "" ? NaN : Number(broj),
+            { error: () => poruka }
+        )
+    }
+
+    const handleGeneriraj = async (e, stavka) => {
+        const { generiraj, naziv, nazivZapisa } = stavka
         e.preventDefault()
 
         if (generiranjeZabranjeno) {
@@ -310,19 +320,28 @@ export default function GeneriranjePodataka() {
             return
         }
 
+        if (loading) return
+
+        const rezultat = provjeriBroj(stavka)
+        if (!rezultat.success) {
+            setPoruka({ tip: "warning", tekst: `${naziv}: ${rezultat.error.issues[0].message}` })
+            return
+        }
+
+        const broj = rezultat.data
         setLoading(true)
         setPoruka(null)
 
         try {
-            await generiraj(broj);
+            await generiraj(broj)
             setPoruka({
                 tip: 'success',
-                tekst: `Uspješno generirano ${broj} ${naziv}!`
+                tekst: `Uspješno generirano ${broj} ${nazivZapisa}!`
             })
         } catch (error) {
             setPoruka({
                 tip: 'danger',
-                tekst: `Greška pri generiranju ${naziv}: ` + error.message
+                tekst: `Greška pri generiranju ${nazivZapisa}: ` + error.message
             })
         } finally {
             setLoading(false)
@@ -340,10 +359,8 @@ export default function GeneriranjePodataka() {
             return
         }
 
-        const neispravanUnos = kartaGeneriranja.find((k) =>
-            !Number.isInteger(k.broj) ||
-            k.broj < 1 ||
-            k.broj > k.max
+        const neispravanUnos = kartaGeneriranja.find(
+            stavka => !provjeriBroj(stavka).success
         )
 
         if (neispravanUnos) {
@@ -358,12 +375,12 @@ export default function GeneriranjePodataka() {
         setPoruka(null)
 
         try {
-            await generirajOperatere(brojOperatera)
-            await generirajDrzave(brojDrzava)
-            await generirajPredmete(brojPredmeta)
-            await generirajPutovanja(brojPutovanja)
-            await generirajItinerar(brojItinerara)
-            await generirajPakiranja(brojPakiranja)
+            await generirajOperatere(Number(brojOperatera))
+            await generirajDrzave(Number(brojDrzava))
+            await generirajPredmete(Number(brojPredmeta))
+            await generirajPutovanja(Number(brojPutovanja))
+            await generirajItinerar(Number(brojItinerara))
+            await generirajPakiranja(Number(brojPakiranja))
 
             setPoruka({
                 tip: 'success',
@@ -444,53 +461,48 @@ export default function GeneriranjePodataka() {
             broj: brojOperatera,
             setBroj: setBrojOperatera,
             max: 50,
-            generiraj: (broj) => generirajOperatere(broj),
-            handler: (e) => handleGeneriraj(e, generirajOperatere, brojOperatera, 'operatera')
+            generiraj: generirajOperatere,
+            nazivZapisa: "operatera"
         },
         {
             naziv: 'Države',
             broj: brojDrzava,
             setBroj: setBrojDrzava,
             max: 195,
-            generiraj: (broj) => generirajDrzave(broj),
-            handler: (e) => handleGeneriraj(e, generirajDrzave, brojDrzava, 'država')
+            generiraj: generirajDrzave,
+            nazivZapisa: "država"
         },
         {
             naziv: 'Predmeti',
             broj: brojPredmeta,
             setBroj: setBrojPredmeta,
             max: 50,
-            generiraj: (broj) => generirajPredmete(broj),
-            handler: (e) => handleGeneriraj(e, generirajPredmete, brojPredmeta, 'predmeta')
+            generiraj: generirajPredmete,
+            nazivZapisa: "predmeta"
         },
         {
             naziv: 'Putovanja',
             broj: brojPutovanja,
             setBroj: setBrojPutovanja,
             max: 50,
-            generiraj: (broj) => generirajPutovanja(broj),
-            handler: (e) => handleGeneriraj(e, generirajPutovanja, brojPutovanja, 'putovanja')
+            generiraj: generirajPutovanja,
+            nazivZapisa: "putovanja"
         },
         {
             naziv: 'Itinerar',
             broj: brojItinerara,
             setBroj: setBrojItinerara,
             max: 200,
-            generiraj: (broj) => generirajItinerar(broj),
-            handler: (e) => handleGeneriraj(
-                e,
-                generirajItinerar,
-                brojItinerara,
-                'stavki itinerara'
-            )
+            generiraj: generirajItinerar,
+            nazivZapisa: "stavki itinerara"
         },
         {
             naziv: 'Pakiranja',
             broj: brojPakiranja,
             setBroj: setBrojPakiranja,
             max: 200,
-            generiraj: (broj) => generirajPakiranja(broj),
-            handler: (e) => handleGeneriraj(e, generirajPakiranja, brojPakiranja, 'pakiranja')
+            generiraj: generirajPakiranja,
+            nazivZapisa: "pakiranja"
         }
     ]
 
@@ -667,15 +679,16 @@ export default function GeneriranjePodataka() {
             <Row>
                 {kartaGeneriranja.map((k) => (
                     <Col md={3} key={k.naziv}>
-                        <Form onSubmit={k.handler}>
-                            <Form.Group className="mb-3">
+                        <Form noValidate onSubmit={e => handleGeneriraj(e, k)}>
+                            <Form.Group className="mb-3" controlId={`generator-${k.naziv}`}>
                                 <Form.Label>Broj {k.naziv.toLowerCase()}</Form.Label>
                                 <Form.Control
                                     type="number"
                                     min="1"
                                     max={k.max}
                                     value={k.broj}
-                                    onChange={(e) => k.setBroj(parseInt(e.target.value))}
+                                    step="1"
+                                    onChange={e => k.setBroj(e.target.value)}
                                     disabled={loading || generiranjeZabranjeno}
                                 />
                                 <Form.Text className="text-muted">

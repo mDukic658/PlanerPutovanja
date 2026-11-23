@@ -6,8 +6,6 @@ import { Link } from "react-router-dom";
 import { FaPlaneDeparture } from "react-icons/fa6";
 import { FaMapPin } from "react-icons/fa";
 import { BsSuitcase2Fill } from "react-icons/bs";
-import { GiAirplaneArrival, GiAirplaneDeparture } from "react-icons/gi";
-import { TbMoneybag } from "react-icons/tb";
 import KartaPosjeta from "../components/karta/KartaPosjeta";
 import KartaServis from "../services/karta/KartaServis"
 import useAuth from "../hooks/useAuth";

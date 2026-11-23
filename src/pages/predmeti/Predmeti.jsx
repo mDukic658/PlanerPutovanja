@@ -1,3 +1,4 @@
+import PotvrdaBrisanja from "../../components/zajednicko/PotvrdaBrisanja"
 import { useEffect, useState } from "react"
 import { Button, Form, Table, Pagination, InputGroup } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
@@ -13,6 +14,8 @@ export default function Predmeti() {
     const obavijesti = useObavijesti()
 
     const [predmeti, setPredmeti] = useState([])
+    const [brisanjeUTijeku, setBrisanjeUTijeku] = useState(false)
+    const [predmetZaBrisanje, setPredmetZaBrisanje] = useState(null)
     const [trenutnaStranica, setTrenutnuStranicu] = useState(1)
     const [ukupnoStranica, setUkupnoStranica] = useState(0)
     const [ukupnoStavki, setUkupnoStavki] = useState(0)
@@ -98,7 +101,19 @@ export default function Predmeti() {
         }
     }
 
-    async function obrisi(sifra) {
+    async function obrisi() {
+        if (!predmetZaBrisanje || brisanjeUTijeku) return
+
+        setBrisanjeUTijeku(true)
+        try {
+            await obrisiPredmet(predmetZaBrisanje.sifra)
+        } finally {
+            setPredmetZaBrisanje(null)
+            setBrisanjeUTijeku(false)
+        }
+    }
+
+    async function obrisiPredmet(sifra) {
         try {
             await PredmetiService.obrisi(sifra)
         } catch (error) {
@@ -200,7 +215,7 @@ export default function Predmeti() {
 
                                         <Button
                                             variant="danger"
-                                            onClick={() => obrisi(predmet.sifra)}
+                                            onClick={() => setPredmetZaBrisanje(predmet)}
                                         >
                                             <FaTrash />
                                             {" "}Obriši
@@ -339,6 +354,16 @@ export default function Predmeti() {
                 </Button>
             </Form>
 
+            <PotvrdaBrisanja
+                otvoreno={predmetZaBrisanje !== null}
+                naslov="Brisanje predmeta"
+                brisanjeUTijeku={brisanjeUTijeku}
+                onOdustani={() => setPredmetZaBrisanje(null)}
+                onPotvrdi={obrisi}
+            >
+                Želiš li obrisati predmet „{predmetZaBrisanje?.naziv}”?
+                <p className="mb-0 mt-2">Predmet će se ukloniti i iz svih lista pakiranja u kojima se nalazi.</p>
+            </PotvrdaBrisanja>
         </section>
     )
 }

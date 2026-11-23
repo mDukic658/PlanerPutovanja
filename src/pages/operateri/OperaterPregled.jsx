@@ -1,3 +1,5 @@
+import { useObavijesti } from "../../components/zajednicko/Obavijesti"
+import PotvrdaBrisanja from "../../components/zajednicko/PotvrdaBrisanja"
 import { useEffect, useState } from "react"
 import OperaterService from "../../services/operateri/OperaterService"
 import { Table, Button } from "react-bootstrap"
@@ -8,7 +10,10 @@ import { FaEdit, FaTrash, FaKey } from "react-icons/fa"
 export default function OperaterPregled() {
 
     const navigate = useNavigate()
+    const obavijesti = useObavijesti()
     const [operateri, setOperateri] = useState([])
+    const [brisanjeUTijeku, setBrisanjeUTijeku] = useState(false)
+    const [operaterZaBrisanje, setOperaterZaBrisanje] = useState(null)
 
     useEffect(()=>{document.title='Operateri, ' + IME_APLIKACIJE})
 
@@ -26,14 +31,26 @@ export default function OperaterPregled() {
         })
     }
 
-    async function brisanje(sifra) {
-        if (!confirm('Sigurno obrisati operatera?')) return
-        
-        const rezultat = await OperaterService.obrisi(sifra)
-        if (rezultat.success) {
-            ucitajOperatere()
-        } else {
-            alert(rezultat.message || 'Greška pri brisanju')
+    async function obrisi() {
+        if (!operaterZaBrisanje || brisanjeUTijeku) return
+
+        setBrisanjeUTijeku(true)
+        try {
+            const odgovor = await OperaterService.obrisi(operaterZaBrisanje.sifra)
+            if (odgovor?.success === false) {
+                throw new Error(odgovor.message)
+            }
+
+            setOperateri(prethodni => prethodni.filter(
+                stavka => stavka.sifra !== operaterZaBrisanje.sifra
+            ))
+            obavijesti("Operater je obrisan.")
+        } catch (error) {
+            console.error(error)
+            obavijesti("Brisanje operatera nije uspjelo.", "danger")
+        } finally {
+            setOperaterZaBrisanje(null)
+            setBrisanjeUTijeku(false)
         }
     }
 
@@ -82,7 +99,7 @@ export default function OperaterPregled() {
                                     <Button
                                         variant="outline-danger"
                                         size="sm"
-                                        onClick={() => brisanje(operater.sifra)}
+                                        onClick={() => setOperaterZaBrisanje(operater)}
                                         title="Obriši"
                                     >
                                         <FaTrash />
@@ -93,6 +110,15 @@ export default function OperaterPregled() {
                     ))}
                 </tbody>
             </Table>
+            <PotvrdaBrisanja
+                otvoreno={operaterZaBrisanje !== null}
+                naslov="Brisanje operatera"
+                brisanjeUTijeku={brisanjeUTijeku}
+                onOdustani={() => setOperaterZaBrisanje(null)}
+                onPotvrdi={obrisi}
+            >
+                Želiš li obrisati operatera „{operaterZaBrisanje?.email}”?
+            </PotvrdaBrisanja>
         </>
     )
 }

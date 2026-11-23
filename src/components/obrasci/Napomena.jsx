@@ -4,6 +4,8 @@ import { FaPen, FaTimes } from "react-icons/fa";
 import PakiranjaService from "../../services/lista_pakiranja/PakiranjaService";
 import { useObavijesti } from "../zajednicko/Obavijesti";
 
+import { ShemaPakiranje } from "../../schemas/ShemaListaPakiranja";
+
 export default function Napomena({
     pakiranje, ucitajPakiranja
 }) {
@@ -28,7 +30,14 @@ export default function Napomena({
 
         if (spremanje) return
 
-        const novaNapomena = napomena.trim()
+        const rezultat = ShemaPakiranje.shape.napomena.safeParse(napomena)
+
+        if (!rezultat.success) {
+            obavijesti(rezultat.error.issues[0].message, "danger")
+            return
+        }
+
+        const novaNapomena = rezultat.data
         const prethodnaNapomena = String(
             pakiranje.napomena ?? ""
         ).trim()

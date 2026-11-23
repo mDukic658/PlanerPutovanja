@@ -65,12 +65,6 @@ export default function ItinerarPregled() {
         })
     }
 
-    async function ucitajStavke() {
-        await ItinerarService.getByPutovanje(odabranaSifra).then((odgovor) => {
-            setStavke(odgovor.data)
-        })
-    }
-
     async function obrisi() {
         if (!aktivnostZaBrisanje || brisanjeAktivnosti) return
 

@@ -53,8 +53,11 @@ function App() {
   return (
     <>
       <Container>
+        <a className="prelazak-na-sadrzaj visually-hidden-focusable" href="#glavni-sadrzaj">
+          Preskoči na glavni sadržaj
+        </a>
         <Izbornik />
-        <Container className='app'>
+        <Container as="main" id="glavni-sadrzaj" className="app" tabIndex={-1}>
           <Routes>
             <Route path={RouteNames.HOME} element={<Stranica naslov="Početna"><Home /></Stranica>} />
             <Route path={RouteNames.O_APLIKACIJI} element={<Stranica naslov="O aplikaciji"><OAplikaciji /></Stranica>} />
@@ -114,8 +117,10 @@ function App() {
             <Route path="*" element={<Stranica naslov="Stranica nije pronađena"><NepostojecaStranica /></Stranica>} />
           </Routes>
         </Container>
-        <hr className="footer-hr" />
-        <p className="footer-text">&copy; {IME_APLIKACIJE}</p>
+        <footer>
+          <hr className="footer-hr" />
+          <p className="footer-text">&copy; {IME_APLIKACIJE}</p>
+        </footer>
       </Container>
     </>
   )

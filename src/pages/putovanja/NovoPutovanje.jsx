@@ -66,6 +66,31 @@ export default function NovoPutovanje({
         })
     }
 
+    function provjeriDatume(e) {
+        const aktivnoPolje = e.currentTarget.name
+        const podaci = Object.fromEntries(new FormData(e.currentTarget.form))
+        const rezultat = ShemaNovoPutovanje.safeParse(podaci)
+
+        setGreske(prethodne => {
+            const nove = { ...prethodne }
+            for (const polje of ['datumPolaska', 'datumPovratka']) {
+                if (polje !== aktivnoPolje && !podaci[polje] && !prethodne[polje]) {
+                    continue
+                }
+                const poruka = rezultat.error?.issues.find(
+                    issue => issue.path[0] === polje
+                )?.message
+
+                if (poruka) {
+                    nove[polje] = poruka
+                } else {
+                    delete nove[polje]
+                }
+            }
+            return nove
+        })
+    }
+
     function obradiSubmit(e) {
         e.preventDefault()
         setGreske({})
@@ -186,7 +211,10 @@ export default function NovoPutovanje({
                                 name="datumPolaska"
                                 defaultValue={pocetniDatumi.datumPolaska || ""}
                                 isInvalid={!!greske.datumPolaska}
-                                onChange={() => ocistiGresku('datumPolaska')}
+                                onBlur={provjeriDatume}
+                                onChange={e => {
+                                    if (greske.datumPolaska || greske.datumPovratka) provjeriDatume(e)
+                                }}
                             />
                             <Form.Control.Feedback type="invalid">
                                 {greske.datumPolaska}
@@ -204,7 +232,10 @@ export default function NovoPutovanje({
                                 name="datumPovratka"
                                 defaultValue={pocetniDatumi.datumPovratka || ""}
                                 isInvalid={!!greske.datumPovratka}
-                                onChange={() => ocistiGresku('datumPovratka')}
+                                onBlur={provjeriDatume}
+                                onChange={e => {
+                                    if (greske.datumPovratka) provjeriDatume(e)
+                                }}
                             />
                             <Form.Control.Feedback type="invalid">
                                 {greske.datumPovratka}

@@ -9,6 +9,13 @@ const datum = z.string().min(1, 'Morate odabrati datum.').refine((vrijednost) =>
         && parsed.toISOString().slice(0, 10) === vrijednost
 }, 'Datum nije ispravan.')
 
+const datumi = z.object({
+    datumPolaska: datum,
+    datumPovratka: datum
+})
+
+const polazak = datumi.pick({ datumPolaska: true })
+
 export const ShemaPutovanje = z.object({
     naziv: z.string()
         .trim()
@@ -24,9 +31,7 @@ export const ShemaPutovanje = z.object({
         .trim()
         .min(1, 'Morate odabrati državu.'),
 
-    datumPolaska: datum,
-
-    datumPovratka: datum,
+    ...datumi.shape,
 
     budzet: z.string()
         .trim()
@@ -41,7 +46,8 @@ export const ShemaPutovanje = z.object({
     (podaci) => podaci.datumPovratka >= podaci.datumPolaska,
     {
         message: 'Datum povratka ne može biti prije datuma polaska.',
-        path: ['datumPovratka']
+        path: ['datumPovratka'],
+        when: ({ value }) => datumi.safeParse(value).success
     }
 )
 
@@ -56,6 +62,7 @@ export const ShemaNovoPutovanje = ShemaPutovanje.refine(
     },
     {
         message: 'Datum polaska ne može biti u prošlosti.',
-        path: ['datumPolaska']
+        path: ['datumPolaska'],
+        when: ({ value }) => polazak.safeParse(value).success
     }
 )

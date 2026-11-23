@@ -1,3 +1,4 @@
+import PotvrdaBrisanja from "../../components/zajednicko/PotvrdaBrisanja"
 import { useEffect, useState } from "react"
 import KartaServis from "../../services/karta/KartaServis"
 import KartaPosjeta from "../../components/karta/KartaPosjeta"
@@ -9,6 +10,7 @@ import { useObavijesti } from "../../components/zajednicko/Obavijesti"
 
 export default function KartaPregled() {
     const [posjeti, setPosjeti] = useState([])
+    const [posjetZaBrisanje, setPosjetZaBrisanje] = useState(null)
     const [ucitavanje, setUcitavanje] = useState(true)
     const [greska, setGreska] = useState("")
     const [brisanjeSifra, setBrisanjeSifra] = useState(null)
@@ -49,21 +51,17 @@ export default function KartaPregled() {
         posjeti.map(posjet => posjet.iso2)
     ).size
 
-    async function obrisiPosjet(posjet) {
-        if (brisanjeSifra !== null) {
-            return
-        }
+    async function obrisiPosjet() {
+        if (!posjetZaBrisanje || brisanjeSifra !== null) return
 
-        if (!confirm(
-            `Obrisati posjet mjestu „${posjet.grad}, ${posjet.drzava}”?`
-        )) {
-            return
-        }
-
+        const posjet = posjetZaBrisanje
         setBrisanjeSifra(posjet.sifra)
 
         try {
-            await KartaServis.obrisi(posjet.sifra)
+            const odgovor = await KartaServis.obrisi(posjet.sifra)
+            if (odgovor?.success === false) {
+                throw new Error(odgovor.message)
+            }
 
             setPosjeti(prethodni =>
                 prethodni.filter(
@@ -76,6 +74,7 @@ export default function KartaPregled() {
             console.error(error)
             obavijesti("Brisanje posjeta nije uspjelo.", "danger")
         } finally {
+            setPosjetZaBrisanje(null)
             setBrisanjeSifra(null)
         }
     }
@@ -109,11 +108,20 @@ export default function KartaPregled() {
                     <KartaPosjeta posjeti={posjeti} />
                     <PopisPosjeta
                         posjeti={posjeti}
-                        onObrisi={obrisiPosjet}
+                        onObrisi={setPosjetZaBrisanje}
                         brisanjeSifra={brisanjeSifra}
                     />
                 </>
             )}
+            <PotvrdaBrisanja
+                otvoreno={posjetZaBrisanje !== null}
+                naslov="Brisanje posjeta"
+                brisanjeUTijeku={brisanjeSifra !== null}
+                onOdustani={() => setPosjetZaBrisanje(null)}
+                onPotvrdi={obrisiPosjet}
+            >
+                Želiš li obrisati posjet mjestu „{posjetZaBrisanje?.grad}, {posjetZaBrisanje?.drzava}”?
+            </PotvrdaBrisanja>
         </section>
     )
 }
