@@ -1,0 +1,49 @@
+/* --- Navigacija ------------------------------------------------------- */
+:root {
+  --wheat: #faf5e8;
+  --charcoal: #1f2937;
+  --pacific-blue: #1ca9c9;
+  --mango-orange: #ff8243;
+  --sage-green: #556b2f;
+  --terracotta: #c8553d;
+}
+
+@mixin zaobljeni-rubovi($radijus) {
+  border-radius: $radijus;
+}
+
+.navbar {
+  background-color: var(--charcoal) !important;
+  @include zaobljeni-rubovi(16px)
+}
+
+.navbar-brand {
+  color: var(--wheat) !important;
+  font-weight: bold;
+}
+
+.navbar-brand:hover {
+  color: var(--pacific-blue) !important;
+}
+
+.navbar .nav-link {
+  color: var(--wheat) !important;
+}
+
+.navbar-toggler-icon {
+  filter: invert(1);
+}
+
+.navbar .dropdown-menu {
+  background-color: var(--charcoal) !important;
+  border: none;
+}
+
+.navbar .dropdown-menu .dropdown-item {
+  color: var(--wheat) !important;
+}
+
+.navbar .dropdown-item:hover {
+  background-color: var(--pacific-blue) !important;
+  color: white !important;
+}

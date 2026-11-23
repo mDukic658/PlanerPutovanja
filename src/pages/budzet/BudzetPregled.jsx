@@ -26,6 +26,7 @@ export default function BudzetPregled() {
     const [troskovi, setTroskovi] = useState([])
     const [pretraga, setPretraga] = useState("")
     const [prikaziPrijedloge, setPrikaziPrijedloge] = useState(false)
+    const [aktivniPrijedlog, setAktivniPrijedlog] = useState(-1)
     const [ucitavanje, setUcitavanje] = useState(true)
     const [greska, setGreska] = useState("")
     const [brisanjeSifra, setBrisanjeSifra] = useState(null)
@@ -83,6 +84,10 @@ export default function BudzetPregled() {
             new Date(b.datumPolaska) - new Date(a.datumPolaska))
         .filter(putovanje => putovanje.naziv.toLowerCase().includes(pretraga.trim().toLowerCase()))
 
+    const aktivnoPutovanje = prikaziPrijedloge
+        ? filtriranaPutovanja[aktivniPrijedlog]
+        : undefined
+
     const prikazaniTroskovi = troskovi
         .filter(
             trosak =>
@@ -109,8 +114,57 @@ export default function BudzetPregled() {
     function odaberiPutovanje(sifra) {
         setSearchParams({ putovanjeSifra: String(sifra) })
         setPretraga("")
-        setPrikaziPrijedloge(false)
+        zatvoriPrijedloge()
     }
+
+    function zatvoriPrijedloge() {
+        setPrikaziPrijedloge(false)
+        setAktivniPrijedlog(-1)
+    }
+
+    function obradiTipkuPretrage(e) {
+        if (e.key === "Escape" && prikaziPrijedloge) {
+            e.preventDefault()
+            zatvoriPrijedloge()
+            return
+        }
+
+        if (e.key === "Enter" && aktivnoPutovanje) {
+            e.preventDefault()
+            odaberiPutovanje(aktivnoPutovanje.sifra)
+            return
+        }
+
+        if (e.key !== "ArrowDown" && e.key !== "ArrowUp") {
+            return
+        }
+
+        e.preventDefault()
+        setPrikaziPrijedloge(true)
+
+        const brojPrijedloga = filtriranaPutovanja.length
+
+        if (brojPrijedloga === 0) {
+            return
+        }
+
+        const pomak = e.key === "ArrowDown" ? 1 : -1
+        setAktivniPrijedlog(trenutni => {
+            if (trenutni < 0 || trenutni >= brojPrijedloga) {
+                return pomak > 0 ? 0 : brojPrijedloga - 1
+            }
+
+            return (trenutni + pomak + brojPrijedloga) % brojPrijedloga
+        })
+    }
+
+    useEffect(() => {
+        if (aktivnoPutovanje) {
+            document.getElementById(
+                `budzet-prijedlog-${aktivniPrijedlog}`
+            )?.scrollIntoView({ block: "nearest" })
+        }
+    }, [aktivniPrijedlog, aktivnoPutovanje])
 
     async function obrisi(trosak) {
         if (brisanjeSifra !== null) {
@@ -169,36 +223,8 @@ export default function BudzetPregled() {
                             controlId="budzet-pretraga-putovanja"
                             className="position-relative"
                             onBlur={e => {
-                                if (
-                                    !e.currentTarget.contains(e.relatedTarget)
-                                ) {
-                                    setPrikaziPrijedloge(false)
-                                }
-                            }}
-                            onKeyDown={e => {
-                                const polje = e.currentTarget.querySelector('input[type="search"]')
-
-                                if (e.key === "Escape") {
-                                    polje?.focus()
-                                    setPrikaziPrijedloge(false)
-                                    return
-                                }
-
-                                if (e.key !== "ArrowDown" && e.key !== "ArrowUp") {
-                                    return
-                                }
-
-                                const prijedlozi = [
-                                    ...e.currentTarget.querySelectorAll(".itinerar-prijedlog")
-                                ]
-                                const trenutni = prijedlozi.indexOf(e.target)
-                                const sljedeci = e.key === "ArrowDown"
-                                    ? prijedlozi[trenutni + 1]
-                                    : trenutni === 0 ? polje : prijedlozi[trenutni - 1]
-
-                                if (sljedeci) {
-                                    e.preventDefault()
-                                    sljedeci.focus()
+                                if (!e.currentTarget.contains(e.relatedTarget)) {
+                                    zatvoriPrijedloge()
                                 }
                             }}
                         >
@@ -209,31 +235,46 @@ export default function BudzetPregled() {
                                 placeholder="Pretraži putovanja..."
                                 value={pretraga}
                                 autoComplete="off"
+                                role="combobox"
+                                aria-autocomplete="list"
+                                aria-expanded={prikaziPrijedloge}
+                                aria-controls={prikaziPrijedloge ? "budzet-prijedlozi" : undefined}
+                                aria-activedescendant={aktivnoPutovanje
+                                    ? `budzet-prijedlog-${aktivniPrijedlog}`
+                                    : undefined}
+                                onKeyDown={obradiTipkuPretrage}
                                 onChange={e => {
                                     setPretraga(e.target.value)
+                                    setAktivniPrijedlog(-1)
                                     setPrikaziPrijedloge(true)
                                 }}
-                                onFocus={() =>
-                                    setPrikaziPrijedloge(true)
-                                }
+                                onFocus={() => setPrikaziPrijedloge(true)}
+                                onClick={() => setPrikaziPrijedloge(true)}
                             />
 
                             {prikaziPrijedloge && (
                                 <div className="itinerar-prijedlozi">
-                                    {filtriranaPutovanja.map(putovanje => (
-                                        <button
-                                            key={putovanje.sifra}
-                                            type="button"
-                                            className="itinerar-prijedlog border-0 w-100 text-start"
-                                            onClick={() =>
-                                                odaberiPutovanje(
-                                                    putovanje.sifra
-                                                )
-                                            }
-                                        >
-                                            {putovanje.naziv}
-                                        </button>
-                                    ))}
+                                    <div id="budzet-prijedlozi" role="listbox" aria-label="Pronađena putovanja">
+                                        {filtriranaPutovanja.map((putovanje, index) => (
+                                            <button
+                                                key={putovanje.sifra}
+                                                type="button"
+                                                id={`budzet-prijedlog-${index}`}
+                                                role="option"
+                                                tabIndex={-1}
+                                                aria-selected={index === aktivniPrijedlog}
+                                                onMouseDown={e => e.preventDefault()}
+                                                className={`itinerar-prijedlog border-0 w-100 text-start${index === aktivniPrijedlog ? " aktivan" : ""}`}
+                                                onClick={() =>
+                                                    odaberiPutovanje(
+                                                        putovanje.sifra
+                                                    )
+                                                }
+                                            >
+                                                {putovanje.naziv}
+                                            </button>
+                                        ))}
+                                    </div>
 
                                     {filtriranaPutovanja.length === 0 && (
                                         <p className="p-3 mb-0">

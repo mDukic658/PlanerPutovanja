@@ -5,13 +5,14 @@ import NavDropdown from 'react-bootstrap/NavDropdown'
 import { Link, useNavigate } from 'react-router-dom'
 import { IME_APLIKACIJE, RouteNames } from '../../constants'
 import useAuth from '../../hooks/useAuth'
+import './Izbornik.scss'
 
 export default function Izbornik() {
     const navigate = useNavigate()
     const { isLoggedIn, authUser, logout } = useAuth()
 
     return (
-        <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary">
+        <Navbar collapseOnSelect expand="xl" className="bg-body-tertiary">
             <Container>
                 <Navbar.Brand as={Link} to={RouteNames.HOME}>
                     {IME_APLIKACIJE}

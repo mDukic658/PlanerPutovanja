@@ -248,61 +248,6 @@ function PrijavljenaPocetna() {
                     </Col>
                 ))}
             </Row>
-
-            <h2 className="mt-4">
-                <BsSuitcase2Fill />
-                Moja putovanja
-            </h2>
-
-            {putovanja.length === 0 ? (
-                <p>Trenutno nemaš niti jedno putovanje.</p>
-            ) : (
-                <Row>
-                    {putovanja.map((putovanje) => (
-                        <Col md={4} key={putovanje.sifra} className="mb-4">
-                            <Card>
-                                <Card.Body>
-                                    <Card.Title>
-                                        {putovanje.naziv}
-                                    </Card.Title>
-
-                                    <Card.Text>
-                                        <FaMapPin />
-                                        {putovanje.destinacija}, {putovanje.drzava}
-                                    </Card.Text>
-
-                                    <Card.Text>
-                                        <GiAirplaneDeparture />
-                                        Datum polaska: {putovanje.datumPolaska}
-                                    </Card.Text>
-
-                                    <Card.Text>
-                                        <GiAirplaneArrival />
-                                        Datum povratka: {putovanje.datumPovratka}
-                                    </Card.Text>
-
-                                    <Card.Text>
-                                        <TbMoneybag />
-                                        Budžet: {putovanje.budzet} €
-                                    </Card.Text>
-
-                                    <Button
-                                        as={Link}
-                                        to={RouteNames.PUTOVANJA_DETALJI.replace(
-                                            ":sifra",
-                                            putovanje.sifra
-                                        )}
-                                        variant="outline-primary"
-                                    >
-                                        Pregledaj putovanje
-                                    </Button>
-                                </Card.Body>
-                            </Card>
-                        </Col>
-                    ))}
-                </Row>
-            )}
-
         </>
     )
 

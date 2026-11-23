@@ -53,7 +53,7 @@ export default function Login() {
                 return
             }
 
-            navigate(RouteNames.PUTOVANJA, { replace: true })
+            navigate(RouteNames.HOME, { replace: true })
         } finally {
             setPrijavaUTijeku(false)
         }

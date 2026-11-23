@@ -13,6 +13,10 @@
  * 10. UREĐIVAČ SLIKE
  * 11. GALERIJA FOTOGRAFIJA
  * 12. VELIKI PRIKAZ FOTOGRAFIJE
+ * 13. ZAJEDNIČKI STILOVI SUČELJA
+ * 14. POČETNA, PRIJAVA, O APLIKACIJI I 404
+ * 15. BUDŽET, KARTA I DETALJI PUTOVANJA
+ * 16. OPERATERI I GENERIRANJE PODATAKA
  *
  */
 
@@ -29,6 +33,13 @@
   --mango-orange: #ff8243;
   --sage-green: #556b2f;
   --terracotta: #c8553d;
+  --povrsina: #fffefa;
+  --rub-povrsine: #e0d9ca;
+  --pozadina-naglaska: #e8f5f7;
+  --tamni-naglasak: #096779;
+  --sjena-povrsine: 0 4px 16px rgb(31 41 55 / 8%);
+  --radijus-kartice: 1rem;
+  --razmak-kartice: clamp(1rem, 2.5vw, 1.75rem);
 }
 
 /* ==========================================================================
@@ -47,43 +58,6 @@ body {
 
 .desno {
   text-align: right;
-}
-
-/* --- Navigacija ------------------------------------------------------- */
-
-.navbar {
-  background-color: var(--charcoal) !important;
-}
-
-.navbar-brand {
-  color: var(--wheat) !important;
-  font-weight: bold;
-}
-
-.navbar-brand:hover {
-  color: var(--pacific-blue) !important;
-}
-
-.navbar .nav-link {
-  color: var(--wheat) !important;
-}
-
-.navbar-toggler-icon {
-  filter: invert(1);
-}
-
-.navbar .dropdown-menu {
-  background-color: var(--charcoal) !important;
-  border: none;
-}
-
-.navbar .dropdown-menu .dropdown-item {
-  color: var(--wheat) !important;
-}
-
-.navbar .dropdown-item:hover {
-  background-color: var(--pacific-blue) !important;
-  color: white !important;
 }
 
 /* --- Početna stranica ------------------------------------------------- */
@@ -180,14 +154,14 @@ h4 {
 /* --- Primarni gumbi --------------------------------------------------- */
 
 .btn-primary {
-  background-color: var(--pacific-blue);
-  border-color: var(--pacific-blue);
-  margin-bottom: 1rem;
-}
-
-.btn-primary:hover {
-  background-color: var(--mango-orange);
-  border-color: var(--mango-orange);
+  --bs-btn-bg: var(--tamni-naglasak);
+  --bs-btn-border-color: var(--tamni-naglasak);
+  --bs-btn-hover-bg: #075465;
+  --bs-btn-hover-border-color: #075465;
+  --bs-btn-active-bg: #064655;
+  --bs-btn-active-border-color: #064655;
+  --bs-btn-disabled-bg: var(--tamni-naglasak);
+  --bs-btn-disabled-border-color: var(--tamni-naglasak);
 }
 
 /* ==========================================================================
@@ -3079,4 +3053,250 @@ h4 {
     padding-inline: 0.65rem;
     font-size: 0.85rem;
   }
+}
+
+/* ==========================================================================
+   13. ZAJEDNIČKI STILOVI SUČELJA
+   ========================================================================== */
+
+body {
+  color: var(--charcoal);
+}
+
+.app {
+  min-width: 0;
+  padding-block: clamp(1.25rem, 3vw, 2.5rem) 1.5rem;
+}
+
+.app :where(h1, h2, h3, h4) {
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.app h1 {
+  font-weight: 750;
+  letter-spacing: -0.025em;
+}
+
+.app :where(.form-control, .form-select):not(.is-invalid):focus {
+  border-color: var(--tamni-naglasak);
+  box-shadow: 0 0 0 0.2rem rgb(9 103 121 / 18%);
+}
+
+.app :where(.form-label) {
+  font-weight: 600;
+}
+
+.app :where(a, button):focus-visible,
+.modal :where(a, button):focus-visible {
+  outline: 2px solid var(--tamni-naglasak);
+  outline-offset: 2px;
+}
+
+.app :where(.btn, .form-control, .form-select),
+.modal :where(.btn, .form-control, .form-select) {
+  border-radius: 0.625rem;
+}
+
+.modal:not(.galerija-modal) {
+  --bs-modal-border-color: var(--rub-povrsine);
+  --bs-modal-border-radius: var(--radijus-kartice);
+  --bs-modal-header-border-color: var(--rub-povrsine);
+  --bs-modal-footer-border-color: var(--rub-povrsine);
+  --bs-modal-bg: var(--povrsina);
+}
+
+.modal:not(.galerija-modal) .modal-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.modal:not(.galerija-modal) :where(.modal-body, .modal-title) {
+  overflow-wrap: anywhere;
+}
+
+/* ==========================================================================
+   14. POČETNA, PRIJAVA, O APLIKACIJI I 404
+   ========================================================================== */
+
+.app>section:is(.py-4, .py-5):has(> .lead) {
+  max-width: 58rem;
+  padding-inline: var(--razmak-kartice);
+  background: var(--povrsina);
+  border: 1px solid var(--rub-povrsine);
+  border-radius: var(--radijus-kartice);
+  box-shadow: var(--sjena-povrsine);
+}
+
+.app>section.py-5:has(> .lead) {
+  max-width: none;
+  padding-inline: clamp(1.25rem, 5vw, 4rem);
+  background: linear-gradient(125deg, var(--povrsina) 45%, var(--pozadina-naglaska));
+}
+
+.app>section:is(.py-4, .py-5)>.lead {
+  max-width: 58ch;
+}
+
+.app>section.py-4:has(> .lead) li+li {
+  margin-top: 0.5rem;
+}
+
+.app>section.text-center:has(> .display-1) {
+  background: var(--povrsina);
+  border: 1px solid var(--rub-povrsine);
+  border-radius: var(--radijus-kartice);
+  padding-inline: var(--razmak-kartice);
+}
+
+.app>section.text-center:has(> .display-1)>.d-flex {
+  flex-wrap: wrap;
+}
+
+.app .card:has(#prijava-email) {
+  border-color: var(--rub-povrsine);
+  border-radius: var(--radijus-kartice);
+  background: var(--povrsina);
+  text-align: left;
+}
+
+.app .card:has(#prijava-email) .card-body {
+  padding: var(--razmak-kartice);
+}
+
+/* ==========================================================================
+   15. BUDŽET, KARTA I DETALJI PUTOVANJA
+   ========================================================================== */
+
+:is(.budzet-pregled, .karta-pregled, .putovanje-detalji) .card,
+:is(.budzet-novo, .budzet-promjena, .karta-novo, .karta-promjena) form,
+.app>.container form:has(input[type="number"][min="1"]) {
+  min-width: 0;
+  background: var(--povrsina);
+  border: 1px solid var(--rub-povrsine);
+  border-radius: var(--radijus-kartice);
+  box-shadow: var(--sjena-povrsine);
+}
+
+:is(.budzet-pregled, .karta-pregled, .putovanje-detalji) .card-body {
+  padding: var(--razmak-kartice);
+  text-align: start;
+  overflow-wrap: anywhere;
+}
+
+:is(.budzet-novo, .budzet-promjena, .karta-novo, .karta-promjena) form {
+  max-width: 50rem;
+  padding: var(--razmak-kartice);
+}
+
+:is(.budzet-pregled, .putovanje-detalji) .card-body>.h6 {
+  color: #4c5969;
+}
+
+:is(.budzet-pregled, .putovanje-detalji) .card-body> :where(strong, p) {
+  font-variant-numeric: tabular-nums;
+}
+
+.putovanje-detalji .putovanje-detalji-cover {
+  display: block;
+  border-radius: var(--radijus-kartice) !important;
+}
+
+.app .leaflet-container {
+  border: 1px solid var(--rub-povrsine);
+  border-radius: var(--radijus-kartice);
+  isolation: isolate;
+}
+
+.pregled-itinerara .itinerar-odabir .row .btn {
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* ==========================================================================
+   16. OPERATERI I GENERIRANJE PODATAKA
+   ========================================================================== */
+
+.app .card:has(#uloga),
+.app .card:has(#novaLozinka) {
+  background: var(--povrsina);
+  border-color: var(--rub-povrsine);
+  border-radius: var(--radijus-kartice);
+  text-align: start;
+}
+
+.app :is(.card:has(#uloga), .card:has(#novaLozinka)) .card-body {
+  padding: var(--razmak-kartice);
+}
+
+.app .table-responsive:has(.badge) {
+  background: var(--povrsina);
+  border: 1px solid var(--rub-povrsine);
+  border-radius: var(--radijus-kartice);
+  box-shadow: var(--sjena-povrsine);
+}
+
+.app .table-responsive .table:has(.badge) {
+  --bs-table-bg: var(--povrsina);
+  --bs-table-striped-bg: #f7f5ef;
+  --bs-table-hover-bg: var(--pozadina-naglaska);
+  --bs-table-border-color: var(--rub-povrsine);
+  margin-bottom: 0;
+  vertical-align: middle;
+}
+
+.app .table-responsive .table:has(.badge) thead {
+  --bs-table-bg: var(--charcoal);
+  --bs-table-color: white;
+}
+
+.app>.container:has(form input[type="number"][min="1"])>.row:has(form) {
+  --bs-gutter-y: 1rem;
+}
+
+.app>.container form:has(input[type="number"][min="1"]) {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1rem;
+}
+
+.app>.container form:has(input[type="number"][min="1"])>.btn {
+  margin-top: auto;
+}
+
+@media (max-width: 575.98px) {
+  .app {
+    padding-inline: 0.25rem;
+  }
+
+  .app>section:is(.py-4, .py-5):has(> .lead) {
+    padding-inline: 1rem;
+  }
+
+  .modal-footer>.btn {
+    white-space: normal;
+  }
+}
+
+/* Odabir putovanja mora ostati vidljiv i u stanju fokusa. */
+.pregled-itinerara .itinerar-odabir .row .btn-outline-primary {
+  --bs-btn-color: var(--tamni-naglasak);
+  --bs-btn-border-color: var(--tamni-naglasak);
+  --bs-btn-hover-bg: var(--tamni-naglasak);
+  --bs-btn-hover-border-color: var(--tamni-naglasak);
+  --bs-btn-active-bg: var(--tamni-naglasak);
+  --bs-btn-active-border-color: var(--tamni-naglasak);
+}
+
+.pregled-itinerara .itinerar-odabir .row .btn-primary {
+  background-color: var(--tamni-naglasak);
+  border-color: var(--tamni-naglasak);
+}
+
+.pregled-itinerara .itinerar-odabir .row .btn-primary:hover {
+  background-color: #075465;
+  border-color: #075465;
 }
