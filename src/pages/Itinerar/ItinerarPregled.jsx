@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { Button, Badge, Card, Form, Row, Col } from "react-bootstrap"
+import { Button, Badge, Card, Form, Row, Col, Pagination } from "react-bootstrap"
 import { RouteNames } from "../../constants";
 import PutovanjaService from '../../services/putovanja/PutovanjaService'
 import ItinerarService from '../../services/itinerar/ItinerarService'
@@ -10,6 +10,7 @@ import { generirajItinerarWord } from "../../components/dokumenti/WordGenerator"
 import RichTextPrikaz from "../../components/ui/RichTextEditor/RichTextPrikaz";
 import PotvrdaBrisanja from "../../components/zajednicko/PotvrdaBrisanja";
 
+const PUTOVANJA_PO_STRANICI = 6
 
 export default function ItinerarPregled() {
 
@@ -18,6 +19,7 @@ export default function ItinerarPregled() {
     const [stavke, setStavke] = useState([])
     const [odabranoPutovanje, setOdabranoPutovanje] = useState({})
     const [pretragaPutovanje, setPretragaPutovanje] = useState('')
+    const [stranicaPutovanja, setStranicaPutovanja] = useState(1)
     const [generiranjeWorda, setGeneriranjeWorda] = useState(false)
     const [aktivnostZaBrisanje, setAktivnostZaBrisanje] = useState(null)
     const [brisanjeAktivnosti, setBrisanjeAktivnosti] = useState(false)
@@ -144,6 +146,13 @@ export default function ItinerarPregled() {
     }
 
     const filtriranaPutovanja = filtrirajPutovanje()
+    const ukupnoStranica = Math.ceil(filtriranaPutovanja.length / PUTOVANJA_PO_STRANICI)
+    const trenutnaStranica = Math.min(stranicaPutovanja, Math.max(1, ukupnoStranica))
+    const pocetakStranice = (trenutnaStranica - 1) * PUTOVANJA_PO_STRANICI
+    const putovanjaNaStranici = filtriranaPutovanja.slice(
+        pocetakStranice,
+        pocetakStranice + PUTOVANJA_PO_STRANICI
+    )
 
     return (
 
@@ -184,7 +193,10 @@ export default function ItinerarPregled() {
                         type="search"
                         placeholder="Pretraži putovanja..."
                         value={pretragaPutovanje}
-                        onChange={(e) => setPretragaPutovanje(e.target.value)}
+                        onChange={(e) => {
+                            setPretragaPutovanje(e.target.value)
+                            setStranicaPutovanja(1)
+                        }}
                     />
                 </Form.Group>
 
@@ -192,7 +204,7 @@ export default function ItinerarPregled() {
                     <p>Nema pronađenih putovanja.</p>
                 ) : (
                     <div className="row g-2 mb-3">
-                        {filtriranaPutovanja.map((putovanje) => (
+                        {putovanjaNaStranici.map((putovanje) => (
                             <div className="col-12 col-sm-6 col-lg-4" key={putovanje.sifra}>
                                 <Button
                                     type="button"
@@ -210,6 +222,47 @@ export default function ItinerarPregled() {
                             </div>
                         ))}
                     </div>
+                )}
+
+                {ukupnoStranica > 1 && (
+                    <nav aria-label="Stranice popisa putovanja">
+                        <Pagination className="justify-content-center flex-wrap">
+                            <Pagination.First
+                                aria-label="Prva stranica"
+                                disabled={trenutnaStranica === 1}
+                                onClick={() => setStranicaPutovanja(1)}
+                            />
+                            <Pagination.Prev
+                                aria-label="Prethodna stranica"
+                                disabled={trenutnaStranica === 1}
+                                onClick={() => setStranicaPutovanja(trenutnaStranica - 1)}
+                            />
+                            {Array.from({ length: ukupnoStranica }, (_, indeks) => {
+                                const brojStranice = indeks + 1
+
+                                return (
+                                    <Pagination.Item
+                                        key={brojStranice}
+                                        active={brojStranice === trenutnaStranica}
+                                        activeLabel="(trenutna stranica)"
+                                        onClick={() => setStranicaPutovanja(brojStranice)}
+                                    >
+                                        {brojStranice}
+                                    </Pagination.Item>
+                                )
+                            })}
+                            <Pagination.Next
+                                aria-label="Sljedeća stranica"
+                                disabled={trenutnaStranica === ukupnoStranica}
+                                onClick={() => setStranicaPutovanja(trenutnaStranica + 1)}
+                            />
+                            <Pagination.Last
+                                aria-label="Zadnja stranica"
+                                disabled={trenutnaStranica === ukupnoStranica}
+                                onClick={() => setStranicaPutovanja(ukupnoStranica)}
+                            />
+                        </Pagination>
+                    </nav>
                 )}
 
                 {Boolean(odabranoPutovanje.sifra) && (
