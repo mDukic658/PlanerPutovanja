@@ -8,6 +8,7 @@ import { RouteNames } from '../../constants'
 export default function Login() {
     const [email, setEmail] = useState('')
     const [lozinka, setLozinka] = useState('')
+    const [prikaziLozinku, setPrikaziLozinku] = useState(false)
     const [errors, setErrors] = useState({})
     const [prijavaUTijeku, setPrijavaUTijeku] = useState(false)
 
@@ -95,11 +96,11 @@ export default function Login() {
 
                             <Form.Group
                                 controlId="prijava-lozinka"
-                                className="mb-4"
+                                className="mb-2"
                             >
                                 <Form.Label>Lozinka</Form.Label>
                                 <Form.Control
-                                    type="password"
+                                    type={prikaziLozinku ? 'text' : 'password'}
                                     name="lozinka"
                                     autoComplete="current-password"
                                     value={lozinka}
@@ -112,6 +113,15 @@ export default function Login() {
                                     {errors.lozinka}
                                 </Form.Control.Feedback>
                             </Form.Group>
+
+                            <Form.Check
+                                type="checkbox"
+                                id="prijava-prikazi-lozinku"
+                                className="mb-4"
+                                label={prikaziLozinku ? 'Sakrij lozinku' : 'Pokaži lozinku'}
+                                checked={prikaziLozinku}
+                                onChange={(e) => setPrikaziLozinku(e.target.checked)}
+                            />
 
                             <Button
                                 type="submit"
