@@ -2,7 +2,7 @@ import { Button, Form } from "react-bootstrap"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import { useEffect, useState } from "react"
 import PredmetiService from "../../services/predmeti/PredmetiService"
-import { RouteNames } from "../../constants"
+import { RouteNames, DATA_SOURCE } from "../../constants"
 import { FaArrowLeft, FaPen, FaSave, FaTimes } from "react-icons/fa"
 import { ShemaPredmet } from "../../schemas/ShemaPredmeti"
 
@@ -10,6 +10,9 @@ export default function PredmetPromjena() {
 
     const navigate = useNavigate()
     const params = useParams()
+    const sifraPredmeta = DATA_SOURCE === 'firebase'
+        ? params.sifra
+        : Number(params.sifra)
     const [errors, setErrors] = useState({})
     const [predmet, setPredmet] = useState(null)
     const [ucitavanje, setUcitavanje] = useState(true)
@@ -24,9 +27,7 @@ export default function PredmetPromjena() {
         setGreska('')
 
         try {
-            const odgovor = await PredmetiService.getBySifra(
-                Number(params.sifra)
-            )
+            const odgovor = await PredmetiService.getBySifra(sifraPredmeta)
 
             setPredmet(odgovor.data || null)
         } catch (error) {
@@ -63,10 +64,7 @@ export default function PredmetPromjena() {
             return
         }
 
-        await PredmetiService.promijeni(
-            Number(params.sifra),
-            rezultat.data
-        )
+        await PredmetiService.promijeni(sifraPredmeta, rezultat.data)
 
         navigate(RouteNames.PREDMETI)
     }

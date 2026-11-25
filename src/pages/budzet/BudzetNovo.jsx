@@ -144,7 +144,7 @@ export default function BudzetNovo() {
     }
 
     return (
-        <section className="budzet-novo">
+        <section className="budzet-novo mx-auto text-center">
             <Link to={povratak} className="natrag-na-pregled">
                 <FaArrowLeft />
                 {" "}Natrag na pregled budžeta
@@ -167,7 +167,7 @@ export default function BudzetNovo() {
                         </span>
                     </div>
 
-                    <Form onSubmit={obradiSubmit} noValidate>
+                    <Form className="mx-auto" onSubmit={obradiSubmit} noValidate>
                         <fieldset disabled={spremanje}>
                             <Form.Group controlId="trosak-naziv" className="mb-3">
                                 <Form.Label>Naziv troška</Form.Label>

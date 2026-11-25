@@ -1,16 +1,16 @@
 export default function OAplikaciji() {
     return (
-        <section className="py-4">
+        <section className="py-4 mx-auto text-center">
             <h1>O aplikaciji</h1>
 
-            <p className="lead">
+            <p className="lead mx-auto">
                 Planer putovanja pomaže ti organizirati put prije polaska
                 i pratiti planove i troškove tijekom putovanja.
             </p>
 
             <h2 className="h4 mt-4">Što možeš raditi u Planeru</h2>
 
-            <ul>
+            <ul className="d-inline-block text-start" >
                 <li>Planirati putovanja i dnevne aktivnosti u kalendaru.</li>
                 <li>Pripremiti listu pakiranja i pratiti što je spakirano.</li>
                 <li>Evidentirati troškove i pratiti budžet.</li>

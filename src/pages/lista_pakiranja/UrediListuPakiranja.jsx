@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom"
 import PutovanjaService from "../../services/putovanja/PutovanjaService"
 import PakiranjaService from "../../services/lista_pakiranja/PakiranjaService"
 import PredmetiService from "../../services/predmeti/PredmetiService"
+import PotvrdaBrisanja from "../../components/zajednicko/PotvrdaBrisanja"
 import Pakiranje from "./Pakiranje"
 import NovoPakiranje from "./NovoPakiranje"
 import { Button } from "react-bootstrap"
@@ -15,6 +16,17 @@ export default function UrediListuPakiranja() {
     const [putovanje, setPutovanje] = useState([])
     const [predmeti, setPredmeti] = useState([])
     const [pakiranja, setPakiranja] = useState([])
+
+    const [pakiranjeZaBrisanje, setPakiranjeZaBrisanje] = useState(null)
+    const [brisanjeUTijeku, setBrisanjeUTijeku] = useState(false)
+    const [greskaBrisanja, setGreskaBrisanja] = useState("")
+
+    const pakiranjaPutovanja = pakiranja.filter(
+        pakiranje => String(pakiranje.putovanjeSifra) === params.sifra
+    )
+    const nazivPredmetaZaBrisanje = predmeti.find(
+        predmet => predmet.sifra === pakiranjeZaBrisanje?.predmetSifra
+    )?.naziv
 
     useEffect(() => {
         ucitajPutovanje()
@@ -62,14 +74,31 @@ export default function UrediListuPakiranja() {
         ucitajPakiranja()
     }
 
-    async function obrisi(predmetSifra, putovanjeSifra) {
+    async function potvrdiBrisanje() {
+        if (!pakiranjeZaBrisanje || brisanjeUTijeku) return
 
-        await PakiranjaService.obrisi(
-            predmetSifra,
-            putovanjeSifra
-        )
+        const { predmetSifra, putovanjeSifra } = pakiranjeZaBrisanje
 
-        ucitajPakiranja()
+        setBrisanjeUTijeku(true)
+        setGreskaBrisanja("")
+
+        try {
+            const odgovor = await PakiranjaService.obrisi(predmetSifra, putovanjeSifra)
+
+            if (odgovor?.success === false) {
+                throw new Error(odgovor.message)
+            }
+
+            setPakiranja(stavke => stavke.filter(stavka =>
+                stavka.predmetSifra !== predmetSifra ||
+                stavka.putovanjeSifra !== putovanjeSifra
+            ))
+            setPakiranjeZaBrisanje(null)
+        } catch {
+            setGreskaBrisanja("Uklanjanje stavke nije uspjelo.")
+        } finally {
+            setBrisanjeUTijeku(false)
+        }
     }
 
     return (
@@ -105,59 +134,51 @@ export default function UrediListuPakiranja() {
                 </h4>
 
                 <div className="pakiranja-stavke">
-                    {pakiranja
-                        .filter((pakiranje) =>
-                            pakiranje.putovanjeSifra === params.sifra
-                        )
-                        .map((pakiranje) => (
-                            <div
-                                key={pakiranje.predmetSifra}
-                                className="pakiranje-red"
-                            >
-                                <div className="flex-grow-1">
-                                    <Pakiranje
-                                        pakiranje={pakiranje}
-                                        predmeti={predmeti}
-                                        promijeni={promijeni}
-                                    />
+                    {pakiranjaPutovanja.map((pakiranje) => (
+                        <div
+                            key={pakiranje.predmetSifra}
+                            className="pakiranje-red"
+                        >
+                            <div className="flex-grow-1">
+                                <Pakiranje
+                                    pakiranje={pakiranje}
+                                    predmeti={predmeti}
+                                    promijeni={promijeni}
+                                />
 
-                                    {pakiranje.napomena && (
-                                        <p
-                                            className="small text-muted mt-2 mb-0"
-                                            style={{
-                                                whiteSpace: "pre-wrap",
-                                                overflowWrap: "anywhere"
-                                            }}
-                                        >
-                                            {pakiranje.napomena}
-                                        </p>
-                                    )}
-                                </div>
-
-                                <Button
-                                    variant="danger"
-                                    size="sm"
-                                    onClick={() =>
-                                        obrisi(
-                                            pakiranje.predmetSifra,
-                                            pakiranje.putovanjeSifra
-                                        )
-                                    }
-                                >
-                                    <FaTrash />
-                                    Obriši
-                                </Button>
+                                {pakiranje.napomena && (
+                                    <p
+                                        className="small text-muted mt-2 mb-0"
+                                        style={{
+                                            whiteSpace: "pre-wrap",
+                                            overflowWrap: "anywhere"
+                                        }}
+                                    >
+                                        {pakiranje.napomena}
+                                    </p>
+                                )}
                             </div>
-                        ))}
+
+                            <Button
+                                variant="danger"
+                                size="sm"
+                                onClick={() => {
+                                    setGreskaBrisanja("")
+                                    setPakiranjeZaBrisanje(pakiranje)
+                                }}
+                            >
+                                <FaTrash />
+                                Obriši
+                            </Button>
+                        </div>
+                    ))}
                 </div>
 
-                {!pakiranja.some((pakiranje) =>
-                    pakiranje.putovanjeSifra === params.sifra
-                ) && (
-                        <p className="pakiranja-prazno">
-                            Lista je prazna. Dodaj prvi predmet ispod.
-                        </p>
-                    )}
+                {pakiranjaPutovanja.length === 0 && (
+                    <p className="pakiranja-prazno">
+                        Lista je prazna. Dodaj prvi predmet ispod.
+                    </p>
+                )}
 
                 <div className="pakiranja-dodavanje">
                     <h4 className="pakiranja-podnaslov">
@@ -172,6 +193,22 @@ export default function UrediListuPakiranja() {
                 </div>
 
             </div>
+
+            <PotvrdaBrisanja
+                otvoreno={pakiranjeZaBrisanje !== null}
+                naslov="Uklanjanje stavke s liste pakiranja"
+                tekstPotvrde="Ukloni"
+                brisanjeUTijeku={brisanjeUTijeku}
+                onOdustani={() => setPakiranjeZaBrisanje(null)}
+                onPotvrdi={potvrdiBrisanje}
+            >
+                <p className="mb-0">
+                    Želiš li ukloniti {nazivPredmetaZaBrisanje
+                        ? `„${nazivPredmetaZaBrisanje}”`
+                        : "ovu stavku"} s liste pakiranja?
+                </p>
+                {greskaBrisanja && <p className="text-danger mt-2 mb-0" role="alert">{greskaBrisanja}</p>}
+            </PotvrdaBrisanja>
 
         </section>
     )

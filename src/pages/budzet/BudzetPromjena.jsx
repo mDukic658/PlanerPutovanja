@@ -154,7 +154,7 @@ export default function BudzetPromjena() {
     }
 
     return (
-        <section className="budzet-promjena">
+        <section className="budzet-promjena mx-auto text-center">
             <Link to={povratak} className="natrag-na-pregled">
                 <FaArrowLeft />
                 {" "}Natrag na pregled budžeta
@@ -181,6 +181,7 @@ export default function BudzetPromjena() {
                         key={trosak.sifra}
                         onSubmit={obradiSubmit}
                         noValidate
+                        className="mx-auto"
                     >
                         <fieldset disabled={spremanje}>
                             <Form.Group controlId="trosak-naziv" className="mb-3">
